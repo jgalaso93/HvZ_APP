@@ -5,7 +5,7 @@
 """
 Simple Bot to reply to Telegram messages.
 
-First, a few handler functions are defined. Then, those functions are passed to
+First, ada few handler functions are defined. Then, those functions are passed to
 the Dispatcher and registered at their respective places.
 Then, the bot is started and runs until we press Ctrl-C on the command line.
 
@@ -37,6 +37,9 @@ def help(update, context):
     """Send a message when the command /help is issued."""
     update.message.reply_text('Esto es la ayuda!')
 
+def halal(update, context):
+    """Send a halal message when the command /halal is issued"""
+    update.message.reply_text('القرآن')
 
 def echo(update, context):
     """Echo the user message."""
