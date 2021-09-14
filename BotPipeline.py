@@ -41,6 +41,10 @@ def halal(update, context):
     """Send a halal message when the command /halal is issued"""
     update.message.reply_text('القرآن')
 
+def corruptus(update, context):
+    """Send corruptus description when the command /corruptus is issued"""
+    update.message.reply_text('Des de temps immemorials del passat, la diversitat d’idees ha portat a la Humanitat a viure grans guerres i conflictes que només han acabat amb la masacre de vides i amb la pèrdua dels nostres iguals. És hora de deixar enrere el individualisme egoista i el benestar personal i unir-nos sota un nou líder que alliberi finalment als éssers humans de la seva càrrega. No més desigualtat, no més destrucció. Volem un món pacífic per tots i això només ho aconseguirem plegats. La heterogeneïtat present en la societat és l’origen de tots els problemes actuals! És hora de canviar, uneix-te per preservar i salvar el planeta!')
+
 def echo(update, context):
     """Echo the user message."""
     # update.message.reply_text(update.message.text)
@@ -66,6 +70,7 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("halal", halal))
+    dp.add_handler(CommandHandler("corruptus", corruptus))
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, echo))
 
