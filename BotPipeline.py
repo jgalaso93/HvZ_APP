@@ -16,6 +16,9 @@ bot.
 """
 
 import logging
+import os
+import sys
+import pandas as pd
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
@@ -24,6 +27,32 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
+database_file = os.path.join(sys.path[0], 'database.csv')
+data = pd.read_csv(database_file, sep=';', header=0, dtype={'BOT_ID': str})
+
+
+# TOOLS
+def write_in_db(bot_id, field, value):
+    if bot_id in data['BOT_ID'].tolist():
+        pass
+    else:
+        new_register(bot_id, data)
+
+
+def new_register(bot_id, df):
+    new_row = dict()
+    field = 'BOT_ID'
+    for column in df.columns:
+        if column == field:
+            new_row[column] = str(bot_id)
+        else:
+            new_row[column] = 'unactive'
+
+    new_row['ID'] = max(data['ID']) + 1
+    df = df.append(new_row, ignore_index=True)
+    df.to_csv(database_file, index=False)
+
+# LOGIC AND FUNCTIONALITY
 
 
 # Define a few command handlers. These usually take the two arguments update and
@@ -33,22 +62,38 @@ def start(update, context):
     update.message.reply_text('Bienvenides a HvZ!')
 
 
+def register(update, context):
+    bot_id = update.message.chat['id']
+    if str(bot_id) in data['BOT_ID'].tolist():
+        update.message.reply_text('Tu registra ya está completado')
+    else:
+        new_register(bot_id, data)
+        update.message.reply_text('Te has registrado!')
+
+
 def help(update, context):
     """Send a message when the command /help is issued."""
     update.message.reply_text('Esto es la ayuda!')
+
 
 def halal(update, context):
     """Send a halal message when the command /halal is issued"""
     update.message.reply_text('القرآن')
 
+
 def corruptus(update, context):
     """Send corruptus description when the command /corruptus is issued"""
     update.message.reply_text('Des de temps immemorials del passat, la diversitat d’idees ha portat a la Humanitat a viure grans guerres i conflictes que només han acabat amb la masacre de vides i amb la pèrdua dels nostres iguals. És hora de deixar enrere el individualisme egoista i el benestar personal i unir-nos sota un nou líder que alliberi finalment als éssers humans de la seva càrrega. No més desigualtat, no més destrucció. Volem un món pacífic per tots i això només ho aconseguirem plegats. La heterogeneïtat present en la societat és l’origen de tots els problemes actuals! És hora de canviar, uneix-te per preservar i salvar el planeta!')
 
+
 def echo(update, context):
     """Echo the user message."""
-    # update.message.reply_text(update.message.text)
+    # update.message.reply_text(update.message.chat['id'])
     update.message.reply_text("Escribe /help para entrar a la ayuda")
+
+
+def get_my_id(update, context):
+    update.message.reply_text(update.message.chat['id'])
 
 
 def error(update, context):
@@ -71,6 +116,13 @@ def main():
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("halal", halal))
     dp.add_handler(CommandHandler("corruptus", corruptus))
+
+    # Util class to check the id of the conversation
+    dp.add_handler(CommandHandler("GetMyId", get_my_id))
+
+    # Test class to register
+    dp.add_handler(CommandHandler("register", register))
+
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, echo))
 
