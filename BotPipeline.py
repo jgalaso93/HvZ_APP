@@ -60,6 +60,77 @@ def missions(update, context):
                               '\n/Veterinaria'
                               '\n/FTI')
 
+
+def Aulari(update, context):
+    foto_path = sys.path[0]
+    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
+    foto_path = os.path.join(foto_path, 'Aulari Central')
+    # TODO: index WIP
+    index = 0
+    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
+    with open(final_foto_path, 'rb') as f:
+        update.message.reply_photo(f)
+
+def Carpa(update, context):
+    foto_path = sys.path[0]
+    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
+    foto_path = os.path.join(foto_path, 'Carpa letras')
+    # TODO: index WIP
+    index = 0
+    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
+    with open(final_foto_path, 'rb') as f:
+        update.message.reply_photo(f)
+
+def Civica(update, context):
+    foto_path = sys.path[0]
+    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
+    foto_path = os.path.join(foto_path, 'Civica')
+    # TODO: index WIP
+    index = 0
+    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
+    with open(final_foto_path, 'rb') as f:
+        update.message.reply_photo(f)
+
+def Comunicacio(update, context):
+    foto_path = sys.path[0]
+    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
+    foto_path = os.path.join(foto_path, 'Comunicación')
+    # TODO: index WIP
+    index = 0
+    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
+    with open(final_foto_path, 'rb') as f:
+        update.message.reply_photo(f)
+
+def Edifici_B_central(update, context):
+    foto_path = sys.path[0]
+    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
+    foto_path = os.path.join(foto_path, 'Edifici B central')
+    # TODO: index WIP
+    index = 0
+    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
+    with open(final_foto_path, 'rb') as f:
+        update.message.reply_photo(f)
+
+def Edifici_B_Nord(update, context):
+    foto_path = sys.path[0]
+    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
+    foto_path = os.path.join(foto_path, 'Edifici B Nord')
+    # TODO: index WIP
+    index = 0
+    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
+    with open(final_foto_path, 'rb') as f:
+        update.message.reply_photo(f)
+
+def Edifici_B_Sud(update, context):
+    foto_path = sys.path[0]
+    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
+    foto_path = os.path.join(foto_path, 'Edifici B Sud')
+    # TODO: index WIP
+    index = 0
+    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
+    with open(final_foto_path, 'rb') as f:
+        update.message.reply_photo(f)
+
 def Edifici_C(update, context):
     foto_path = sys.path[0]
     foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
@@ -70,6 +141,75 @@ def Edifici_C(update, context):
     with open(final_foto_path, 'rb') as f:
         update.message.reply_photo(f)
 
+def Educacio(update, context):
+    foto_path = sys.path[0]
+    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
+    foto_path = os.path.join(foto_path, 'Educació')
+    # TODO: index WIP
+    index = 0
+    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
+    with open(final_foto_path, 'rb') as f:
+        update.message.reply_photo(f)
+
+def Etse(update, context):
+    foto_path = sys.path[0]
+    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
+    foto_path = os.path.join(foto_path, 'Etse')
+    # TODO: index WIP
+    index = 0
+    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
+    with open(final_foto_path, 'rb') as f:
+        update.message.reply_photo(f)
+
+def FTI(update, context):
+    foto_path = sys.path[0]
+    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
+    foto_path = os.path.join(foto_path, 'FTI')
+    # TODO: index WIP
+    index = 0
+    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
+    with open(final_foto_path, 'rb') as f:
+        update.message.reply_photo(f)
+
+def Medicina(update, context):
+    foto_path = sys.path[0]
+    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
+    foto_path = os.path.join(foto_path, 'Medicina')
+    # TODO: index WIP
+    index = 0
+    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
+    with open(final_foto_path, 'rb') as f:
+        update.message.reply_photo(f)
+
+def SAF(update, context):
+    foto_path = sys.path[0]
+    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
+    foto_path = os.path.join(foto_path, 'SAF')
+    # TODO: index WIP
+    index = 0
+    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
+    with open(final_foto_path, 'rb') as f:
+        update.message.reply_photo(f)
+
+def Torres(update, context):
+    foto_path = sys.path[0]
+    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
+    foto_path = os.path.join(foto_path, 'Torres Applus')
+    # TODO: index WIP
+    index = 0
+    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
+    with open(final_foto_path, 'rb') as f:
+        update.message.reply_photo(f)
+
+def Veterinaria(update, context):
+    foto_path = sys.path[0]
+    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
+    foto_path = os.path.join(foto_path, 'Veterinaria')
+    # TODO: index WIP
+    index = 0
+    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
+    with open(final_foto_path, 'rb') as f:
+        update.message.reply_photo(f)
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
@@ -81,7 +221,7 @@ def start(update, context):
 def register(update, context):
     bot_id = update.message.chat['id']
     if str(bot_id) in data['BOT_ID'].tolist():
-        update.message.reply_text('Tu registra ya está completado')
+        update.message.reply_text('Tu registro ya está completado')
     else:
         new_register(bot_id, data)
         update.message.reply_text('Te has registrado!')
@@ -141,7 +281,21 @@ def main():
 
     # Mission handlers
     dp.add_handler(CommandHandler("missions", missions))
+    dp.add_handler(CommandHandler("Aulari", Aulari))
+    dp.add_handler(CommandHandler("Carpa", Carpa))
+    dp.add_handler(CommandHandler("Civica", Civica))
+    dp.add_handler(CommandHandler("Comunicació", Comunicacio))
+    dp.add_handler(CommandHandler("Edifici_B_Central", Edifici_B_central))
+    dp.add_handler(CommandHandler("Edifici_B_Nord", Edifici_B_Nord))
+    dp.add_handler(CommandHandler("Edifici_B_Sud", Edifici_B_Sud))
     dp.add_handler(CommandHandler("Edifici_C", Edifici_C))
+    dp.add_handler(CommandHandler("Educació", Educacio))
+    dp.add_handler(CommandHandler("ETSE", Etse))
+    dp.add_handler(CommandHandler("FTI", FTI))
+    dp.add_handler(CommandHandler("Medicina", Medicina))
+    dp.add_handler(CommandHandler("SAF", SAF))
+    dp.add_handler(CommandHandler("Torres", Torres))
+    dp.add_handler(CommandHandler("Veterinaria", Veterinaria))
 
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, echo))
