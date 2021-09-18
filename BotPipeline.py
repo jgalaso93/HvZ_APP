@@ -52,7 +52,23 @@ def new_register(bot_id, df):
     df = df.append(new_row, ignore_index=True)
     df.to_csv(database_file, index=False)
 
+
 # LOGIC AND FUNCTIONALITY
+def missions(update, context):
+    update.message.reply_text('En quina Zona vols fer una missio?'
+                              '\n/Edifici_C'
+                              '\n/Veterinaria'
+                              '\n/FTI')
+
+def Edifici_C(update, context):
+    foto_path = sys.path[0]
+    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
+    foto_path = os.path.join(foto_path, 'Edifici C')
+    # TODO: index WIP
+    index = 0
+    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
+    with open(final_foto_path, 'rb') as f:
+        update.message.reply_photo(f)
 
 
 # Define a few command handlers. These usually take the two arguments update and
@@ -122,6 +138,10 @@ def main():
 
     # Test class to register
     dp.add_handler(CommandHandler("register", register))
+
+    # Mission handlers
+    dp.add_handler(CommandHandler("missions", missions))
+    dp.add_handler(CommandHandler("Edifici_C", Edifici_C))
 
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, echo))

@@ -1,4 +1,5 @@
-ID;BOT_ID;Name;Corruptus;Anomalis
-0;1975576679;Clua;False;True
-1;981802604;Shaggy;True;False
-2;1930136278;unactive;unactive;unactive
+ID,BOT_ID,Name,Corruptus,Anomalis
+0,1975576679,Clua,False,True
+1,981802604,Shaggy,True,False
+2,1930136278,unactive,unactive,unactive
+3,932020044,unactive,unactive,unactive
