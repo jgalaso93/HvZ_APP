@@ -55,10 +55,22 @@ def new_register(bot_id, df):
 
 # LOGIC AND FUNCTIONALITY
 def missions(update, context):
-    update.message.reply_text('En quina Zona vols fer una missio?'
+    update.message.reply_text('En quina zona vols fer una missio?'
+                              '\n/Aulari'
+                              '\n/Carpa'
+                              '\n/Civica'
+                              '\n/Comunicacio'
+                              '\n/Edifici_B_central'
+                              '\n/Edifici_B_Nord'
+                              '\n/Edifici_B_Sud'
                               '\n/Edifici_C'
-                              '\n/Veterinaria'
-                              '\n/FTI')
+                              '\n/Educacio'
+                              '\n/Etse'
+                              '\n/FTI'
+                              '\n/Medicina'
+                              '\n/SAF'
+                              '\n/Torres'
+                              '\n/Veterinaria')
 
 
 def Aulari(update, context):
