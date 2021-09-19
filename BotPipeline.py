@@ -19,6 +19,9 @@ import logging
 import os
 import sys
 import pandas as pd
+import cv2
+import tempfile
+import shutil
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
@@ -32,6 +35,53 @@ data = pd.read_csv(database_file, sep=';', header=0, dtype={'BOT_ID': str})
 
 
 # TOOLS
+def read_QR(update, context):
+    # update.message.reply_text("Entro en read")
+    file = update.message.photo[-1].file_id
+    obj = context.bot.get_file(file)
+    tmp_dir = tempfile.mkdtemp()
+    filename = os.path.join(tmp_dir, 'tmp_file.jpg')
+    obj.download(filename)
+    img = cv2.imread(filename=filename)
+    shutil.rmtree(tmp_dir)
+    # print(img)
+    # update.message.reply_text("proceso hecho")
+    det = cv2.QRCodeDetector()
+    val, pts, st_code = det.detectAndDecode(img)
+    # update.message.reply_text("imagen detectada")
+    # print(val)
+    if val == "":
+        update.message.reply_text("Esta imagen no contiene ningún QR!")
+    else:
+        if val == 'mission_Politiques1':
+            update.message.reply_text("Vaig morir assesinat per un català amb un piolet a Mèxic després d'exiliar-m'hi. Se'm coneix per la URSS")
+        else:
+            update.message.reply_text(val)
+
+
+
+    # update.message.reply_text("Entro en read")
+    # update.message.reply_photo(update.message.photo[-1])
+    # cv2.imwrite('D:\\Proyectos\\HvZ\\HvZ PvE\\QR Holiwi2.png', update.message.photo[-1])
+    # det = cv2.QRCodeDetector()
+    # update.message.reply_text("qr detector activado")
+    # image_array = np.array(update.message.photo[-1])
+    # val, pts, st_code = det.detectAndDecode(image_array)
+    # update.message.reply_text("imagen detectada")
+
+    # img = cv2.imread(filename=update.message.photo)
+    # update.message.reply_text("imagen guardada")
+    # det = cv2.QRCodeDetector()
+    # update.message.reply_text("qr detectado")
+    # update.message.reply_text(img)
+    # val, pts, st_code = det.detectAndDecode(img)
+    # update.message.reply_text("val llenado")
+    # if val == '':
+    #     update.message.reply_text("En esta foto no hay ningún QR!!")
+    # else:
+    #     update.message.reply_text(val)
+
+
 def write_in_db(bot_id, field, value):
     if bot_id in data['BOT_ID'].tolist():
         pass
@@ -257,7 +307,12 @@ def corruptus(update, context):
 def echo(update, context):
     """Echo the user message."""
     # update.message.reply_text(update.message.chat['id'])
-    update.message.reply_text("Escribe /help para entrar a la ayuda")
+    if update.message.text == 'hola':
+        update.message.reply_text("Holiwi")
+    elif update.message.text == 'Lev Trotski':
+        update.message.reply_text("Correcte!! Has completat la missió activa P1. Obtens 10 Punts!!")
+    else:
+        update.message.reply_text("Escribe /help para entrar a la ayuda")
 
 
 def get_my_id(update, context):
@@ -309,8 +364,11 @@ def main():
     dp.add_handler(CommandHandler("Torres", Torres))
     dp.add_handler(CommandHandler("Veterinaria", Veterinaria))
 
-    # on noncommand i.e message - echo the message on Telegram
+    # on noncommand i.e message - tree decision (WIP)
     dp.add_handler(MessageHandler(Filters.text, echo))
+
+    # on noncommand i.e pictures - activate QR protocol
+    dp.add_handler(MessageHandler(Filters.photo, read_QR))
 
     # log all errors
     dp.add_error_handler(error)
