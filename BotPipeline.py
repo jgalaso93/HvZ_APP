@@ -32,6 +32,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 database_file = os.path.join(sys.path[0], 'database.csv')
 data = pd.read_csv(database_file, sep=';', header=0, dtype={'BOT_ID': str})
+registred_ids = data['BOT_ID'].tolist()
 
 
 # TOOLS
@@ -58,32 +59,8 @@ def read_QR(update, context):
         else:
             update.message.reply_text(val)
 
-
-
-    # update.message.reply_text("Entro en read")
-    # update.message.reply_photo(update.message.photo[-1])
-    # cv2.imwrite('D:\\Proyectos\\HvZ\\HvZ PvE\\QR Holiwi2.png', update.message.photo[-1])
-    # det = cv2.QRCodeDetector()
-    # update.message.reply_text("qr detector activado")
-    # image_array = np.array(update.message.photo[-1])
-    # val, pts, st_code = det.detectAndDecode(image_array)
-    # update.message.reply_text("imagen detectada")
-
-    # img = cv2.imread(filename=update.message.photo)
-    # update.message.reply_text("imagen guardada")
-    # det = cv2.QRCodeDetector()
-    # update.message.reply_text("qr detectado")
-    # update.message.reply_text(img)
-    # val, pts, st_code = det.detectAndDecode(img)
-    # update.message.reply_text("val llenado")
-    # if val == '':
-    #     update.message.reply_text("En esta foto no hay ningún QR!!")
-    # else:
-    #     update.message.reply_text(val)
-
-
 def write_in_db(bot_id, field, value):
-    if bot_id in data['BOT_ID'].tolist():
+    if bot_id in registred_ids:
         pass
     else:
         new_register(bot_id, data)
@@ -96,8 +73,11 @@ def new_register(bot_id, df):
         if column == field:
             new_row[column] = str(bot_id)
         else:
-            new_row[column] = 'unactive'
+            new_row[column] = 0
 
+    new_row['Level'] = 'Player'
+    new_row['Corruptus'] = 'False'
+    new_row['Anomalis'] = 'False'
     new_row['ID'] = max(data['ID']) + 1
     df = df.append(new_row, ignore_index=True)
     df.to_csv(database_file, index=False)
@@ -282,7 +262,7 @@ def start(update, context):
 
 def register(update, context):
     bot_id = update.message.chat['id']
-    if str(bot_id) in data['BOT_ID'].tolist():
+    if str(bot_id) in registred_ids:
         update.message.reply_text('Tu registro ya está completado')
     else:
         new_register(bot_id, data)
