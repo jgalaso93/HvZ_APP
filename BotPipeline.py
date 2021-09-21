@@ -31,13 +31,21 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 database_file = os.path.join(sys.path[0], 'database.csv')
-data = pd.read_csv(database_file, sep=';', header=0, dtype={'BOT_ID': str})
-registred_ids = data['BOT_ID'].tolist()
+try:
+    data = pd.read_csv(database_file, sep=';', header=0, dtype={'BOT_ID': str})
+    registred_ids = data['BOT_ID'].tolist()
+except:
+    data = pd.read_csv(database_file, sep=',', header=0, dtype={'BOT_ID': str})
+    registred_ids = data['BOT_ID'].tolist()
 
+mission_database_file = os.path.join(sys.path[0], 'mission_database.csv')
+mission_data = pd.read_csv(mission_database_file, sep=';', header=0,
+                           dtype={'MISSION': str, 'RESULT_POOL': str},
+                           encoding='cp1252')
+mission_ids = mission_data['MISSION_ID'].tolist()
 
 # TOOLS
 def read_QR(update, context):
-    # update.message.reply_text("Entro en read")
     file = update.message.photo[-1].file_id
     obj = context.bot.get_file(file)
     tmp_dir = tempfile.mkdtemp()
@@ -45,19 +53,28 @@ def read_QR(update, context):
     obj.download(filename)
     img = cv2.imread(filename=filename)
     shutil.rmtree(tmp_dir)
-    # print(img)
-    # update.message.reply_text("proceso hecho")
     det = cv2.QRCodeDetector()
     val, pts, st_code = det.detectAndDecode(img)
-    # update.message.reply_text("imagen detectada")
-    # print(val)
     if val == "":
         update.message.reply_text("Esta imagen no contiene ningún QR!")
     else:
-        if val == 'mission_Politiques1':
-            update.message.reply_text("Vaig morir assesinat per un català amb un piolet a Mèxic després d'exiliar-m'hi. Se'm coneix per la URSS")
+        if val in mission_ids:
+            throw_mission(update, val, update.message.chat['id'])
         else:
-            update.message.reply_text(val)
+            update.message.reply_text("Aquest QR no té cap missió associada!")
+
+
+def throw_mission(update, mission_id, user_id):
+    # TODO: Check mission is not already done
+    text = mission_data[mission_data['MISSION_ID'] == mission_id]['MISSION']
+    am = mission_data[mission_data['MISSION_ID'] == mission_id]['AM_BUILDING']
+    data.loc[data['BOT_ID'] == str(user_id), str(am.values[0])] = mission_id
+    data.to_csv(database_file, index=False)
+    try:
+        update.message.reply_text(text.values[0])
+    except:
+        update.message.reply_text("Hi ha un problema amb la base de dades d'aquesta missió, si us plau contacta amb el moderador Shaggy, gracies :)")
+
 
 def write_in_db(bot_id, field, value):
     if bot_id in registred_ids:
