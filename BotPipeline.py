@@ -69,7 +69,7 @@ def throw_mission(update, mission_id, user_id):
     text = mission_data[mission_data['MISSION_ID'] == mission_id]['MISSION']
     am = mission_data[mission_data['MISSION_ID'] == mission_id]['AM_BUILDING']
     data.loc[data['BOT_ID'] == str(user_id), str(am.values[0])] = mission_id
-    data.to_csv(database_file, index=False)
+    data.to_csv(database_file, index=False, sep=';')
     try:
         update.message.reply_text(text.values[0])
     except:
@@ -97,7 +97,7 @@ def new_register(bot_id, df):
     new_row['Anomalis'] = 'False'
     new_row['ID'] = max(data['ID']) + 1
     df = df.append(new_row, ignore_index=True)
-    df.to_csv(database_file, index=False)
+    df.to_csv(database_file, index=False, sep=';')
 
 
 # LOGIC AND FUNCTIONALITY
