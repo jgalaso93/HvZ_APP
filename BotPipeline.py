@@ -33,10 +33,10 @@ logger = logging.getLogger(__name__)
 database_file = os.path.join(sys.path[0], 'database.csv')
 try:
     data = pd.read_csv(database_file, sep=';', header=0, dtype={'BOT_ID': str})
-    registred_ids = data['BOT_ID'].tolist()
 except:
     data = pd.read_csv(database_file, sep=',', header=0, dtype={'BOT_ID': str})
-    registred_ids = data['BOT_ID'].tolist()
+
+registred_ids = data['BOT_ID'].tolist()
 
 mission_database_file = os.path.join(sys.path[0], 'mission_database.csv')
 mission_data = pd.read_csv(mission_database_file, sep=';', header=0,
@@ -44,7 +44,60 @@ mission_data = pd.read_csv(mission_database_file, sep=';', header=0,
                            encoding='cp1252')
 mission_ids = mission_data['MISSION_ID'].tolist()
 
+
 # TOOLS
+def all_active_missions(df, user_id):
+    """
+    For a given user_id returns all the active missions as a list of strings
+    """
+    active_missions = []
+    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_Aulari'])
+    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_Carpa'])
+    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_Civica'])
+    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_Comunicacio'])
+    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_EB_Sud'])
+    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_EB_Nord'])
+    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_EB_Central'])
+    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_ETSE'])
+    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_FTI'])
+    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_Med'])
+    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_SAF'])
+    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_EC'])
+    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_Torres'])
+    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_Vet'])
+    active_missions = list(filter(lambda x: x != ' ', active_missions))
+    return active_missions
+
+
+def valid_answers(df, tam):
+    """
+    For a given list of strings containing mission_id returns a dit with the mission_id as key and the possible
+    answers as value of the dict
+    """
+    va = dict()
+    for am in tam:
+        result_pool = df[df['MISSION_ID'] == am]['RESULT_POOL']
+        try:
+            va[am] = result_pool.values[0].split(", ")
+        except IndexError:
+            pass
+    return va
+
+
+def check_answer(user_id, answer):
+    """
+    For a given user_id and answer, check if the answer is part of a mission or not.
+    In case it is returns the mission_id for the given answer's mission
+    In case it is not, returns None
+    """
+    tam = all_active_missions(data, str(user_id))
+    va = valid_answers(mission_data, tam)
+    for key, value in va.items():
+        if answer in value:
+            return key
+
+    return None
+
 def read_QR(update, context):
     file = update.message.photo[-1].file_id
     obj = context.bot.get_file(file)
@@ -84,20 +137,63 @@ def write_in_db(bot_id, field, value):
 
 
 def new_register(bot_id, df):
+    global data
     new_row = dict()
     field = 'BOT_ID'
-    for column in df.columns:
+    for column in data.columns:
         if column == field:
             new_row[column] = str(bot_id)
         else:
             new_row[column] = 0
 
+    # Registration for new players
     new_row['Level'] = 'Player'
     new_row['Corruptus'] = 'False'
     new_row['Anomalis'] = 'False'
+
+    # Set missions to a empty value
+    new_row['AM_Aulari'] = ' '
+    new_row['AM_Carpa'] = ' '
+    new_row['AM_Civica'] = ' '
+    new_row['AM_Comunicacio'] = ' '
+    new_row['AM_EB_Sud'] = ' '
+    new_row['AM_EB_Nord'] = ' '
+    new_row['AM_EB_Central'] = ' '
+    new_row['AM_Educacio'] = ' '
+    new_row['AM_ETSE'] = ' '
+    new_row['AM_FTI'] = ' '
+    new_row['AM_Med'] = ' '
+    new_row['AM_SAF'] = ' '
+    new_row['AM_EC'] = ' '
+    new_row['AM_Torres'] = ' '
+    new_row['AM_Vet'] = ' '
+
+    new_row['DM_Aulari'] = ' '
+    new_row['DM_Carpa'] = ' '
+    new_row['DM_Civica'] = ' '
+    new_row['DM_Comunicacio'] = ' '
+    new_row['DM_EB_Sud'] = ' '
+    new_row['DM_EB_Nord'] = ' '
+    new_row['DM_EB_Central'] = ' '
+    new_row['DM_Educacio'] = ' '
+    new_row['DM_ETSE'] = ' '
+    new_row['DM_FTI'] = ' '
+    new_row['DM_Med'] = ' '
+    new_row['DM_SAF'] = ' '
+    new_row['DM_EC'] = ' '
+    new_row['DM_Torres'] = ' '
+    new_row['DM_Vet'] = ' '
+
+    # ID registration
     new_row['ID'] = max(data['ID']) + 1
-    df = df.append(new_row, ignore_index=True)
-    df.to_csv(database_file, index=False, sep=';')
+
+    # Save the new data to database
+    data = data.append(new_row, ignore_index=True)
+    data.to_csv(database_file, index=False, sep=';')
+
+    # Update the registred id's
+    global registred_ids
+    registred_ids = data['BOT_ID'].tolist()
 
 
 # LOGIC AND FUNCTIONALITY
@@ -302,14 +398,18 @@ def corruptus(update, context):
 
 
 def echo(update, context):
-    """Echo the user message."""
-    # update.message.reply_text(update.message.chat['id'])
-    if update.message.text == 'hola':
-        update.message.reply_text("Holiwi")
-    elif update.message.text == 'Lev Trotski':
-        update.message.reply_text("Correcte!! Has completat la missió activa P1. Obtens 10 Punts!!")
+    """Check the message and act if it's an answer"""
+    answer = update.message.text
+    user_id = update.message.chat['id']
+    if user_id in registred_ids:
+        new_register(user_id, data)
+    mission_solved = check_answer(user_id, answer)
+    if mission_solved:
+        to_send = "Enhorabona!! Has respost correctament la missio " + mission_solved + ". Continua així!"
+        update.message.reply_text(to_send)
     else:
-        update.message.reply_text("Escribe /help para entrar a la ayuda")
+        update.message.reply_text("El missatge que has enviat no és cap resposta de les teves missions actives!")
+        update.message.reply_text("Escriu /help per saber més de com funciona el bot")
 
 
 def get_my_id(update, context):
