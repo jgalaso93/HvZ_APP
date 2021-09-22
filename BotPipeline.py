@@ -164,8 +164,8 @@ def mission_accomplished(user_id, mission_id):
 
     data.loc[data['BOT_ID'] == user_id, am_filed] = ' '
     data.loc[data['BOT_ID'] == user_id, dm_field] = updated_done_missions
-    data.loc[data['BOT_ID'] == user_id, tm_field] = total_missions.values[0] + 1
-    data.loc[data['BOT_ID'] == user_id, p_field] = total_points.values[0] + mission_points
+    data.loc[data['BOT_ID'] == user_id, tm_field] = int(total_missions.values[0]) + 1
+    data.loc[data['BOT_ID'] == user_id, p_field] = int(total_points.values[0]) + int(mission_points)
 
     data.to_csv(database_file, index=False, sep=';')
 
@@ -512,7 +512,7 @@ def echo(update, context):
     if mission_solved:
         to_send = "Enhorabona!! Has respost correctament la missio " + mission_solved + ". Continua així!"
         update.message.reply_text(to_send)
-        mission_accomplished(user_id, mission_solved)
+        mission_accomplished(str(user_id), mission_solved)
     else:
         update.message.reply_text("El missatge que has enviat no és cap resposta de les teves missions actives!")
         update.message.reply_text("Escriu /help per saber més de com funciona el bot")
