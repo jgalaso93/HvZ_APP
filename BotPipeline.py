@@ -48,12 +48,21 @@ mission_ids = mission_data['MISSION_ID'].tolist()
 # TOOLS
 def mission_accomplished(user_id, mission_id):
     """
-    Function that erases the active mission and add the mission to the done pile
+    Function that handles an accomplished mission:
+     - Erases the active mission to empty
+     - Added the accomplished mission to the done pile
+     - Adds one the total mission accomplished
+     - Adds the points value to the total value points of the user
     """
     building = mission_data[mission_data['MISSION_ID'] == mission_id]['AM_BUILDING']
     am_filed = building.values[0]
     dm_field = 'D' + am_filed[1:]
+    tm_field = 'T' + am_filed[1:]
+    p_field = 'P' + am_filed[2:]
     done_missions = data[data['BOT_ID'] == user_id][dm_field]
+    total_missions = data[data['BOT_ID'] == user_id][tm_field]
+    mission_points = mission_data[mission_data['MISSION_ID'] == mission_id]['POINTS']
+    total_points = data[data['BOT_ID'] == user_id][p_field]
     try:
         if done_missions.values[0] == ' ':
             updated_done_missions = mission_id
@@ -62,8 +71,10 @@ def mission_accomplished(user_id, mission_id):
     except:
         updated_done_missions = mission_id
 
-    data.loc[data['BOT_ID'] == user_id, dm_field] = updated_done_missions
     data.loc[data['BOT_ID'] == user_id, am_filed] = ' '
+    data.loc[data['BOT_ID'] == user_id, dm_field] = updated_done_missions
+    data.loc[data['BOT_ID'] == user_id, tm_field] = total_missions.values[0] + 1
+    data.loc[data['BOT_ID'] == user_id, p_field] = total_points.values[0] + mission_points
 
     data.to_csv(database_file, index=False, sep=';')
 
@@ -89,6 +100,29 @@ def all_active_missions(df, user_id):
     active_missions.extend(df[df['BOT_ID'] == user_id]['AM_Vet'])
     active_missions = list(filter(lambda x: x != ' ', active_missions))
     return active_missions
+
+
+def amount_of_missions_done(df, user_id):
+    """
+    For a given user_id returns the amount of missions done by this user
+    """
+    amount_missions = []
+    amount_missions.extend(df[df['BOT_ID'] == user_id]['TM_Aulari'])
+    amount_missions.extend(df[df['BOT_ID'] == user_id]['TM_Carpa'])
+    amount_missions.extend(df[df['BOT_ID'] == user_id]['TM_Civica'])
+    amount_missions.extend(df[df['BOT_ID'] == user_id]['TM_Comunicacio'])
+    amount_missions.extend(df[df['BOT_ID'] == user_id]['TM_EB_Sud'])
+    amount_missions.extend(df[df['BOT_ID'] == user_id]['TM_EB_Nord'])
+    amount_missions.extend(df[df['BOT_ID'] == user_id]['TM_EB_Central'])
+    amount_missions.extend(df[df['BOT_ID'] == user_id]['TM_ETSE'])
+    amount_missions.extend(df[df['BOT_ID'] == user_id]['TM_FTI'])
+    amount_missions.extend(df[df['BOT_ID'] == user_id]['TM_Med'])
+    amount_missions.extend(df[df['BOT_ID'] == user_id]['TM_SAF'])
+    amount_missions.extend(df[df['BOT_ID'] == user_id]['TM_EC'])
+    amount_missions.extend(df[df['BOT_ID'] == user_id]['TM_Torres'])
+    amount_missions.extend(df[df['BOT_ID'] == user_id]['TM_Vet'])
+    amount_missions = list(filter(lambda x: x != ' ', amount_missions))
+    return amount_missions
 
 
 def all_done_missions(df, user_id):
