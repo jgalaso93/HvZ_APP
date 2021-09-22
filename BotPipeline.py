@@ -46,6 +46,28 @@ mission_ids = mission_data['MISSION_ID'].tolist()
 
 
 # TOOLS
+def mission_accomplished(user_id, mission_id):
+    """
+    Function that erases the active mission and add the mission to the done pile
+    """
+    building = mission_data[mission_data['MISSION_ID'] == mission_id]['AM_BUILDING']
+    am_filed = building.values[0]
+    dm_field = 'D' + am_filed[1:]
+    done_missions = data[data['BOT_ID'] == user_id][dm_field]
+    try:
+        if done_missions.values[0] == ' ':
+            updated_done_missions = mission_id
+        else:
+            updated_done_missions = done_missions.values[0] + ', ' + mission_id
+    except:
+        updated_done_missions = mission_id
+
+    data.loc[data['BOT_ID'] == user_id, dm_field] = updated_done_missions
+    data.loc[data['BOT_ID'] == user_id, am_filed] = ' '
+
+    data.to_csv(database_file, index=False, sep=';')
+
+
 def all_active_missions(df, user_id):
     """
     For a given user_id returns all the active missions as a list of strings
@@ -407,6 +429,7 @@ def echo(update, context):
     if mission_solved:
         to_send = "Enhorabona!! Has respost correctament la missio " + mission_solved + ". Continua així!"
         update.message.reply_text(to_send)
+        mission_accomplished(user_id, mission_solved)
     else:
         update.message.reply_text("El missatge que has enviat no és cap resposta de les teves missions actives!")
         update.message.reply_text("Escriu /help per saber més de com funciona el bot")
