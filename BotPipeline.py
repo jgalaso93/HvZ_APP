@@ -114,7 +114,7 @@ def amount_of_missions_done(df, user_id):
     return amount_missions
 
 
-def amount_of_missions_done(df, user_id):
+def user_points(df, user_id):
     """
     For a given user_id returns the amount of points achieved due to missions
     """
