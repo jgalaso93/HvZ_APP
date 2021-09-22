@@ -22,7 +22,7 @@ import pandas as pd
 import cv2
 import tempfile
 import shutil
-
+from random import randrange
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 # Enable logging
@@ -325,8 +325,8 @@ def Aulari(update, context):
     foto_path = sys.path[0]
     foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
     foto_path = os.path.join(foto_path, 'Aulari Central')
-    # TODO: index WIP
-    index = 0
+    number_of_photos = len(os.listdir(foto_path))
+    index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
     with open(final_foto_path, 'rb') as f:
         update.message.reply_photo(f)
@@ -335,8 +335,8 @@ def Carpa(update, context):
     foto_path = sys.path[0]
     foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
     foto_path = os.path.join(foto_path, 'Carpa letras')
-    # TODO: index WIP
-    index = 0
+    number_of_photos = len(os.listdir(foto_path))
+    index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
     with open(final_foto_path, 'rb') as f:
         update.message.reply_photo(f)
@@ -345,8 +345,8 @@ def Civica(update, context):
     foto_path = sys.path[0]
     foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
     foto_path = os.path.join(foto_path, 'Civica')
-    # TODO: index WIP
-    index = 0
+    number_of_photos = len(os.listdir(foto_path))
+    index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
     with open(final_foto_path, 'rb') as f:
         update.message.reply_photo(f)
@@ -355,8 +355,8 @@ def Comunicacio(update, context):
     foto_path = sys.path[0]
     foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
     foto_path = os.path.join(foto_path, 'Comunicación')
-    # TODO: index WIP
-    index = 0
+    number_of_photos = len(os.listdir(foto_path))
+    index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
     with open(final_foto_path, 'rb') as f:
         update.message.reply_photo(f)
@@ -365,8 +365,8 @@ def Edifici_B_central(update, context):
     foto_path = sys.path[0]
     foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
     foto_path = os.path.join(foto_path, 'Edifici B central')
-    # TODO: index WIP
-    index = 0
+    number_of_photos = len(os.listdir(foto_path))
+    index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
     with open(final_foto_path, 'rb') as f:
         update.message.reply_photo(f)
@@ -375,8 +375,8 @@ def Edifici_B_Nord(update, context):
     foto_path = sys.path[0]
     foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
     foto_path = os.path.join(foto_path, 'Edifici B Nord')
-    # TODO: index WIP
-    index = 0
+    number_of_photos = len(os.listdir(foto_path))
+    index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
     with open(final_foto_path, 'rb') as f:
         update.message.reply_photo(f)
@@ -385,8 +385,8 @@ def Edifici_B_Sud(update, context):
     foto_path = sys.path[0]
     foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
     foto_path = os.path.join(foto_path, 'Edifici B Sud')
-    # TODO: index WIP
-    index = 0
+    number_of_photos = len(os.listdir(foto_path))
+    index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
     with open(final_foto_path, 'rb') as f:
         update.message.reply_photo(f)
@@ -395,8 +395,8 @@ def Edifici_C(update, context):
     foto_path = sys.path[0]
     foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
     foto_path = os.path.join(foto_path, 'Edifici C')
-    # TODO: index WIP
-    index = 0
+    number_of_photos = len(os.listdir(foto_path))
+    index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
     with open(final_foto_path, 'rb') as f:
         update.message.reply_photo(f)
@@ -405,8 +405,8 @@ def Educacio(update, context):
     foto_path = sys.path[0]
     foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
     foto_path = os.path.join(foto_path, 'Educació')
-    # TODO: index WIP
-    index = 0
+    number_of_photos = len(os.listdir(foto_path))
+    index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
     with open(final_foto_path, 'rb') as f:
         update.message.reply_photo(f)
@@ -415,8 +415,8 @@ def Etse(update, context):
     foto_path = sys.path[0]
     foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
     foto_path = os.path.join(foto_path, 'Etse')
-    # TODO: index WIP
-    index = 0
+    number_of_photos = len(os.listdir(foto_path))
+    index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
     with open(final_foto_path, 'rb') as f:
         update.message.reply_photo(f)
@@ -425,8 +425,8 @@ def FTI(update, context):
     foto_path = sys.path[0]
     foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
     foto_path = os.path.join(foto_path, 'FTI')
-    # TODO: index WIP
-    index = 0
+    number_of_photos = len(os.listdir(foto_path))
+    index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
     with open(final_foto_path, 'rb') as f:
         update.message.reply_photo(f)
@@ -435,8 +435,8 @@ def Medicina(update, context):
     foto_path = sys.path[0]
     foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
     foto_path = os.path.join(foto_path, 'Medicina')
-    # TODO: index WIP
-    index = 0
+    number_of_photos = len(os.listdir(foto_path))
+    index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
     with open(final_foto_path, 'rb') as f:
         update.message.reply_photo(f)
@@ -445,8 +445,8 @@ def SAF(update, context):
     foto_path = sys.path[0]
     foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
     foto_path = os.path.join(foto_path, 'SAF')
-    # TODO: index WIP
-    index = 0
+    number_of_photos = len(os.listdir(foto_path))
+    index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
     with open(final_foto_path, 'rb') as f:
         update.message.reply_photo(f)
@@ -455,8 +455,8 @@ def Torres(update, context):
     foto_path = sys.path[0]
     foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
     foto_path = os.path.join(foto_path, 'Torres Applus')
-    # TODO: index WIP
-    index = 0
+    number_of_photos = len(os.listdir(foto_path))
+    index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
     with open(final_foto_path, 'rb') as f:
         update.message.reply_photo(f)
@@ -465,8 +465,8 @@ def Veterinaria(update, context):
     foto_path = sys.path[0]
     foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
     foto_path = os.path.join(foto_path, 'Veterinaria')
-    # TODO: index WIP
-    index = 0
+    number_of_photos = len(os.listdir(foto_path))
+    index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
     with open(final_foto_path, 'rb') as f:
         update.message.reply_photo(f)
