@@ -91,6 +91,29 @@ def all_active_missions(df, user_id):
     return active_missions
 
 
+def all_done_missions(df, user_id):
+    """
+    For a given user_id returns all the done missions as a list of strings
+    """
+    done_missions = []
+    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_Aulari'])
+    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_Carpa'])
+    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_Civica'])
+    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_Comunicacio'])
+    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_EB_Sud'])
+    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_EB_Nord'])
+    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_EB_Central'])
+    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_ETSE'])
+    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_FTI'])
+    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_Med'])
+    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_SAF'])
+    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_EC'])
+    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_Torres'])
+    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_Vet'])
+    done_missions = list(filter(lambda x: x != ' ', done_missions))
+    return done_missions
+
+
 def valid_answers(df, tam):
     """
     For a given list of strings containing mission_id returns a dit with the mission_id as key and the possible
@@ -134,7 +157,11 @@ def read_QR(update, context):
         update.message.reply_text("Esta imagen no contiene ningún QR!")
     else:
         if val in mission_ids:
-            throw_mission(update, val, update.message.chat['id'])
+            done_missions = all_done_missions(data, update.message.chat['id'])
+            if val in done_missions:
+                update.message.reply_text("Ja has fet aquesta missió!!")
+            else:
+                throw_mission(update, val, update.message.chat['id'])
         else:
             update.message.reply_text("Aquest QR no té cap missió associada!")
 
