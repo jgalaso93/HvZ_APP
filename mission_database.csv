@@ -2,3 +2,45 @@ MISSION_ID;AM_BUILDING;MISSION_P1;MISSION_P2;MISSION_P3;RESULT_POOL;HINT;POINTS
 C1;AM_EC;Com es diu el centre de recerca instal·lat en aquesta planta;;;ICTA;Esta a l'entrada;10
 C2;AM_EC;De quin color és la dutxa que tens a la dreta?;;;Groc, Groga;Dude.. really? En català;10
 C3;AM_EC;Quian funció té l’aparell gris metàl·lic gran d’aquest passadís?;;;Refrigerar, Arrefredar;És una paraula d'un sol verb;10
+C4;AM_EC;;;;;;10
+C5;AM_EC;;;;;;10
+C6;AM_EC;;;;;;10
+C7;AM_EC;;;;;;10
+C8;AM_EC;;;;;;10
+C9;AM_EC;;;;;;
+BNORD1;AM_EB_Nord;;;;;;
+BNORD2;AM_EB_Nord;;;;;;
+BNORD3;AM_EB_Nord;;;;;;
+BNORD4;;;;;;;
+COM1;AM_Comunicacio;;;;;;
+COM2;AM_Comunicacio;;;;;;
+COM3;;;;;;;
+VET1;AM_Vet;;;;;;
+VET2;AM_Vet;;;;;;
+VET3;;;;;;;
+VET4;;;;;;;
+VET5;;;;;;;
+MED1;AM_Med;;;;;;
+MED2;AM_Med;;;;;;
+MED3;AM_Med;;;;;;
+MED4;;;;;;;
+SAF1;AM_SAF;;;;;;
+SAF2;AM_SAF;;;;;;
+SAF3;;;;;;;
+SAF4;;;;;;;
+SAF5;;;;;;;
+BSUD1;AM_EB_Sud;;;;;;
+BSUD2;AM_EB_Sud;;;;;;
+BSUD3;;;;;;;
+BCEN1;AM_EB_Central;;;;;;
+BCEN2;AM_EB_Central;;;;;;
+BCEN3;;;;;;;
+FTI1;AM_FTI;;;;;;
+FTI2;AM_FTI;;;;;;
+FTI3;AM_FTI;;;;;;
+FTI4;;;;;;;
+ETSE1;AM_ETSE;;;;;;
+ETSE2;AM_ETSE;;;;;;
+ETSE3;AM_ETSE;;;;;;
+ETSE4;;;;;;;
+ETSE5;;;;;;;
