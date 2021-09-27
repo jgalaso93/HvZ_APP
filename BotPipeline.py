@@ -250,12 +250,12 @@ def new_register(bot_id, df):
         else:
             new_row[column] = 0
 
-    # Registration for new players7
+    # Registration for new players
+    new_row['ALIAS'] = 'no_alias'
     new_row['GUILD'] = ' '
-    new_row['GUILD_LEVEL'] = ' '
+    new_row['GUILD_LEVEL'] = 'unguilded'
     new_row['Level'] = 'Player'
-    new_row['Corruptus'] = 'False'
-    new_row['Anomalis'] = 'False'
+    new_row['FACTION'] = 'Neutral'
 
     # Set missions to a empty value
     new_row['AM_Aulari'] = ' '
@@ -513,13 +513,15 @@ def join_team(update, context):
 def show_team(update, context):
     bot_id = str(update.message.chat['id'])
     guild_name = str(data[data['BOT_ID'] == bot_id]['GUILD'].values[0])
+    if bot_id not in registred_ids:
+        new_register(bot_id, data)
+
     if guild_name == ' ':
         update.message.reply_text("No estàs a cap equip!")
     else:
         guild_ids = data[data['GUILD'] == guild_name]['BOT_ID'].tolist()
         output_text = ""
         for bid in guild_ids:
-            print(data[data['BOT_ID'] == bid]["ALIAS"])
             output_text += "La persona amb alies: " + str(data[data['BOT_ID'] == bid]["ALIAS"].values[0])
             done_missions = amount_of_missions_done(data, bid)
             tp = user_points(data, bid)
@@ -528,6 +530,39 @@ def show_team(update, context):
             output_text += " punts per la seva faccio\n\n"
 
         update.message.reply_text(output_text)
+
+
+# Personal stuff related methods
+def set_alias(update, context):
+    alias = str(update.message.text)[10:]
+    bot_id = str(update.message.chat['id'])
+    if bot_id not in registred_ids:
+        new_register(bot_id, data)
+
+    data.loc[data['BOT_ID'] == bot_id, 'ALIAS'] = alias
+    data.to_csv(database_file, index=False, sep=';')
+
+    output_text = 'El teu alias ha canviat correctament a ' + alias
+    update.message.reply_text(output_text)
+
+
+def show_me(update, context):
+    bot_id = str(update.message.chat['id'])
+    if bot_id not in registred_ids:
+        new_register(bot_id, data)
+
+    output_text = "El teu alias és " + str(data[data['BOT_ID'] == bot_id]['ALIAS'].values[0]) + "\n"
+    output_text += "El teu equip és " + str(data[data['BOT_ID'] == bot_id]['GUILD'].values[0]) + "\n"
+    output_text += "El teu rang és " + str(data[data['BOT_ID'] == bot_id]['GUILD_LEVEL'].values[0]) + "\n"
+    output_text += "La teva facció és " + str(data[data['BOT_ID'] == bot_id]['FACTION'].values[0]) + "\n"
+
+    dm = amount_of_missions_done(data, bot_id)
+    tp = user_points(data, bot_id)
+
+    output_text += "Has fet un total de " + str(dm) + " missions per tot el campus\n"
+    output_text += "Tens acumulats un total de " + str(tp) + " punts per la teva facció\n"
+
+    update.message.reply_text(output_text)
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
@@ -605,6 +640,10 @@ def main():
     dp.add_handler(CommandHandler("createteam", create_team))
     dp.add_handler(CommandHandler("jointeam", join_team))
     dp.add_handler(CommandHandler("showteam", show_team))
+
+    # Commands related to personal stuff
+    dp.add_handler(CommandHandler("setalias", set_alias))
+    dp.add_handler(CommandHandler("stats", show_me))
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
