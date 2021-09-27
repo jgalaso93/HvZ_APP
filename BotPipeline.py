@@ -223,7 +223,6 @@ def read_QR(update, context):
 
 
 def throw_mission(update, mission_id, user_id):
-    # TODO: Check mission is not already done
     text = mission_data[mission_data['MISSION_ID'] == mission_id]['MISSION']
     am = mission_data[mission_data['MISSION_ID'] == mission_id]['AM_BUILDING']
     data.loc[data['BOT_ID'] == str(user_id), str(am.values[0])] = mission_id
@@ -251,7 +250,9 @@ def new_register(bot_id, df):
         else:
             new_row[column] = 0
 
-    # Registration for new players
+    # Registration for new players7
+    new_row['GUILD'] = ' '
+    new_row['GUILD_LEVEL'] = ' '
     new_row['Level'] = 'Player'
     new_row['Corruptus'] = 'False'
     new_row['Anomalis'] = 'False'
@@ -478,6 +479,22 @@ def start(update, context):
     update.message.reply_text('Bienvenides a HvZ!')
 
 
+def create_team(update, context):
+    global data
+    team_name = str(update.message.text)[12:]
+    user_id = str(update.message.chat['id'])
+    if user_id not in registred_ids:
+        new_register(user_id, data)
+
+    data.loc[data['BOT_ID'] == user_id, 'GUILD'] = team_name
+    data.loc[data['BOT_ID'] == user_id, 'GUILD_LEVEL'] = 'Founder'
+
+    data.to_csv(database_file, index=False, sep=';')
+
+    reply_message = "L'equip " + team_name + " s'ha creat correctament!!! El teu rang és \"Founder\""
+    update.message.reply_text(reply_message)
+
+
 def register(update, context):
     bot_id = update.message.chat['id']
     if str(bot_id) in registred_ids:
@@ -522,6 +539,12 @@ def get_my_id(update, context):
     update.message.reply_text(update.message.chat['id'])
 
 
+def test(update, context):
+    print(update.message)
+    print(update.message.text)
+    print(str(update.message.text)[6:])
+
+
 def error(update, context):
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, context.error)
@@ -542,6 +565,8 @@ def main():
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("halal", halal))
     dp.add_handler(CommandHandler("corruptus", corruptus))
+    dp.add_handler(CommandHandler("createteam", create_team))
+    dp.add_handler(CommandHandler("test", test))
 
     # Util class to check the id of the conversation
     dp.add_handler(CommandHandler("GetMyId", get_my_id))
