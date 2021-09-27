@@ -111,7 +111,7 @@ def amount_of_missions_done(df, user_id):
     amount_missions += df[df['BOT_ID'] == user_id]['TM_EC']
     amount_missions += df[df['BOT_ID'] == user_id]['TM_Torres']
     amount_missions += df[df['BOT_ID'] == user_id]['TM_Vet']
-    return amount_missions
+    return amount_missions.values[0]
 
 
 def user_points(df, user_id):
@@ -133,7 +133,7 @@ def user_points(df, user_id):
     total_points += df[df['BOT_ID'] == user_id]['P_EC']
     total_points += df[df['BOT_ID'] == user_id]['P_Torres']
     total_points += df[df['BOT_ID'] == user_id]['P_Vet']
-    return total_points
+    return total_points.values[0]
 
 
 # TOOLS
@@ -472,13 +472,8 @@ def Veterinaria(update, context):
     with open(final_foto_path, 'rb') as f:
         update.message.reply_photo(f)
 
-# Define a few command handlers. These usually take the two arguments update and
-# context. Error handlers also receive the raised TelegramError object in error.
-def start(update, context):
-    """Send a message when the command /start is issued."""
-    update.message.reply_text('Bienvenides a HvZ!')
 
-
+# Team related functions
 def create_team(update, context):
     global data
     team_name = str(update.message.text)[12:]
@@ -514,6 +509,31 @@ def join_team(update, context):
     else:
         reply_message = "L'equip " + team_name + " no existeix!!! Comproba que ho hagis escrit correctament! Majúscules incloses!"
         update.message.reply_text(reply_message)
+
+def show_team(update, context):
+    bot_id = str(update.message.chat['id'])
+    guild_name = str(data[data['BOT_ID'] == bot_id]['GUILD'].values[0])
+    if guild_name == ' ':
+        update.message.reply_text("No estàs a cap equip!")
+    else:
+        guild_ids = data[data['GUILD'] == guild_name]['BOT_ID'].tolist()
+        output_text = ""
+        for bid in guild_ids:
+            print(data[data['BOT_ID'] == bid]["ALIAS"])
+            output_text += "La persona amb alies: " + str(data[data['BOT_ID'] == bid]["ALIAS"].values[0])
+            done_missions = amount_of_missions_done(data, bid)
+            tp = user_points(data, bid)
+            output_text += " ha fet " + str(done_missions) + " missions"
+            output_text += "\nTé acumulats " + str(tp)
+            output_text += " punts per la seva faccio\n\n"
+
+        update.message.reply_text(output_text)
+
+# Define a few command handlers. These usually take the two arguments update and
+# context. Error handlers also receive the raised TelegramError object in error.
+def start(update, context):
+    """Send a message when the command /start is issued."""
+    update.message.reply_text('Bienvenides a HvZ!')
 
 
 def register(update, context):
@@ -581,13 +601,16 @@ def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
+    # Commands related to teams
+    dp.add_handler(CommandHandler("createteam", create_team))
+    dp.add_handler(CommandHandler("jointeam", join_team))
+    dp.add_handler(CommandHandler("showteam", show_team))
+
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("halal", halal))
     dp.add_handler(CommandHandler("corruptus", corruptus))
-    dp.add_handler(CommandHandler("createteam", create_team))
-    dp.add_handler(CommandHandler("jointeam", join_team))
     dp.add_handler(CommandHandler("test", test))
 
     # Util class to check the id of the conversation
