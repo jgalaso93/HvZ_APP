@@ -510,6 +510,7 @@ def join_team(update, context):
         reply_message = "L'equip " + team_name + " no existeix!!! Comproba que ho hagis escrit correctament! Majúscules incloses!"
         update.message.reply_text(reply_message)
 
+
 def show_team(update, context):
     bot_id = str(update.message.chat['id'])
     guild_name = str(data[data['BOT_ID'] == bot_id]['GUILD'].values[0])
@@ -532,6 +533,35 @@ def show_team(update, context):
         update.message.reply_text(output_text)
 
 
+def promote(update, context):
+    text = str(update.message.text)[9:]
+    values = text.split(", ")
+    bot_id = str(update.message.chat['id'])
+
+    if bot_id not in registred_ids:
+        new_register(bot_id, data)
+        update.message.reply_text("El teu registre no estava complert! Si us plau uneix-te a un equip primer")
+        return 0
+
+    own_alias = str(data[data['BOT_ID'] == bot_id]['ALIAS'].values[0])
+    guild_name = str(data[data['BOT_ID'] == bot_id]['GUILD'].values[0])
+    if guild_name == " ":
+        update.message.reply_text("No formes part de cap equip!")
+        return 0
+
+    guild_level = str(data[data['BOT_ID'] == bot_id]['GUILD_LEVEL'].values[0])
+    if guild_level != "Founder":
+        update.message.reply_text("Només els \"Founders\" poden promocionar gent del seu equip!")
+        return 0
+
+    if values[0] == own_alias:
+        update.message.reply_text("Els \"Founders\" no poden canviar el seu propi rang!")
+        return 0
+
+    data.loc[(data['GUILD'] == guild_name) & (data['ALIAS'] == str(values[0])), 'GUILD_LEVEL'] = str(values[1])
+    data.to_csv(database_file, index=False, sep=';')
+
+
 # Personal stuff related methods
 def set_alias(update, context):
     alias = str(update.message.text)[10:]
@@ -539,11 +569,14 @@ def set_alias(update, context):
     if bot_id not in registred_ids:
         new_register(bot_id, data)
 
-    data.loc[data['BOT_ID'] == bot_id, 'ALIAS'] = alias
-    data.to_csv(database_file, index=False, sep=';')
+    if alias == '' or alias is None:
+        update.message.reply_text("L'alias que has escollit no és vàlid!!")
+    else:
+        data.loc[data['BOT_ID'] == bot_id, 'ALIAS'] = alias
+        data.to_csv(database_file, index=False, sep=';')
 
-    output_text = 'El teu alias ha canviat correctament a ' + alias
-    update.message.reply_text(output_text)
+        output_text = 'El teu alias ha canviat correctament a ' + alias
+        update.message.reply_text(output_text)
 
 
 def show_me(update, context):
@@ -640,6 +673,7 @@ def main():
     dp.add_handler(CommandHandler("createteam", create_team))
     dp.add_handler(CommandHandler("jointeam", join_team))
     dp.add_handler(CommandHandler("showteam", show_team))
+    dp.add_handler(CommandHandler("promote", promote))
 
     # Commands related to personal stuff
     dp.add_handler(CommandHandler("setalias", set_alias))
