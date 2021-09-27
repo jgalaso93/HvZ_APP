@@ -495,6 +495,27 @@ def create_team(update, context):
     update.message.reply_text(reply_message)
 
 
+def join_team(update, context):
+    global data
+    team_name = str(update.message.text)[10:]
+    user_id = str(update.message.chat['id'])
+    if user_id not in registred_ids:
+        new_register(user_id, data)
+
+    if team_name in data['GUILD'].tolist():
+        data.loc[data['BOT_ID'] == user_id, 'GUILD'] = team_name
+        data.loc[data['BOT_ID'] == user_id, 'GUILD_LEVEL'] = 'Newbie'
+
+        data.to_csv(database_file, index=False, sep=';')
+
+        reply_message = "T'has unit a l'equip " + team_name + " correctament!!! El teu rang és \"Newbie\""
+        update.message.reply_text(reply_message)
+
+    else:
+        reply_message = "L'equip " + team_name + " no existeix!!! Comproba que ho hagis escrit correctament! Majúscules incloses!"
+        update.message.reply_text(reply_message)
+
+
 def register(update, context):
     bot_id = update.message.chat['id']
     if str(bot_id) in registred_ids:
@@ -566,6 +587,7 @@ def main():
     dp.add_handler(CommandHandler("halal", halal))
     dp.add_handler(CommandHandler("corruptus", corruptus))
     dp.add_handler(CommandHandler("createteam", create_team))
+    dp.add_handler(CommandHandler("jointeam", join_team))
     dp.add_handler(CommandHandler("test", test))
 
     # Util class to check the id of the conversation
