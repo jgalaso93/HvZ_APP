@@ -199,7 +199,27 @@ def check_answer(user_id, answer):
 
     return None
 
+
+def check_pic(user_id, photo_id):
+    df_pics = os.path.join(sys.path[0], 'fotos_database.csv')
+    db_pics = pd.read_csv(df_pics, sep=';', header=0)
+    pics = db_pics['IMAGE_ID'].tolist()
+    if photo_id in pics:
+        return True
+    else:
+        new_row = dict()
+        new_row['BOT_ID'] = user_id
+        new_row['IMAGE_ID'] = photo_id
+
+        db_pics = db_pics.append(new_row, ignore_index=True)
+        db_pics.to_csv(df_pics, index=False, sep=';')
+        return False
+
+
 def read_QR(update, context):
+    if check_pic(str(update.message.chat['id']), update.message.photo[-1].file_unique_id):
+        update.message.reply_text("Aquesta foto ja s'ha fet servir!!")
+        return 0
     file = update.message.photo[-1].file_id
     obj = context.bot.get_file(file)
     tmp_dir = tempfile.mkdtemp()
@@ -223,7 +243,7 @@ def read_QR(update, context):
 
 
 def throw_mission(update, mission_id, user_id):
-    text = mission_data[mission_data['MISSION_ID'] == mission_id]['MISSION']
+    text = mission_data[mission_data['MISSION_ID'] == mission_id]['MISSION_P1']
     am = mission_data[mission_data['MISSION_ID'] == mission_id]['AM_BUILDING']
     data.loc[data['BOT_ID'] == str(user_id), str(am.values[0])] = mission_id
     data.to_csv(database_file, index=False, sep=';')
@@ -561,6 +581,9 @@ def promote(update, context):
     data.loc[(data['GUILD'] == guild_name) & (data['ALIAS'] == str(values[0])), 'GUILD_LEVEL'] = str(values[1])
     data.to_csv(database_file, index=False, sep=';')
 
+    output_text = "Totes les persones amb alies " + values[0] + " han sigut ascendides a " + values[1]
+    update.message.reply_text(output_text)
+
 
 # Personal stuff related methods
 def set_alias(update, context):
@@ -664,7 +687,11 @@ def main():
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater("1975748853:AAG2-lzGxFToo0d2-hVwQQ7f_t499SEU_fk", use_context=True)
+    updater = Updater("1975748853:AAAG2-lzGxFToo0d2-hVwQQ7f_t499SEU_fk", use_context=True)
+    path = os.path.join(sys.path[0], 'zarigueyas.txt')
+    file = open(path, "r")
+    zz = file.read()
+    updater = Updater(zz, use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
