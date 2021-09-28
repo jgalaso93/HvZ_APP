@@ -620,6 +620,22 @@ def show_me(update, context):
 
     update.message.reply_text(output_text)
 
+
+def activity(update, context):
+    bot_id = str(update.message.chat['id'])
+    if bot_id not in registred_ids:
+        new_register(bot_id, data)
+
+    am = all_active_missions(data, bot_id)
+    output_text = "Missions actives acutals, codi i enunciat\n"
+    for m in am:
+        output_text += str(m) + ": "
+        output_text += str(mission_data[mission_data['MISSION_ID'] == m]['MISSION_P1'].values[0])
+        output_text += "\n"
+
+    update.message.reply_text(output_text)
+
+
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
 def start(update, context):
@@ -687,10 +703,11 @@ def main():
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater("1975748853:AAAG2-lzGxFToo0d2-hVwQQ7f_t499SEU_fk", use_context=True)
+    updater = Updater("1975748853:AAG2-lzGxFToo0d2-hVwQQ7f_t499SEU_fk", use_context=True)
     path = os.path.join(sys.path[0], 'zarigueyas.txt')
     file = open(path, "r")
     zz = file.read()
+    file.close()
     updater = Updater(zz, use_context=True)
 
     # Get the dispatcher to register handlers
@@ -705,6 +722,7 @@ def main():
     # Commands related to personal stuff
     dp.add_handler(CommandHandler("setalias", set_alias))
     dp.add_handler(CommandHandler("stats", show_me))
+    dp.add_handler(CommandHandler("activity", activity))
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
