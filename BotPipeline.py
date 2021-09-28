@@ -636,6 +636,31 @@ def activity(update, context):
     update.message.reply_text(output_text)
 
 
+def hint(update, context):
+    bot_id = str(update.message.chat['id'])
+    if bot_id not in registred_ids:
+        new_register(bot_id, data)
+
+    am = str(update.message.text)[6:]
+
+    real_active = all_active_missions(data, bot_id)
+    if am not in real_active:
+        output_text = "La missió per la que demanes pista no és una missió que tinguis activa! " \
+                      "Troba i escaneja el seu QR primer!"
+        update.message.reply_text(output_text)
+        return 0
+
+    try:
+        pista = str(mission_data[mission_data['MISSION_ID'] == am]['HINT'].values[0])
+        output_text = "La pista per la missió amb codi " + am + " és:\n"
+        output_text += pista
+
+    except IndexError:
+        output_text = "La missió de la qual demanes no té pista"
+
+    update.message.reply_text(output_text)
+
+
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
 def start(update, context):
@@ -723,6 +748,7 @@ def main():
     dp.add_handler(CommandHandler("setalias", set_alias))
     dp.add_handler(CommandHandler("stats", show_me))
     dp.add_handler(CommandHandler("activity", activity))
+    dp.add_handler(CommandHandler("hint", hint))
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
