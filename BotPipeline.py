@@ -44,6 +44,9 @@ mission_data = pd.read_csv(mission_database_file, sep=';', header=0,
                            encoding='cp1252')
 mission_ids = mission_data['MISSION_ID'].tolist()
 
+NPC_file = os.path.join(sys.path[0], 'NPC_database.csv')
+NPC_data = pd.read_csv(NPC_file, sep=';', header=0)
+
 
 # Functions about all the things of a given user
 def all_active_missions(df, user_id):
@@ -167,7 +170,36 @@ def mission_accomplished(user_id, mission_id):
     data.loc[data['BOT_ID'] == user_id, tm_field] = int(total_missions.values[0]) + 1
     data.loc[data['BOT_ID'] == user_id, p_field] = int(total_points.values[0]) + int(mission_points)
 
+    try:
+        npc = str(mission_data[mission_data['MISSION_ID'] == mission_id]['NPC'].values[0])
+        faction = str(data[data['BOT_ID'] == user_id]['FACTION'].values[0])
+        add_influence(npc, mission_points % 10, faction)
+    except IndexError:
+        pass
+
     data.to_csv(database_file, index=False, sep=';')
+
+
+def add_influence(npc_name, influence_points, user_faction):
+    actual_points = NPC_data[NPC_data['NAME'] == npc_name]['FAVOR']
+    favor_value = position_value(actual_points, user_faction)
+    NPC_data.loc[NPC_data['NAME'] == npc_name, 'FAVOR'] = actual_points + (influence_points * favor_value)
+    NPC_data.to_csv(NPC_file, index=False, sep=';')
+
+
+def position_value(npc_favor, user_faction):
+    if user_faction == 'Anomalis':
+        return 1
+    if user_faction == 'Corruptus':
+        return -1
+
+    if user_faction == 'Neutral':
+        if npc_favor > 0:
+            return -1
+        if npc_favor < 0:
+            return 1
+        if npc_favor == 0:
+            return 0
 
 
 def valid_answers(df, tam):

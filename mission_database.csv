@@ -1,46 +1,46 @@
-MISSION_ID;AM_BUILDING;MISSION_P1;MISSION_P2;MISSION_P3;RESULT_POOL;HINT;POINTS
-C1;AM_EC;Com es diu el centre de recerca instal·lat en aquesta planta;;;ICTA;Esta a l'entrada;10
-C2;AM_EC;De quin color és la dutxa que tens a la dreta?;;;Groc, Groga;Dude.. really? En català;10
-C3;AM_EC;Quian funció té l’aparell gris metàl·lic gran d’aquest passadís?;;;Refrigerar, Arrefredar;És una paraula d'un sol verb;10
-C4;AM_EC;He guanyat un premi nobel gràcies a la radioactivitat del 84;;;Marie Curie;1=H, Mira davant teu ;10
-C5;AM_EC;"Una de les meves frases més celebres és: ""Ne pleure pas, Alfred ! J'ai besoin de tout mon courage pour mourir à vingt ans ! (No ploris Alfred! Em cal tot el meu coratge per a morir a vint anys)""";;;Evariste Galois;Google it;10
-C6;AM_EC;Acabo de demostrar que tota acció té una reacció.;;;Sir Isaac Newton, Isaac Newton;The apple is a lie;10
-C7;AM_EC;He escrit l’equació que relaciona l’energia d’un cos amb la seva massa i velocitat;;;Albert Einstein;E=mc^2;10
-C8;AM_EC;He estat la primera persona del món en fotografiar informació cel·lular i em recorda subtilment a un helicòpter. Tot i això, encara no he rebut cap reconeixement… Estic decepcionada.;;;Rosalind Franklin;Estructura en forma d’hèlix de l’ADN;10
-C9;;;;;;;
-BNORD1;AM_EB_Nord;Reconeixes aquest fragment d’una obra de teatre? L’he escrit  jo! “Te lo ruego buen Mercucio, vámonos. Hace calor, los Capuletos han salido y, si los encontramos, tendremos pelea, pues este calor inflama la sangre.”;;;William Shakespeare;Autor anglès, 23 d’abril;10
-BNORD2;AM_EB_Nord;Em considero molt bona escriptora i n’estic molt ORGULLOSA, sobretot de comèdies, però publico en anònim per por als PREJUDICIS.;;;Jane Austen;Un llibre sempre comença amb majúscula;10
-BNORD3;AM_EB_Nord;Pren nota siusplau. La negació del tot és l'afirmació del no res;;;Sòcrates;El meu deixeble és bon escriptor;10
-BNORD4;;;;;;;
-COM1;AM_Comunicacio;He llegit un llibre per la ràdio i sóc tan bo que la gent pensa que de veritat ens estan envaint els alienígenes. Qui sóc?;;;Orson Welles;És el director de ciutadà Kane;10
-COM2;AM_Comunicacio;Tot i que el meu nom de pila és Norma Jeane Baker, pràcticament ningú em coneix com a tal;;;Marilyn Monroe;Sóc la estrella principal de la pel·lícula Niagara (1953);10
-COM3;;;;;;;
-VET1;AM_Vet;Enfronto cada dia a caçadors furtius per protegir els goril·les de muntanya de l’extinció.;;;Dian Fossey;A 1983 publico “Goril·les en la boira”;10
-VET2;AM_Vet;;;;Steve Irwin;;10
-VET3;;;;;;;
-VET4;;;;;;;
-VET5;;;;;;;
-MED1;AM_Med;;;;;;10
-MED2;AM_Med;;;;;;10
-MED3;AM_Med;;;;;;10
-MED4;;;;;;;
-SAF1;AM_SAF;;;;;;10
-SAF2;AM_SAF;;;;;;10
-SAF3;;;;;;;
-SAF4;;;;;;;
-SAF5;;;;;;;
-BSUD1;AM_EB_Sud;;;;;;10
-BSUD2;AM_EB_Sud;;;;;;10
-BSUD3;;;;;;;
-BCEN1;AM_EB_Central;;;;;;10
-BCEN2;AM_EB_Central;;;;;;10
-BCEN3;;;;;;;
-FTI1;AM_FTI;;;;;;10
-FTI2;AM_FTI;;;;;;10
-FTI3;AM_FTI;;;;;;10
-FTI4;;;;;;;
-ETSE1;AM_ETSE;;;;;;10
-ETSE2;AM_ETSE;;;;;;10
-ETSE3;AM_ETSE;;;;;;10
-ETSE4;;;;;;;
-ETSE5;;;;;;;
+MISSION_ID;AM_BUILDING;MISSION_P1;MISSION_P2;MISSION_P3;RESULT_POOL;HINT;POINTS;NPC
+C1;AM_EC;Com es diu el centre de recerca instal·lat en aquesta planta;;;ICTA;Esta a l'entrada;10;
+C2;AM_EC;De quin color és la dutxa que tens a la dreta?;;;Groc, Groga;Dude.. really? En català;10;
+C3;AM_EC;Quian funció té l’aparell gris metàl·lic gran d’aquest passadís?;;;Refrigerar, Arrefredar;És una paraula d'un sol verb;10;
+C4;AM_EC;He guanyat un premi nobel gràcies a la radioactivitat del 84;;;Marie Curie;1=H, Mira davant teu ;10;Marie Curie
+C5;AM_EC;"Una de les meves frases més celebres és: ""Ne pleure pas, Alfred ! J'ai besoin de tout mon courage pour mourir à vingt ans ! (No ploris Alfred! Em cal tot el meu coratge per a morir a vint anys)""";;;Evariste Galois;Google it;10;Evariste Galois
+C6;AM_EC;Acabo de demostrar que tota acció té una reacció.;;;Sir Isaac Newton, Isaac Newton;The apple is a lie;10;Isaac Newton
+C7;AM_EC;He escrit l’equació que relaciona l’energia d’un cos amb la seva massa i velocitat;;;Albert Einstein;E=mc^2;10;Albert Einstein
+C8;AM_EC;He estat la primera persona del món en fotografiar informació cel·lular i em recorda subtilment a un helicòpter. Tot i això, encara no he rebut cap reconeixement… Estic decepcionada.;;;Rosalind Franklin;Estructura en forma d’hèlix de l’ADN;10;Rosalind Franklin
+C9;;;;;;;;
+BNORD1;AM_EB_Nord;Reconeixes aquest fragment d’una obra de teatre? L’he escrit  jo! “Te lo ruego buen Mercucio, vámonos. Hace calor, los Capuletos han salido y, si los encontramos, tendremos pelea, pues este calor inflama la sangre.”;;;William Shakespeare;Autor anglès, 23 d’abril;10;William Shakespeare
+BNORD2;AM_EB_Nord;Em considero molt bona escriptora i n’estic molt ORGULLOSA, sobretot de comèdies, però publico en anònim per por als PREJUDICIS.;;;Jane Austen;Un llibre sempre comença amb majúscula;10;Jane Austen
+BNORD3;AM_EB_Nord;Pren nota siusplau. La negació del tot és l'afirmació del no res;;;Sòcrates;El meu deixeble és bon escriptor;10;Sòcrates
+BNORD4;;;;;;;;
+COM1;AM_Comunicacio;He llegit un llibre per la ràdio i sóc tan bo que la gent pensa que de veritat ens estan envaint els alienígenes. Qui sóc?;;;Orson Welles;És el director de ciutadà Kane;10;Orson Welles
+COM2;AM_Comunicacio;Tot i que el meu nom de pila és Norma Jeane Baker, pràcticament ningú em coneix com a tal;;;Marilyn Monroe;Sóc la estrella principal de la pel·lícula Niagara (1953);10;Marilyn Monroe
+COM3;;;;;;;;
+VET1;AM_Vet;Enfronto cada dia a caçadors furtius per protegir els goril·les de muntanya de l’extinció.;;;Dian Fossey;A 1983 publico “Goril·les en la boira”;10;Dian Fossey
+VET2;AM_Vet;;;;Steve Irwin;;10;Steve Irwin
+VET3;;;;;;;;
+VET4;;;;;;;;
+VET5;;;;;;;;
+MED1;AM_Med;;;;;;10;
+MED2;AM_Med;;;;;;10;
+MED3;AM_Med;;;;;;10;
+MED4;;;;;;;;
+SAF1;AM_SAF;;;;;;10;
+SAF2;AM_SAF;;;;;;10;
+SAF3;;;;;;;;
+SAF4;;;;;;;;
+SAF5;;;;;;;;
+BSUD1;AM_EB_Sud;;;;;;10;
+BSUD2;AM_EB_Sud;;;;;;10;
+BSUD3;;;;;;;;
+BCEN1;AM_EB_Central;;;;;;10;
+BCEN2;AM_EB_Central;;;;;;10;
+BCEN3;;;;;;;;
+FTI1;AM_FTI;;;;;;10;
+FTI2;AM_FTI;;;;;;10;
+FTI3;AM_FTI;;;;;;10;
+FTI4;;;;;;;;
+ETSE1;AM_ETSE;;;;;;10;
+ETSE2;AM_ETSE;;;;;;10;
+ETSE3;AM_ETSE;;;;;;10;
+ETSE4;;;;;;;;
+ETSE5;;;;;;;;
