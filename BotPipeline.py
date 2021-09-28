@@ -693,6 +693,35 @@ def hint(update, context):
     update.message.reply_text(output_text)
 
 
+def join_anomalis(update, context):
+    bot_id = str(update.message.chat['id'])
+    if bot_id not in registred_ids:
+        new_register(bot_id, data)
+
+    actual_faction = str(data[data['BOT_ID'] == bot_id]['FACTION'].values[0])
+    if actual_faction == 'Neutral':
+        data.loc[data['BOT_ID'] == bot_id, 'FACTION'] = 'Anomalis'
+        data.to_csv(database_file, index=False, sep=';')
+    else:
+        output_text = "Tu ja ets " + actual_faction + ". No es pot canviar de facció. Contacta amb els organitzadors" \
+                                                      "per demanar-ho"
+        update.message.reply_text(output_text)
+
+
+def join_corruptus(update, context):
+    bot_id = str(update.message.chat['id'])
+    if bot_id not in registred_ids:
+        new_register(bot_id, data)
+
+    actual_faction = str(data[data['BOT_ID'] == bot_id]['FACTION'].values[0])
+    if actual_faction == 'Neutral':
+        data.loc[data['BOT_ID'] == bot_id, 'FACTION'] = 'Corruptus'
+        data.to_csv(database_file, index=False, sep=';')
+    else:
+        output_text = "Tu ja ets " + actual_faction + ". No es pot canviar de facció. Contacta amb els organitzadors" \
+                                                      "per demanar-ho"
+        update.message.reply_text(output_text)
+
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
 def start(update, context):
@@ -781,6 +810,8 @@ def main():
     dp.add_handler(CommandHandler("stats", show_me))
     dp.add_handler(CommandHandler("activity", activity))
     dp.add_handler(CommandHandler("hint", hint))
+    dp.add_handler(CommandHandler("join_anomalis", join_anomalis))
+    dp.add_handler(CommandHandler("join_corruptus", join_corruptus))
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
