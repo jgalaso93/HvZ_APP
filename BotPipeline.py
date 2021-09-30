@@ -777,7 +777,8 @@ def contact(update, context):
     output_text = """Para hablar con un organizador abre conversación a una de las siguientes personas:
 @ShaggyGalaso
 @Janadsb99
-@Nel_tu_mod_fav"""
+@Nel_tu_mod_fav
+@GuillemMoya"""
     update.message.reply_text(output_text)
 
 
