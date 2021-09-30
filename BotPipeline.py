@@ -813,9 +813,8 @@ def get_my_id(update, context):
 
 
 def test(update, context):
-    print(update.message)
-    print(update.message.text)
-    print(str(update.message.text)[6:])
+    """Send link to the aliniation test"""
+    update.message.reply_text('https://bit.ly/3urA0S0')
 
 
 def error(update, context):
