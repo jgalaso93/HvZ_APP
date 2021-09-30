@@ -45,7 +45,7 @@ mission_data = pd.read_csv(mission_database_file, sep=';', header=0,
 mission_ids = mission_data['MISSION_ID'].tolist()
 
 NPC_file = os.path.join(sys.path[0], 'NPC_database.csv')
-NPC_data = pd.read_csv(NPC_file, sep=';', header=0)
+NPC_data = pd.read_csv(NPC_file, sep=';', header=0, encoding='cp1252')
 
 
 # Functions about all the things of a given user
@@ -726,7 +726,29 @@ def join_corruptus(update, context):
 # context. Error handlers also receive the raised TelegramError object in error.
 def start(update, context):
     """Send a message when the command /start is issued."""
-    update.message.reply_text('Bienvenides a HvZ!')
+    bot_id = str(update.message.chat['id'])
+    if bot_id not in registred_ids:
+        new_register(bot_id, data)
+    output_text = """Hola, ¡soy el bot que os va a estar ayudando esta edición!
+
+Os voy a hacer un pequeño resumen de como usarme, no os preocupéis, ¡es muy fácil!
+
+Para registraros, el formulario de inscripción os pedirá el ID, tu ID es: {}. Para tener vuestro ID con un formato fácil de copiar, escribid /getmyid. Si no sabes de qué formulario te hablo, sigue este link: https://bit.ly/3meBpHL
+
+Si tenéis cualquier duda sobre qué comandos utilizar, escribid /help. Allí os explicaré los comandos principales que tengo y como usarlos. 
+
+Si queréis saber como funcionan las normas, escribid /use. Allí os explicaré como hacer y resolver las misiones. 
+
+Si tenéis dudas que yo no os pueda responder, escribid /contact. Allí os pasaremos el contacto de algún moderador que os podrá resolver la duda personalmente. 
+
+Si queréis volver a leer este mensaje en algún momento, escribid /start. 
+
+No hace falta que siempre escribáis los comandos, podéis pulsar encima del comando y se activará automáticamente. 
+
+Por último, si ya sabéis a qué Facción pertenecéis, usad el comando /joincorruptus o /joinanomalis. 
+
+¡Muchas gracias por participar, a jugar!""".format(bot_id)
+    update.message.reply_text(output_text)
 
 
 def register(update, context):
@@ -740,7 +762,17 @@ def register(update, context):
 
 def help(update, context):
     """Send a message when the command /help is issued."""
-    update.message.reply_text('Esto es la ayuda!')
+    update.message.reply_text('Esto es la ayuda! Este comando aun está en desarrollo')
+
+
+def use(update, context):
+    update.message.reply_text('Esto es la guía de uso! Este comando aun está en desarrollo')
+
+
+def contact(update, context):
+    output_text = """Para hablar con un organizador abre conversación a una de las siguientes personas:
+@ShaggyGalaso"""
+    update.message.reply_text(output_text)
 
 
 def halal(update, context):
@@ -819,6 +851,8 @@ def main():
     dp.add_handler(CommandHandler("halal", halal))
     dp.add_handler(CommandHandler("corruptus", corruptus))
     dp.add_handler(CommandHandler("test", test))
+    dp.add_handler(CommandHandler("use", use))
+    dp.add_handler(CommandHandler("contact", contact))
 
     # Util class to check the id of the conversation
     dp.add_handler(CommandHandler("GetMyId", get_my_id))
