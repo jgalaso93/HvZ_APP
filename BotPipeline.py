@@ -702,6 +702,8 @@ def join_anomalis(update, context):
     if actual_faction == 'Neutral':
         data.loc[data['BOT_ID'] == bot_id, 'FACTION'] = 'Anomalis'
         data.to_csv(database_file, index=False, sep=';')
+        output_text = "Ja t'has unit a la facció, ara uneix-te al canal de la teva facció: https://t.me/joinchat/PKx1bv81WUMyMGU0"
+        update.message.reply_text(output_text)
     else:
         output_text = "Tu ja ets " + actual_faction + ". No es pot canviar de facció. Contacta amb els organitzadors" \
                                                       "per demanar-ho"
@@ -717,6 +719,8 @@ def join_corruptus(update, context):
     if actual_faction == 'Neutral':
         data.loc[data['BOT_ID'] == bot_id, 'FACTION'] = 'Corruptus'
         data.to_csv(database_file, index=False, sep=';')
+        output_text = "Ja t'has unit a la facció, uneix-te al canal de la teva facció: https://t.me/joinchat/dLP2gZDhDKUwMmZk"
+        update.message.reply_text(output_text)
     else:
         output_text = "Tu ja ets " + actual_faction + ". No es pot canviar de facció. Contacta amb els organitzadors" \
                                                       "per demanar-ho"
@@ -771,7 +775,9 @@ def use(update, context):
 
 def contact(update, context):
     output_text = """Para hablar con un organizador abre conversación a una de las siguientes personas:
-@ShaggyGalaso"""
+@ShaggyGalaso
+@Janadsb99
+@Nel_tu_mod_fav"""
     update.message.reply_text(output_text)
 
 
@@ -842,8 +848,8 @@ def main():
     dp.add_handler(CommandHandler("stats", show_me))
     dp.add_handler(CommandHandler("activity", activity))
     dp.add_handler(CommandHandler("hint", hint))
-    dp.add_handler(CommandHandler("join_anomalis", join_anomalis))
-    dp.add_handler(CommandHandler("join_corruptus", join_corruptus))
+    dp.add_handler(CommandHandler("joinanomalis", join_anomalis))
+    dp.add_handler(CommandHandler("joincorruptus", join_corruptus))
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
