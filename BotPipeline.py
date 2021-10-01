@@ -356,7 +356,10 @@ def new_register(bot_id, df):
 
 # LOGIC AND FUNCTIONALITY
 def missions(update, context):
-    update.message.reply_text('En quina zona vols fer una missio?'
+    if True:
+        update.message.reply_text('Las missiones aun no están activadas, esperate al lunes!')
+    else:
+        update.message.reply_text('En quina zona vols fer una missio?'
                               '\n/Aulari'
                               '\n/Carpa'
                               '\n/Civica'
@@ -766,11 +769,67 @@ def register(update, context):
 
 def help(update, context):
     """Send a message when the command /help is issued."""
-    update.message.reply_text('Esto es la ayuda! Este comando aun está en desarrollo')
+    output_text = """Estos son todos los comandos que puedes usar por ahora:
+
+💬 BÁSICOS:
+- /start: para recordar la información inicial.
+
+- /help: para volver a ver esta información.
+
+- /help + "otro comando": para obtener información más detallada referente al comando. Ejemplo: /help createteam.
+
+- /use: para obtener un tutorial de las misiones. 
+
+- /getmyid: para obtener tu ID, el número de identificación como jugador.
+
+- /missions: para saber dónde puedes encontrar misiones. 
+
+💬 PERSONALIZADOS:
+- /setalias + "el nombre de tu elección": para cambiar tu alias de registro. Ejemplo: /setalias TimeEscapeBot.
+
+- /stats: para conocer tus logros dentro del juego.
+
+- /activity: para saber las misiones activas que te quedan por resolver.
+
+- /hint + "id de la misión": para obtener una pista de la misión. Ejemplo: /hint C1
+
+- /join + "facción": para unirte a tu facción. Ejemplos: /joinanomalis o /joincorruptus 
+
+💬 DE EQUIPO:
+Los equipos sirven para jugar con tus amigos y acumular puntos.
+
+- /createteam + "un nom": para ser la fundadora de un equipo. Ejemplo: /createteam HvZ
+
+- /jointeam + "un nom": para unirte a un equipo que ya exista. Ejemplo: /jointeam HvZ
+
+- /showteam: para obtener el ranking de tu equipo.
+
+/promote + "alias", "rango": para otorgar cargos dentro del equipo. Ejemplo: /promote antonio, veterano."""
+    # update.message.reply_text('Esto es la ayuda! Este comando aun está en desarrollo')
+    update.message.reply_text(output_text)
 
 
 def use(update, context):
-    update.message.reply_text('Esto es la guía de uso! Este comando aun está en desarrollo')
+    output_text = """HOLA JUGADOR!!👋🏼
+👀Leeme atentamente para saber cómo jugar a TIME ESCAPE y ganar puntos para tu facción.
+
+1. Encuentra un QR
+Ve por el campus y busca por todas partes hasta que veas un codigo QR.
+
+2. Hazle una foto
+Haz una foto del QR y mándamela por aquí. Puedes sacar la foto directamente des de este chat.
+
+3. Recibe la misión
+Después de asegurarme de que tu foto sea original, leeré el QR y te mandaré tu misión. 
+⚠️ ¡Paciencia! Sóis muchos jugando y puede que me bloquee un poco. 
+Si en el momento no puedes realizar la misión, simpre podrás volver a ella usando el comando /activity.
+
+4. Resuelve la misión
+Responde a la misión por este chat. Si tu respuesta es correcta, ganarás puntos para tu facción💪🏿
+
+5. Vuelta a empezar
+Repite este proceso con todos los QRs que encuentres para acumular puntos y cambiar la historia."""
+    update.message.reply_text(output_text)
 
 
 def contact(update, context):
