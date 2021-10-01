@@ -22,7 +22,10 @@ import pandas as pd
 import cv2
 import tempfile
 import shutil
+
 from random import randrange
+from googletrans import Translator
+
 import telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
@@ -47,6 +50,11 @@ mission_ids = mission_data['MISSION_ID'].tolist()
 
 NPC_file = os.path.join(sys.path[0], 'NPC_database.csv')
 NPC_data = pd.read_csv(NPC_file, sep=';', header=0, encoding='cp1252')
+
+translator = Translator(service_urls=[
+      'translate.google.com',
+      'translate.google.co.kr',
+    ])
 
 
 # Functions about all the things of a given user
@@ -141,6 +149,17 @@ def user_points(df, user_id):
 
 
 # TOOLS
+def select_language(l):
+    if l == 'Català':
+        return 'ca'
+    elif l == "Castellano":
+        return 'es'
+    elif l == 'English':
+        return 'en'
+    else:
+        return l
+
+
 def mission_accomplished(user_id, mission_id):
     """
     Function that handles an accomplished mission:
@@ -276,12 +295,19 @@ def read_QR(update, context):
 
 
 def throw_mission(update, mission_id, user_id):
-    text = mission_data[mission_data['MISSION_ID'] == mission_id]['MISSION_P1']
+    text = str(mission_data[mission_data['MISSION_ID'] == mission_id]['MISSION_P1'].values[0])
+    language = str(data[data['BOT_ID'] == str(user_id)]['LANGUAGE'].values[0])
     am = mission_data[mission_data['MISSION_ID'] == mission_id]['AM_BUILDING']
     data.loc[data['BOT_ID'] == str(user_id), str(am.values[0])] = mission_id
     data.to_csv(database_file, index=False, sep=';')
+    if language == 'ca':
+        final_text = text
+    else:
+        translated_text = translator.translate(text=text, dest=language)
+        final_text = translated_text.text
+
     try:
-        update.message.reply_text(text.values[0])
+        update.message.reply_text(final_text)
     except:
         update.message.reply_text("Hi ha un problema amb la base de dades d'aquesta missió, si us plau contacta amb el moderador Shaggy, gracies :)")
 
@@ -305,6 +331,7 @@ def new_register(bot_id, df):
 
     # Registration for new players
     new_row['ALIAS'] = 'no_alias'
+    new_row['LANGUAGE'] = 'ca'
     new_row['GUILD'] = ' '
     new_row['GUILD_LEVEL'] = 'unguilded'
     new_row['Level'] = 'Player'
@@ -730,6 +757,26 @@ def join_corruptus(update, context):
                                                       "per demanar-ho"
         update.message.reply_text(output_text)
 
+
+def set_language(update, context):
+    bot_id = str(update.message.chat['id'])
+    if bot_id not in registred_ids:
+        new_register(bot_id, data)
+
+    new_language = select_language(str(update.message.text)[13:])
+    actual_language = str(data[data['BOT_ID'] == bot_id]['LANGUAGE'].values[0])
+
+    if new_language == actual_language:
+        output_text = "Aquest ja és el teu idioma per les missions!"
+        translated_text = translator.translate(text=output_text, dest=actual_language)
+        update.message.reply_text(translated_text.text)
+    else:
+        data.loc[data['BOT_ID'] == bot_id, 'LANGUAGE'] = new_language
+        data.to_csv(database_file, index=False, sep=';')
+        output_text = "S'ha actualitzat el teu nou llenguatge per les missions!"
+        translated_text = translator.translate(text=output_text, dest=new_language)
+        update.message.reply_text(translated_text.text)
+
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
 def start(update, context):
@@ -935,6 +982,7 @@ def main():
     dp.add_handler(CommandHandler("hint", hint))
     dp.add_handler(CommandHandler("joinanomalis", join_anomalis))
     dp.add_handler(CommandHandler("joincorruptus", join_corruptus))
+    dp.add_handler(CommandHandler("setlanguage", set_language))
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
