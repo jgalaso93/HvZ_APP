@@ -23,6 +23,7 @@ import cv2
 import tempfile
 import shutil
 from random import randrange
+import telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 # Enable logging
@@ -771,65 +772,90 @@ def help(update, context):
     """Send a message when the command /help is issued."""
     output_text = """Estos son todos los comandos que puedes usar por ahora:
 
-💬 BÁSICOS:
-- /start: para recordar la información inicial.
+💬 *BÁSICOS:*
+- */start:* para recordar la información inicial.
 
-- /help: para volver a ver esta información.
+- */rules:* para saber las normas del juego
 
-- /help + "otro comando": para obtener información más detallada referente al comando. Ejemplo: /help createteam.
+- */help*: para volver a ver esta información.
 
-- /use: para obtener un tutorial de las misiones. 
+- */help + "otro comando"*: para obtener información más detallada referente al comando. _Ejemplo: /help createteam_. (aun en desarrollo)
 
-- /getmyid: para obtener tu ID, el número de identificación como jugador.
+- */use:* para obtener un tutorial de las misiones. 
 
-- /missions: para saber dónde puedes encontrar misiones. 
+- */getmyid:* para obtener tu ID, el número de identificación como jugador.
 
-💬 PERSONALIZADOS:
-- /setalias + "el nombre de tu elección": para cambiar tu alias de registro. Ejemplo: /setalias TimeEscapeBot.
+- */missions*: para saber dónde puedes encontrar misiones. 
 
-- /stats: para conocer tus logros dentro del juego.
+💬 *PERSONALIZADOS:*
+- */setalias + "el nombre de tu elección"*: para cambiar tu alias de registro. _Ejemplo: /setalias TimeEscapeBot_.
 
-- /activity: para saber las misiones activas que te quedan por resolver.
+- */stats*: para conocer tus logros dentro del juego.
 
-- /hint + "id de la misión": para obtener una pista de la misión. Ejemplo: /hint C1
+- */activity*: para saber las misiones activas que te quedan por resolver.
 
-- /join + "facción": para unirte a tu facción. Ejemplos: /joinanomalis o /joincorruptus 
+- */hint + "id de la misión"*: para obtener una pista de la misión. _Ejemplo: /hint C1_
 
-💬 DE EQUIPO:
+- */join + "facción"*: para unirte a tu facción. _Ejemplos: /joinanomalis o /joincorruptus_ 
+
+💬 *DE EQUIPO:*
 Los equipos sirven para jugar con tus amigos y acumular puntos.
 
-- /createteam + "un nom": para ser la fundadora de un equipo. Ejemplo: /createteam HvZ
+- */createteam + "nombre"*: para ser la fundadora de un equipo. _Ejemplo: /createteam HvZ_
 
-- /jointeam + "un nom": para unirte a un equipo que ya exista. Ejemplo: /jointeam HvZ
+- */jointeam + "nombre"*: para unirte a un equipo que ya exista. _Ejemplo: /jointeam HvZ_
 
-- /showteam: para obtener el ranking de tu equipo.
+- */showteam*: para obtener el ranking de tu equipo.
 
-/promote + "alias", "rango": para otorgar cargos dentro del equipo. Ejemplo: /promote antonio, veterano."""
-    # update.message.reply_text('Esto es la ayuda! Este comando aun está en desarrollo')
-    update.message.reply_text(output_text)
+*/promote + "alias", "rango"*: para otorgar cargos dentro del equipo. _Ejemplo: /promote antonio, veterano_."""
+    update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
 
 
 def use(update, context):
     output_text = """HOLA JUGADOR!!👋🏼
 👀Leeme atentamente para saber cómo jugar a TIME ESCAPE y ganar puntos para tu facción.
 
-1. Encuentra un QR
+*1. Encuentra un QR*
 Ve por el campus y busca por todas partes hasta que veas un codigo QR.
 
-2. Hazle una foto
-Haz una foto del QR y mándamela por aquí. Puedes sacar la foto directamente des de este chat.
+*2. Hazle una foto*
+Haz una foto del QR y mándamela por aquí. Puedes sacar la foto directamente desde este chat.
 
-3. Recibe la misión
+*3. Recibe la misión*
 Después de asegurarme de que tu foto sea original, leeré el QR y te mandaré tu misión. 
 ⚠️ ¡Paciencia! Sóis muchos jugando y puede que me bloquee un poco. 
-Si en el momento no puedes realizar la misión, simpre podrás volver a ella usando el comando /activity.
+_Si en el momento no puedes realizar la misión, simpre podrás volver a ella usando el comando /activity_.
 
-4. Resuelve la misión
+*4. Resuelve la misión*
 Responde a la misión por este chat. Si tu respuesta es correcta, ganarás puntos para tu facción💪🏿
 
-5. Vuelta a empezar
+*5. Vuelta a empezar*
 Repite este proceso con todos los QRs que encuentres para acumular puntos y cambiar la historia."""
-    update.message.reply_text(output_text)
+    update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
+
+
+def rules(update, context):
+    output_text = """*NORMAS:*
+_Con tal de garantizar que TIME ESCAPE sea un juego divertido para todes, deberéis seguir la siguiente normativa_.
+
+😷 En TIME ESCAPE respetaremos las medidas vigentes del Procicat y sus medidas para protegernos de la Covid-19.
+
+❌ *No arranques QRs*: arrancar un QR será penalizado con la inmediata expulsión del juego.
+
+❌ *No hagas spoilers*: revelar la ubicación de un QR o la solución de una misión por el grupo será penalizado con la expulsión del jugador en dicho grupo. _Esta norma no se aplica si se trata de tu equipo_.
+
+❌ *No compartas el QR*: si una misma imagen se sube 2 veces, nuestro Bot todo poderoso lo sabrá y dicha imagen quedará inutilizada.
+
+💕 *Treat people with kindness*: los demás jugadores (corruptus o anomalis), los moderadores (los de la bandana roja en la pierna) y las personas no jugadoras del campus merecen ser tratadas con respeto. El mobiliario y las instalaciones de la UAB también.
+
+💕 *Stay safe*: todas las misiones se encuentran en sitios accesibles. No hagais burradas.
+
+🛡️ *Escudos*: en TIME ESCAPE los escudos estan permitidos.
+
+
+Y, para terminar...
+✨ *NO SEAIS IDIOTES* ✨"""
+    update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
 
 
 def contact(update, context):
@@ -913,6 +939,7 @@ def main():
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
+    dp.add_handler(CommandHandler("rules", rules))
     dp.add_handler(CommandHandler("halal", halal))
     dp.add_handler(CommandHandler("corruptus", corruptus))
     dp.add_handler(CommandHandler("test", test))
