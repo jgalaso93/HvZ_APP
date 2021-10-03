@@ -253,6 +253,8 @@ def check_answer(user_id, answer):
 
 
 def check_pic(user_id, photo_id):
+    return False
+
     df_pics = os.path.join(sys.path[0], 'fotos_database.csv')
     db_pics = pd.read_csv(df_pics, sep=';', header=0)
     pics = db_pics['IMAGE_ID'].tolist()
