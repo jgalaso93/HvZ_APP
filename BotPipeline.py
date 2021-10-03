@@ -199,6 +199,49 @@ def mission_accomplished(user_id, mission_id):
 
     data.to_csv(database_file, index=False, sep=';')
 
+    final_text = str(mission_data[mission_data['MISSION_ID'] == mission_id]['FINAL_TEXT'].values[0])
+    if final_text != 'None':
+        return final_text
+    else:
+        return None
+
+
+def mission_can_be_done(user_id, mission_id):
+    """
+    Function that checks requirements for a mission and a person
+     - Checks that missions indeed has requirements
+     - In case yes, checks if one or multiple
+       - For multiple checks all of them
+       - If all done return None
+       - If else returns all pending
+     - In case not, checks if it's done
+       - If it's done returns None
+       - If else returns pending mission
+    """
+    dm = all_done_missions(data, user_id)
+    mr = str(mission_data[mission_data['MISSION_ID'] == mission_id]['REQUIREMENTS'].values[0])
+    if mr == 'None':
+        return None
+
+    if ',' in mr:
+        mr = mr.split(", ")
+        ret_list = []
+        for m in mr:
+            if m not in dm:
+                ret_list.append(m)
+
+        if len(ret_list) == 0:
+            return None
+        else:
+            return ret_list
+
+    else:
+        if mr in dm:
+            return None
+        else:
+            return [mr]
+
+
 
 def add_influence(npc_name, influence_points, user_faction):
     actual_points = NPC_data[NPC_data['NAME'] == npc_name]['FAVOR']
@@ -297,6 +340,20 @@ def read_QR(update, context):
 
 
 def throw_mission(update, mission_id, user_id):
+    pending = mission_can_be_done(str(user_id), mission_id)
+    aam = all_active_missions(data, str(user_id))
+    if pending:
+        ret_text = "Encara et falten les següents missions!"
+        for m in pending:
+            ret_text += str(m) +": "
+            if m in aam:
+                ret_text += str(mission_data[mission_data['MISSION_ID'] == mission_id]['TEXT'].values[0])
+                ret_text += "\n"
+            else:
+                ret_text += "Encara no has trobat aquesta missio!\n"
+        update.message.reply_text(ret_text)
+        return None
+
     text = str(mission_data[mission_data['MISSION_ID'] == mission_id]['MISSION_P1'].values[0])
     language = str(data[data['BOT_ID'] == str(user_id)]['LANGUAGE'].values[0])
     am = mission_data[mission_data['MISSION_ID'] == mission_id]['AM_BUILDING']
@@ -936,7 +993,8 @@ def echo(update, context):
     if mission_solved:
         to_send = "Enhorabona!! Has respost correctament la missio " + mission_solved + ". Continua així!"
         update.message.reply_text(to_send)
-        mission_accomplished(str(user_id), mission_solved)
+        final_text = mission_accomplished(str(user_id), mission_solved)
+        update.message.reply_text(final_text)
     else:
         update.message.reply_text("El missatge que has enviat no és cap resposta de les teves missions actives!")
         update.message.reply_text("Escriu /help per saber més de com funciona el bot")
