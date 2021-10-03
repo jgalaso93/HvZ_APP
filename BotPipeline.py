@@ -29,6 +29,9 @@ from googletrans import Translator
 import telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
+import requests
+from bs4 import BeautifulSoup
+
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -146,6 +149,21 @@ def user_points(df, user_id):
     total_points += df[df['BOT_ID'] == user_id]['P_Torres']
     total_points += df[df['BOT_ID'] == user_id]['P_Vet']
     return total_points.values[0]
+
+
+# FUNNY FUNCTIONS
+def get_boop():
+    page = "https://random.dog/"
+    content = requests.get(page)
+
+    if content.status_code == 200:
+        soup = BeautifulSoup(content.content, "html.parser")
+
+    while soup.img is None:
+        content = requests.get(page)
+        soup = BeautifulSoup(content.content, "html.parser")
+
+    return page + str(soup.img)[23:-3]
 
 
 # TOOLS
@@ -679,6 +697,9 @@ def show_team(update, context):
 def promote(update, context):
     text = str(update.message.text)[9:]
     values = text.split(", ")
+    if len(values) == 1:
+        update.message.reply_text("Compte! Has de separar l'alias i el rang per una coma i només un espai!")
+        return None
     bot_id = str(update.message.chat['id'])
 
     if bot_id not in registred_ids:
@@ -711,6 +732,40 @@ def promote(update, context):
 def create_link(update, context):
     # link = update.create_chat_invite_link(update.message.chat['id'])
     print(telegram.ChatInviteLink(invite_link='https://t.me/joinchat/r7Cj1ej7vvg4NWE0', creator="Shaggy", is_primary=True, is_revoked=False))
+
+
+def boop(update, context):
+    bot_id = str(update.message.chat['id'])
+    if bot_id not in registred_ids:
+        new_register(bot_id, data)
+
+    image_url = get_boop()
+    image = requests.get(image_url)
+    update.message.reply_photo(image.content)
+
+
+def sendboop(update, context):
+    bot_id = str(update.message.chat['id'])
+    if bot_id not in registred_ids:
+        new_register(bot_id, data)
+
+    guild_name = str(data[data['BOT_ID'] == bot_id]['GUILD'].values[0])
+    if guild_name == ' ':
+        update.message.reply_text("No estàs a cap equip! Només pots enviar un boop si estàs en un equip!")
+        return None
+
+    alias = str(update.message.text)[10:]
+    total_alias = data[data['GUILD'] == guild_name]['ALIAS'].tolist()
+    own_alias = str(data[data['BOT_ID'] == bot_id]['ALIAS'].values[0])
+    if alias in total_alias:
+        receiver_id = str(data[(data['GUILD'] == guild_name) & (data['ALIAS'] == alias)]['BOT_ID'].values[0])
+        output_text = own_alias + " sends a boop"
+        context.bot.send_message(receiver_id, output_text)
+        image_url = get_boop()
+        context.bot.send_photo(receiver_id, image_url)
+        update.message.reply_text("Has enviat un boop!")
+    else:
+        update.message.reply_text("No hi ha ningú amb aquest alias al teu equip!!")
 
 
 # Personal stuff related methods
@@ -911,6 +966,8 @@ def help(update, context):
 
 - */join + "facción"*: para unirte a tu facción. _Ejemplos: /joinanomalis o /joincorruptus_ 
 
+- */boop*: El bot te mandará un boop!
+
 💬 *DE EQUIPO:*
 Los equipos sirven para jugar con tus amigos y acumular puntos.
 
@@ -920,7 +977,9 @@ Los equipos sirven para jugar con tus amigos y acumular puntos.
 
 - */showteam*: para obtener el ranking de tu equipo.
 
-*/promote + "alias", "rango"*: para otorgar cargos dentro del equipo. _Ejemplo: /promote antonio, veterano_."""
+- */sendboop + "alias": mandar un boop a alguien con ese alias que esté en tu equipo. Boop!
+
+- */promote + "alias", "rango"*: para otorgar cargos dentro del equipo. _Ejemplo: /promote antonio, veterano_."""
     update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
 
 
@@ -974,11 +1033,11 @@ Y, para terminar...
 def contact(update, context):
     output_text = """Contacta con el Mod correspondiente según tu problema:
     
-- *Problemas con el bot:* @ShaggyGalaso
+- *Problemas o dudas con el bot:* @ShaggyGalaso
 - *Problemas con los QR:* @Nelaso
 - *Problemas con la misión:* @Janadsb99
 - *Problemas fuera del campus:* @AlexNevado
-- *Dudas de normas:* @Sargento_Zorro
+- *Dudas de normas:* @Sargento\_Zorro
 - *Dudas de telegram:* @GuillemMoya
 - *Problemas con otros jugadores:* @mar\_clua
 - *Problemas por discriminación:* @AiHysteric"""
@@ -1050,6 +1109,8 @@ def main():
     dp.add_handler(CommandHandler("showteam", show_team))
     dp.add_handler(CommandHandler("promote", promote))
     dp.add_handler(CommandHandler("createlink", create_link))
+    dp.add_handler(CommandHandler("boop", boop))
+    dp.add_handler(CommandHandler("sendboop", sendboop))
 
     # Commands related to personal stuff
     dp.add_handler(CommandHandler("setalias", set_alias))
