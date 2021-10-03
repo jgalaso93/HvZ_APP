@@ -965,12 +965,16 @@ Y, para terminar...
 
 
 def contact(update, context):
-    output_text = """Para hablar con un organizador abre conversación a una de las siguientes personas:
-@ShaggyGalaso
-@Janadsb99
-@Nelaso
-@GuillemMoya"""
-    update.message.reply_text(output_text)
+    output_text = """Contacta con el Mod correspondiente según tu problema:
+    
+- *Problemas con el bot:* @ShaggyGalaso
+- *Problemas con los QR:* @Nelaso
+- *Problemas con la misión:* @Janadsb99
+- *Dudas de normas:* @SargentoZorro
+- *Dudas de telegram:* @GuillemMoya
+- *Problemas con otros jugadores:* @mar\_clua
+- *Problemas por discriminación:* @AiHysteric"""
+    update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
 
 
 def halal(update, context):
