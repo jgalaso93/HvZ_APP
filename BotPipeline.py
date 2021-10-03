@@ -970,6 +970,7 @@ def contact(update, context):
 - *Problemas con el bot:* @ShaggyGalaso
 - *Problemas con los QR:* @Nelaso
 - *Problemas con la misión:* @Janadsb99
+- *Problemas fuera del campus:* @AlexNevado
 - *Dudas de normas:* @SargentoZorro
 - *Dudas de telegram:* @GuillemMoya
 - *Problemas con otros jugadores:* @mar\_clua
