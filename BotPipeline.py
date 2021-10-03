@@ -444,30 +444,31 @@ def new_register(bot_id, df):
 # LOGIC AND FUNCTIONALITY
 def missions(update, context):
     if True:
-        update.message.reply_text('Las missiones aun no están activadas, esperate al lunes!')
+        update.message.reply_text('Las missiones aun no están activadas, esperate a las 11:00!')
     else:
         update.message.reply_text('En quina zona vols fer una missio?'
-                              '\n/Aulari'
-                              '\n/Carpa'
-                              '\n/Civica'
                               '\n/Comunicacio'
                               '\n/Edifici_B_central'
                               '\n/Edifici_B_Nord'
                               '\n/Edifici_B_Sud'
                               '\n/Edifici_C'
-                              '\n/Educacio'
                               '\n/Etse'
                               '\n/FTI'
                               '\n/Medicina'
                               '\n/SAF'
-                              '\n/Torres'
                               '\n/Veterinaria')
+
+        # '\n/Aulari'
+        # '\n/Carpa'
+        # '\n/Civica'
+        # '\n/Torres'
+        # '\n/Educacio'
 
 
 def Aulari(update, context):
     foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
-    foto_path = os.path.join(foto_path, 'Aulari Central')
+    foto_path = os.path.join(foto_path, 'QR activos')
+    foto_path = os.path.join(foto_path, 'MED')
     number_of_photos = len(os.listdir(foto_path))
     index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
@@ -496,8 +497,8 @@ def Civica(update, context):
 
 def Comunicacio(update, context):
     foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
-    foto_path = os.path.join(foto_path, 'Comunicación')
+    foto_path = os.path.join(foto_path, 'QR activos')
+    foto_path = os.path.join(foto_path, 'COM')
     number_of_photos = len(os.listdir(foto_path))
     index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
@@ -506,8 +507,8 @@ def Comunicacio(update, context):
 
 def Edifici_B_central(update, context):
     foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
-    foto_path = os.path.join(foto_path, 'Edifici B central')
+    foto_path = os.path.join(foto_path, 'QR activos')
+    foto_path = os.path.join(foto_path, 'BCEN')
     number_of_photos = len(os.listdir(foto_path))
     index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
@@ -516,8 +517,8 @@ def Edifici_B_central(update, context):
 
 def Edifici_B_Nord(update, context):
     foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
-    foto_path = os.path.join(foto_path, 'Edifici B Nord')
+    foto_path = os.path.join(foto_path, 'QR activos')
+    foto_path = os.path.join(foto_path, 'BNORD')
     number_of_photos = len(os.listdir(foto_path))
     index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
@@ -526,8 +527,8 @@ def Edifici_B_Nord(update, context):
 
 def Edifici_B_Sud(update, context):
     foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
-    foto_path = os.path.join(foto_path, 'Edifici B Sud')
+    foto_path = os.path.join(foto_path, 'QR activos')
+    foto_path = os.path.join(foto_path, 'BSUD')
     number_of_photos = len(os.listdir(foto_path))
     index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
@@ -536,8 +537,8 @@ def Edifici_B_Sud(update, context):
 
 def Edifici_C(update, context):
     foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
-    foto_path = os.path.join(foto_path, 'Edifici C')
+    foto_path = os.path.join(foto_path, 'QR activos')
+    foto_path = os.path.join(foto_path, 'Ciencies')
     number_of_photos = len(os.listdir(foto_path))
     index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
@@ -556,8 +557,8 @@ def Educacio(update, context):
 
 def Etse(update, context):
     foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
-    foto_path = os.path.join(foto_path, 'Etse')
+    foto_path = os.path.join(foto_path, 'QR activos')
+    foto_path = os.path.join(foto_path, 'ETSE')
     number_of_photos = len(os.listdir(foto_path))
     index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
@@ -566,7 +567,7 @@ def Etse(update, context):
 
 def FTI(update, context):
     foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
+    foto_path = os.path.join(foto_path, 'QR activos')
     foto_path = os.path.join(foto_path, 'FTI')
     number_of_photos = len(os.listdir(foto_path))
     index = randrange(number_of_photos)
@@ -576,8 +577,8 @@ def FTI(update, context):
 
 def Medicina(update, context):
     foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
-    foto_path = os.path.join(foto_path, 'Medicina')
+    foto_path = os.path.join(foto_path, 'QR activos')
+    foto_path = os.path.join(foto_path, 'MED')
     number_of_photos = len(os.listdir(foto_path))
     index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
@@ -586,7 +587,7 @@ def Medicina(update, context):
 
 def SAF(update, context):
     foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
+    foto_path = os.path.join(foto_path, 'QR activos')
     foto_path = os.path.join(foto_path, 'SAF')
     number_of_photos = len(os.listdir(foto_path))
     index = randrange(number_of_photos)
@@ -606,8 +607,8 @@ def Torres(update, context):
 
 def Veterinaria(update, context):
     foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
-    foto_path = os.path.join(foto_path, 'Veterinaria')
+    foto_path = os.path.join(foto_path, 'QR activos')
+    foto_path = os.path.join(foto_path, 'VET')
     number_of_photos = len(os.listdir(foto_path))
     index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
@@ -705,6 +706,11 @@ def promote(update, context):
 
     output_text = "Totes les persones amb alies " + values[0] + " han sigut ascendides a " + values[1]
     update.message.reply_text(output_text)
+
+
+def create_link(update, context):
+    # link = update.create_chat_invite_link(update.message.chat['id'])
+    print(telegram.ChatInviteLink(invite_link='https://t.me/joinchat/r7Cj1ej7vvg4NWE0', creator="Shaggy", is_primary=True, is_revoked=False))
 
 
 # Personal stuff related methods
@@ -835,6 +841,7 @@ def set_language(update, context):
         output_text = "S'ha actualitzat el teu nou llenguatge per les missions!"
         translated_text = translator.translate(text=output_text, dest=new_language)
         update.message.reply_text(translated_text.text)
+
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
@@ -971,7 +978,7 @@ def contact(update, context):
 - *Problemas con los QR:* @Nelaso
 - *Problemas con la misión:* @Janadsb99
 - *Problemas fuera del campus:* @AlexNevado
-- *Dudas de normas:* @SargentoZorro
+- *Dudas de normas:* @Sargento_Zorro
 - *Dudas de telegram:* @GuillemMoya
 - *Problemas con otros jugadores:* @mar\_clua
 - *Problemas por discriminación:* @AiHysteric"""
@@ -992,6 +999,9 @@ def echo(update, context):
     """Check the message and act if it's an answer"""
     answer = update.message.text
     user_id = update.message.chat['id']
+    if user_id < 0:
+        return None
+
     if user_id in registred_ids:
         new_register(user_id, data)
     mission_solved = check_answer(user_id, answer)
@@ -1039,6 +1049,7 @@ def main():
     dp.add_handler(CommandHandler("jointeam", join_team))
     dp.add_handler(CommandHandler("showteam", show_team))
     dp.add_handler(CommandHandler("promote", promote))
+    dp.add_handler(CommandHandler("createlink", create_link))
 
     # Commands related to personal stuff
     dp.add_handler(CommandHandler("setalias", set_alias))
