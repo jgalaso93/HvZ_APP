@@ -314,7 +314,7 @@ def check_answer(user_id, answer):
 
 
 def check_pic(user_id, photo_id):
-    return False
+    # return False
 
     df_pics = os.path.join(sys.path[0], 'fotos_database.csv')
     db_pics = pd.read_csv(df_pics, sep=';', header=0)
@@ -461,20 +461,20 @@ def new_register(bot_id, df):
 
 # LOGIC AND FUNCTIONALITY
 def missions(update, context):
-    if True:
-        update.message.reply_text('Las missiones aun no están activadas, esperate a las 11:00!')
-    else:
-        update.message.reply_text('En quina zona vols fer una missio?'
-                              '\n/Comunicacio'
-                              '\n/Edifici_B_central'
-                              '\n/Edifici_B_Nord'
-                              '\n/Edifici_B_Sud'
-                              '\n/Edifici_C'
-                              '\n/Etse'
-                              '\n/FTI'
-                              '\n/Medicina'
-                              '\n/SAF'
-                              '\n/Veterinaria')
+    # if True:
+    #     update.message.reply_text('Las missiones aun no están activadas, esperate a las 11:00!')
+    # else:
+    update.message.reply_text('En quina zona vols fer una missio?'
+                          '\n/Comunicacio'
+                          '\n/Edifici_B_central'
+                          '\n/Edifici_B_Nord'
+                          '\n/Edifici_B_Sud'
+                          '\n/Edifici_C'
+                          '\n/Etse'
+                          '\n/FTI'
+                          '\n/Medicina'
+                          '\n/SAF'
+                          '\n/Veterinaria')
 
         # '\n/Aulari'
         # '\n/Carpa'
@@ -977,7 +977,7 @@ Los equipos sirven para jugar con tus amigos y acumular puntos.
 
 - */showteam*: para obtener el ranking de tu equipo.
 
-- */sendboop + "alias": mandar un boop a alguien con ese alias que esté en tu equipo. Boop!
+- */sendboop + "alias"*: mandar un boop a alguien con ese alias que esté en tu equipo. Boop!
 
 - */promote + "alias", "rango"*: para otorgar cargos dentro del equipo. _Ejemplo: /promote antonio, veterano_."""
     update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
@@ -1064,7 +1064,10 @@ def echo(update, context):
     if user_id in registred_ids:
         new_register(user_id, data)
     mission_solved = check_answer(user_id, answer)
-    if mission_solved:
+    faction = str(data[data['BOT_ID'] == str(user_id)]['FACTION'].values[0])
+    if faction == "Neutral":
+        update.message.reply_text("Abans de fer missions t'has d'unir a una facció, escull una de les dues:\n/joinanomalis \n/joincorruptus")
+    elif mission_solved:
         to_send = "Enhorabona!! Has respost correctament la missio " + mission_solved + ". Continua així!"
         update.message.reply_text(to_send)
         final_text = mission_accomplished(str(user_id), mission_solved)
@@ -1086,7 +1089,7 @@ def test(update, context):
 def error(update, context):
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, context.error)
-    update.message.reply_text("Alguna cosa ha anat malament! Torna-ho a intentar o contacte amb @ShaggyGalaso")
+    # update.message.reply_text("Alguna cosa ha anat malament! Torna-ho a intentar o contacte amb @ShaggyGalaso")
 
 
 def main():
