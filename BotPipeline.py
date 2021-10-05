@@ -1277,6 +1277,78 @@ def activate_mission(update, context):
     update.message.reply_text("Missió actualitzada correctament")
 
 
+def general_top(update, context):
+    user_id = str(update.message.chat['id'])
+
+    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
+    if level != 'Mod':
+        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
+        return None
+
+    update.message.reply_text("No me pienso esforzar en esto (:\n")
+    n = str(update.message.text)[12:]
+    try:
+        top = int(n)
+    except ValueError:
+        top = 10
+
+    anomalis_df = data[(data['FACTION'] == 'Anomalis') & ((data['Level'] == 'Player') | (data['BOT_ID'] == '1972795833') | (data['BOT_ID'] == '750747669'))]
+    corruptus_df = data[(data['FACTION'] == 'Corruptus') & ((data['Level'] == 'Player') | (data['BOT_ID'] == '1972795833') | (data['BOT_ID'] == '750747669'))]
+    a_ids = anomalis_df['BOT_ID'].tolist()
+    score = dict()
+    for ai in a_ids:
+        points = user_points(anomalis_df, ai)
+        if points > 0:
+            score[ai] = points
+    score = dict(sorted(score.items(), key=lambda item: item[1], reverse=True))
+
+    output_text = "Les millors puntuacions d'anomalis són:\n"
+    last_points = max(score.values())
+    position = 1
+    counter = 1
+
+    for key, value in score.items():
+        alias = str(anomalis_df[anomalis_df['BOT_ID'] == key]['ALIAS'].values[0])
+        if alias == 'no_alias':
+            continue
+        if last_points != value:
+            position += 1
+            last_points = value
+        output_text += str(position) + ". " + alias + ": " + str(value) + "\n"
+        if counter == top:
+            break
+        counter += 1
+
+    update.message.reply_text(output_text)
+
+    a_ids = corruptus_df['BOT_ID'].tolist()
+    score = dict()
+    for ai in a_ids:
+        points = user_points(corruptus_df, ai)
+        if points > 0:
+            score[ai] = points
+    score = dict(sorted(score.items(), key=lambda item: item[1], reverse=True))
+
+    output_text = "Les millors puntuacions de corruptus són:\n"
+    last_points = max(score.values())
+    position = 1
+    counter = 1
+
+    for key, value in score.items():
+        alias = str(corruptus_df[corruptus_df['BOT_ID'] == key]['ALIAS'].values[0])
+        if alias == 'no_alias':
+            continue
+        if last_points != value:
+            position += 1
+            last_points = value
+        output_text += str(position) + ". " + alias + ": " + str(value) + "\n"
+        if counter == top:
+            break
+        counter += 1
+
+    update.message.reply_text(output_text)
+
+
 def main():
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
@@ -1335,6 +1407,7 @@ def main():
     # Mod Commands
     dp.add_handler(CommandHandler("bondiaboop", bdb))
     dp.add_handler(CommandHandler("activate", activate_mission))
+    dp.add_handler(CommandHandler("generaltop", general_top))
 
     # Util class to check the id of the conversation
     dp.add_handler(CommandHandler("GetMyId", get_my_id))
