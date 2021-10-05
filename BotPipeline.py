@@ -1022,6 +1022,8 @@ def help(update, context):
 
 - */missions*: para saber dónde puedes encontrar misiones. 
 
+- */contact*: si tienes dudas o problemas usa este comando para contactarnos!
+
 💬 *COMPETITIVOS:*
 
 - */top3*: muestar la puntuación de los 3 jugadores con mayor puntuación
