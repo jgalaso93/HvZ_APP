@@ -898,6 +898,75 @@ def set_language(update, context):
         update.message.reply_text(translated_text.text)
 
 
+# Commands related to competition
+def topfaction(update, context):
+    bot_id = str(update.message.chat['id'])
+    if bot_id not in registred_ids:
+        new_register(bot_id, data)
+
+    n = str(update.message.text)[12:]
+    try:
+        top = int(n)
+    except ValueError:
+        top = 10
+
+    own_faction = str(data[data['BOT_ID'] == str(bot_id)]['FACTION'].values[0])
+    if own_faction == 'Neutral':
+        update.message.reply_text("Primer t'has d'unir a una facció! /joinanomalis o /joincorruptus")
+        return None
+
+    faction_df = data[(data['FACTION'] == own_faction) & (data['Level'] == 'Player')]
+    a_ids = faction_df['BOT_ID'].tolist()
+    score = dict()
+    for ai in a_ids:
+        points = user_points(faction_df, ai)
+        if points > 0:
+            score[ai] = points
+    score = dict(sorted(score.items(), key=lambda item: item[1], reverse=True))
+
+    output_text = "Les millors puntuacions de la vostra facció són:\n"
+    last_points = max(score.values())
+    position = 1
+    counter = 1
+
+    for key, value in score.items():
+        alias = str(faction_df[faction_df['BOT_ID'] == key]['ALIAS'].values[0])
+        if alias == 'no_alias':
+            continue
+        if last_points != value:
+            position += 1
+            last_points = value
+        output_text += str(position) + ". " + alias + ": " + str(value) + "\n"
+        if counter == top:
+            break
+        counter += 1
+
+    output_text += "\nRecordeu: només les persones amb alies surten al top! useu /setalias + \"alias\" per tenir-ne un"
+    update.message.reply_text(output_text)
+
+
+def top3(update,context):
+    all_ids = data['BOT_ID'].tolist()
+    score = dict()
+    for i in all_ids:
+        points = user_points(data, i)
+        if points > 0:
+            score[i] = points
+
+    score = dict(sorted(score.items(), key=lambda item: item[1], reverse=True))
+    output_text = "El top 5 del joc tenen les següents puntuacions:\n\n"
+
+    counter = 1
+    for k, v in score.items():
+        output_text += str(counter) + ": " + str(v) + "\n"
+        if counter >= 3:
+            break
+        counter += 1
+
+    output_text += "\nEnhorabona i seguiu així!!!!"
+
+    update.message.reply_text(output_text)
+
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
 def start(update, context):
@@ -947,13 +1016,17 @@ def help(update, context):
 
 - */help*: para volver a ver esta información.
 
-- */help + "otro comando"*: para obtener información más detallada referente al comando. _Ejemplo: /help createteam_. (aun en desarrollo)
-
 - */use:* para obtener un tutorial de las misiones. 
 
 - */getmyid:* para obtener tu ID, el número de identificación como jugador.
 
 - */missions*: para saber dónde puedes encontrar misiones. 
+
+💬 *COMPETITIVOS:*
+
+- */top3*: muestar la puntuación de los 3 jugadores con mayor puntuación
+
+- */topfaction*: muestra el top de vuestra facción. Para entrar en el top requiere alias y más de 0 puntos
 
 💬 *PERSONALIZADOS:*
 - */setalias + "el nombre de tu elección"*: para cambiar tu alias de registro. _Ejemplo: /setalias TimeEscapeBot_.
@@ -982,6 +1055,7 @@ Los equipos sirven para jugar con tus amigos y acumular puntos.
 - */promote + "alias", "rango"*: para otorgar cargos dentro del equipo. _Ejemplo: /promote antonio, veterano_."""
     update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
 
+# - */help + "otro comando"*: para obtener información más detallada referente al comando. _Ejemplo: /help createteam_. (aun en desarrollo)
 
 def use(update, context):
     output_text = """HOLA JUGADOR!!👋🏼
@@ -1106,6 +1180,10 @@ def main():
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
+
+    # Commands related to competition
+    dp.add_handler(CommandHandler("topfaction", topfaction))
+    dp.add_handler(CommandHandler("top3", top3))
 
     # Commands related to teams
     dp.add_handler(CommandHandler("createteam", create_team))
