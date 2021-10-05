@@ -751,7 +751,7 @@ def sendboop(update, context):
 
     guild_name = str(data[data['BOT_ID'] == bot_id]['GUILD'].values[0])
     if guild_name == ' ':
-        update.message.reply_text("No estàs a cap equip! Només pots enviar un boop si estàs en un equip!")
+        update.message.reply_text("No estàs a cap equip! Només pots enviar un boop si estàs a un equip!")
         return None
 
     alias = str(update.message.text)[10:]
@@ -766,6 +766,25 @@ def sendboop(update, context):
         update.message.reply_text("Has enviat un boop!")
     else:
         update.message.reply_text("No hi ha ningú amb aquest alias al teu equip!!")
+
+
+def sendall(update, context):
+    bot_id = str(update.message.chat['id'])
+    if bot_id not in registred_ids:
+        new_register(bot_id, data)
+
+    guild_name = str(data[data['BOT_ID'] == bot_id]['GUILD'].values[0])
+    if guild_name == ' ':
+        update.message.reply_text("No estàs a cap equip! Només pots enviar un missatge si estàs a un equip!")
+        return None
+
+    message = str(update.message.text)[9:]
+    total_alias = data[data['GUILD'] == guild_name]['ALIAS'].tolist()
+    for alias in total_alias:
+        receiver_id = str(data[(data['GUILD'] == guild_name) & (data['ALIAS'] == alias)]['BOT_ID'].values[0])
+        context.bot.send_message(receiver_id, message)
+
+    update.message.reply_text("Has enviat el teu missatge a tothom del teu equip!")
 
 
 # Personal stuff related methods
@@ -1005,11 +1024,8 @@ def register(update, context):
         update.message.reply_text('Te has registrado!')
 
 
-def help(update, context):
-    """Send a message when the command /help is issued."""
-    output_text = """Estos son todos los comandos que puedes usar por ahora:
-
-💬 *BÁSICOS:*
+def help_basic(update, context):
+    output_text = """💬 *BÁSICOS:*
 - */start:* para recordar la información inicial.
 
 - */rules:* para saber las normas del juego
@@ -1022,15 +1038,20 @@ def help(update, context):
 
 - */missions*: para saber dónde puedes encontrar misiones. 
 
-- */contact*: si tienes dudas o problemas usa este comando para contactarnos!
+- */contact*: si tienes dudas o problemas usa este comando para contactarnos!"""
+    update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
 
-💬 *COMPETITIVOS:*
 
+def help_competitive(update, context):
+    output_text = """💬 *COMPETITIVOS:*
 - */top3*: muestar la puntuación de los 3 jugadores con mayor puntuación
 
-- */topfaction*: muestra el top de vuestra facción. Para entrar en el top requiere alias y más de 0 puntos
+- */topfaction*: muestra el top de vuestra facción. Para entrar en el top requiere alias y más de 0 puntos"""
+    update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
 
-💬 *PERSONALIZADOS:*
+
+def help_personal(update, context):
+    output_text ="""💬 *PERSONALIZADOS:*
 - */setalias + "el nombre de tu elección"*: para cambiar tu alias de registro. _Ejemplo: /setalias TimeEscapeBot_.
 
 - */stats*: para conocer tus logros dentro del juego.
@@ -1041,10 +1062,12 @@ def help(update, context):
 
 - */join + "facción"*: para unirte a tu facción. _Ejemplos: /joinanomalis o /joincorruptus_ 
 
-- */boop*: El bot te mandará un boop!
+- */boop*: El bot te mandará un boop!"""
+    update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
 
-💬 *DE EQUIPO:*
-Los equipos sirven para jugar con tus amigos y acumular puntos.
+
+def help_team(update, context):
+    output_text = """💬 *DE EQUIPO:* Los equipos sirven para jugar con tus amigos y acumular puntos.
 
 - */createteam + "nombre"*: para ser la fundadora de un equipo. _Ejemplo: /createteam HvZ_
 
@@ -1054,7 +1077,22 @@ Los equipos sirven para jugar con tus amigos y acumular puntos.
 
 - */sendboop + "alias"*: mandar un boop a alguien con ese alias que esté en tu equipo. Boop!
 
+- */sendall + "mensaje"*: mandar un mensaje a todo el mundo de tu equipo
+
 - */promote + "alias", "rango"*: para otorgar cargos dentro del equipo. _Ejemplo: /promote antonio, veterano_."""
+    update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
+
+
+def help(update, context):
+    """Send a message when the command /help is issued."""
+    output_text = """Para ver los comandos basicos pulsa en:
+💬 *BÁSICOS: /help_basic*
+
+💬 *COMPETITIVOS: /help_competitive*
+
+💬 *PERSONALIZADOS: /help_personal*
+
+💬 *DE EQUIPO: /help_team*"""
     update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
 
 # - */help + "otro comando"*: para obtener información más detallada referente al comando. _Ejemplo: /help createteam_. (aun en desarrollo)
@@ -1193,8 +1231,8 @@ def main():
     dp.add_handler(CommandHandler("showteam", show_team))
     dp.add_handler(CommandHandler("promote", promote))
     dp.add_handler(CommandHandler("createlink", create_link))
-    dp.add_handler(CommandHandler("boop", boop))
     dp.add_handler(CommandHandler("sendboop", sendboop))
+    dp.add_handler(CommandHandler("sendall", sendall))
 
     # Commands related to personal stuff
     dp.add_handler(CommandHandler("setalias", set_alias))
@@ -1204,16 +1242,23 @@ def main():
     dp.add_handler(CommandHandler("joinanomalis", join_anomalis))
     dp.add_handler(CommandHandler("joincorruptus", join_corruptus))
     dp.add_handler(CommandHandler("setlanguage", set_language))
+    dp.add_handler(CommandHandler("boop", boop))
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("rules", rules))
     dp.add_handler(CommandHandler("halal", halal))
     dp.add_handler(CommandHandler("corruptus", corruptus))
     dp.add_handler(CommandHandler("test", test))
     dp.add_handler(CommandHandler("use", use))
     dp.add_handler(CommandHandler("contact", contact))
+
+    # Commands for help
+    dp.add_handler(CommandHandler("help", help))
+    dp.add_handler(CommandHandler("help_personal", help_personal))
+    dp.add_handler(CommandHandler("help_team", help_team))
+    dp.add_handler(CommandHandler("help_competitive", help_competitive))
+    dp.add_handler(CommandHandler("help_basic", help_basic))
 
     # Util class to check the id of the conversation
     dp.add_handler(CommandHandler("GetMyId", get_my_id))
