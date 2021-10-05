@@ -1349,6 +1349,70 @@ def general_top(update, context):
     update.message.reply_text(output_text)
 
 
+def add_points(update, context):
+    user_id = str(update.message.chat['id'])
+
+    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
+    if level != 'Mod':
+        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
+        return None
+
+    text = str(update.message.text)[11:]
+    values = text.split(", ")
+    if len(values) != 2:
+        update.message.reply_text("Cal entrar el user_id i els punts per separats per una coma i un espai")
+        return None
+
+    try:
+        values[1] = int(values[1])
+    except:
+        update.message.reply_text("***ERROR***:El segon valor ha de ser un número enter")
+        return None
+
+    am_b = 'P_Aulari'
+    actual_points = int(data[data['BOT_ID'] == values[0]][am_b])
+    data.loc[data['BOT_ID'] == values[0], am_b] = actual_points + values[1]
+    data.to_csv(database_file, index=False, sep=';')
+    update.message.reply_text("Punts sumats correctament!!")
+
+
+def message_all(update, context):
+    user_id = str(update.message.chat['id'])
+
+    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
+    if level != 'Mod':
+        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
+        return None
+
+    text = str(update.message.text)[12:]
+
+    all_ids = data['BOT_ID'].tolist()
+    for i in all_ids:
+        try:
+            context.bot.send_message(str(i), text)
+        except:
+            pass
+
+
+def help_mod(update, context):
+    user_id = str(update.message.chat['id'])
+
+    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
+    if level != 'Mod':
+        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
+        return None
+
+    output_text = """💬 *COMANDOS DE SOLO MODS:*
+-*/generaltop*: Muestra el top 10 de las dos facciones. Se puede añadir un numero para que sea el top ese numero
+
+-*/activate + user_id, mission_id*: Le activa a ese usuario esa mission
+ 
+-*/addpoints + user_id, puntos*: Le suma a ese usuario tantos puntos
+
+-*/messageall + texto*: Le manda a todos los jugadores ese texto"""
+    update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
+
+
 def main():
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
@@ -1408,6 +1472,9 @@ def main():
     dp.add_handler(CommandHandler("bondiaboop", bdb))
     dp.add_handler(CommandHandler("activate", activate_mission))
     dp.add_handler(CommandHandler("generaltop", general_top))
+    dp.add_handler(CommandHandler("addpoints", add_points))
+    dp.add_handler(CommandHandler("messageall", message_all))
+    dp.add_handler(CommandHandler("helpmods", help_mod))
 
     # Util class to check the id of the conversation
     dp.add_handler(CommandHandler("GetMyId", get_my_id))
