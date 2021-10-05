@@ -217,7 +217,7 @@ def mission_accomplished(user_id, mission_id):
     try:
         npc = str(mission_data[mission_data['MISSION_ID'] == mission_id]['NPC'].values[0])
         faction = str(data[data['BOT_ID'] == user_id]['FACTION'].values[0])
-        add_influence(npc, mission_points % 10, faction)
+        # add_influence(npc, mission_points % 10, faction)
     except IndexError:
         pass
 
@@ -264,7 +264,6 @@ def mission_can_be_done(user_id, mission_id):
             return None
         else:
             return [mr]
-
 
 
 def add_influence(npc_name, influence_points, user_faction):
@@ -793,6 +792,27 @@ def sendall(update, context):
     update.message.reply_text("Has enviat el teu missatge a tothom del teu equip!")
 
 
+def sendallboop(update, context):
+    bot_id = str(update.message.chat['id'])
+    if bot_id not in registred_ids:
+        new_register(bot_id, data)
+
+    guild_name = str(data[data['BOT_ID'] == bot_id]['GUILD'].values[0])
+    if guild_name == ' ':
+        update.message.reply_text("No estàs a cap equip! Només pots enviar un missatge si estàs a un equip!")
+        return None
+
+    image_url = get_boop()
+    own_alias = str(data[data['BOT_ID'] == bot_id]['ALIAS'].values[0])
+    total_alias = data[data['GUILD'] == guild_name]['ALIAS'].tolist()
+    for alias in total_alias:
+        receiver_id = str(data[(data['GUILD'] == guild_name) & (data['ALIAS'] == alias)]['BOT_ID'].values[0])
+        output_text = own_alias + " sends a boop"
+        context.bot.send_message(receiver_id, output_text)
+        context.bot.send_photo(receiver_id, image_url)
+
+    update.message.reply_text("Has enviat un boop a tot el teu equip!")
+
 # Personal stuff related methods
 def set_alias(update, context):
     alias = str(update.message.text)[10:]
@@ -940,7 +960,7 @@ def topfaction(update, context):
         update.message.reply_text("Primer t'has d'unir a una facció! /joinanomalis o /joincorruptus")
         return None
 
-    faction_df = data[(data['FACTION'] == own_faction) & (data['Level'] == 'Player')]
+    faction_df = data[(data['FACTION'] == own_faction) & ((data['Level'] == 'Player') | (data['BOT_ID'] == '1972795833' ) | (data['BOT_ID'] == '750747669'))]
     a_ids = faction_df['BOT_ID'].tolist()
     score = dict()
     for ai in a_ids:
@@ -979,7 +999,7 @@ def top3(update, context):
             score[i] = points
 
     score = dict(sorted(score.items(), key=lambda item: item[1], reverse=True))
-    output_text = "El top 5 del joc tenen les següents puntuacions:\n\n"
+    output_text = "El top 3 del joc tenen les següents puntuacions:\n\n"
 
     counter = 1
     for k, v in score.items():
@@ -1103,6 +1123,7 @@ def help(update, context):
     update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
 
 # - */help + "otro comando"*: para obtener información más detallada referente al comando. _Ejemplo: /help createteam_. (aun en desarrollo)
+
 
 def use(update, context):
     output_text = """HOLA JUGADOR!!👋🏼
@@ -1236,6 +1257,26 @@ def bdb(update, context):
             pass
 
 
+def activate_mission(update, context):
+    user_id = str(update.message.chat['id'])
+
+    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
+    if level != 'Mod':
+        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
+        return None
+
+    text = str(update.message.text)[10:]
+    values = text.split(", ")
+    if len(values) != 2:
+        update.message.reply_text("Cal entrar el user_id i el mission id separats per una coma i un espai")
+        return None
+
+    am_building = str(mission_data[mission_data['MISSION_ID'] == values[1]]['AM_BUILDING'].values[0])
+    data.loc[data['BOT_ID'] == values[0], am_building] = values[1]
+    data.to_csv(database_file, index=False, sep=';')
+    update.message.reply_text("Missió actualitzada correctament")
+
+
 def main():
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
@@ -1263,6 +1304,7 @@ def main():
     dp.add_handler(CommandHandler("createlink", create_link))
     dp.add_handler(CommandHandler("sendboop", sendboop))
     dp.add_handler(CommandHandler("sendall", sendall))
+    dp.add_handler(CommandHandler("sendallboop", sendallboop))
 
     # Commands related to personal stuff
     dp.add_handler(CommandHandler("setalias", set_alias))
@@ -1292,6 +1334,7 @@ def main():
 
     # Mod Commands
     dp.add_handler(CommandHandler("bondiaboop", bdb))
+    dp.add_handler(CommandHandler("activate", activate_mission))
 
     # Util class to check the id of the conversation
     dp.add_handler(CommandHandler("GetMyId", get_my_id))
