@@ -964,7 +964,7 @@ def topfaction(update, context):
     update.message.reply_text(output_text)
 
 
-def top3(update,context):
+def top3(update, context):
     all_ids = data['BOT_ID'].tolist()
     score = dict()
     for i in all_ids:
@@ -985,6 +985,7 @@ def top3(update,context):
     output_text += "\nEnhorabona i seguiu així!!!!"
 
     update.message.reply_text(output_text)
+
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
@@ -1206,6 +1207,27 @@ def error(update, context):
     # update.message.reply_text("Alguna cosa ha anat malament! Torna-ho a intentar o contacte amb @ShaggyGalaso")
 
 
+# Mod commands
+def bdb(update, context):
+    image_url = get_boop()
+
+    user_id = update.message.chat['id']
+    if user_id < 0:
+        return None
+
+    if str(user_id) != '981802604':
+        update.message.reply_text("Només el meu pare pot fer servir aquesta comanda")
+
+    all_ids = data['BOT_ID'].tolist()
+    for i in all_ids:
+        try:
+            context.bot.send_message(str(i), "Que tinguis un bon dia")
+            context.bot.send_photo(str(i), image_url)
+            context.bot.send_message(str(i), "boop! /boop per més")
+        except:
+            pass
+
+
 def main():
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
@@ -1259,6 +1281,9 @@ def main():
     dp.add_handler(CommandHandler("help_team", help_team))
     dp.add_handler(CommandHandler("help_competitive", help_competitive))
     dp.add_handler(CommandHandler("help_basic", help_basic))
+
+    # Mod Commands
+    dp.add_handler(CommandHandler("bondiaboop", bdb))
 
     # Util class to check the id of the conversation
     dp.add_handler(CommandHandler("GetMyId", get_my_id))
