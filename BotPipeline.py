@@ -60,6 +60,12 @@ translator = Translator(service_urls=[
     ])
 
 
+conver_file = os.path.join(sys.path[0], 'conversation_database.csv')
+conver_data = pd.read_csv(conver_file, sep=';', header=0, dtype={'BOT_ID': str}, encoding='cp1252')
+talk_input = conver_data['INPUT'].tolist()
+talk_output = conver_data['OUTPUT'].tolist()
+talk = {k: v for k, v in zip(talk_input, talk_output)}
+
 # Functions about all the things of a given user
 def all_active_missions(df, user_id):
     """
@@ -1187,6 +1193,8 @@ def echo(update, context):
         update.message.reply_text(to_send)
         final_text = mission_accomplished(str(user_id), mission_solved)
         update.message.reply_text(final_text)
+    elif answer in talk.keys():
+        update.message.reply_text(talk[answer])
     else:
         update.message.reply_text("El missatge que has enviat no és cap resposta de les teves missions actives!")
         update.message.reply_text("Escriu /help per saber més de com funciona el bot")
