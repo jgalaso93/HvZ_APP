@@ -249,13 +249,15 @@ def corruptus_missions_in_zone(zone, ret={}):
 def humanize_mission_dict(d):
     d = dict(sorted(d.items(), key=lambda item: item[1], reverse=True))
     output_text = ""
+    counter = 1
     for key, value in d.items():
         try:
             npc = str(mission_data[mission_data['MISSION_ID'] == key]['NPC'].values[0])
         except:
             npc = ' '
 
-        output_text += "NPC: *" + npc + "* - " + str(value) + " (" + str(key) +")\n"
+        output_text += str(counter) + ". *" + npc + "* - " + str(value) + " (" + str(key) + ")\n"
+        counter += 1
 
     return output_text
 
