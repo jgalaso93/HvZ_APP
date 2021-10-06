@@ -32,6 +32,67 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import requests
 from bs4 import BeautifulSoup
 
+from random import randint
+
+# CONTANTS (frogs actually but u know, i don't even care anymore)
+list_of_frogs = [
+"http://www.allaboutfrogs.org/funstuff/random/0001.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0002.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0003.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0004.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0005.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0006.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0007.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0008.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0009.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0010.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0011.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0012.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0013.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0014.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0015.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0016.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0017.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0018.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0019.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0020.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0021.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0022.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0023.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0024.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0025.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0026.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0027.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0028.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0028.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0029.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0030.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0031.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0032.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0033.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0034.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0035.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0036.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0037.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0038.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0039.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0040.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0041.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0042.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0043.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0044.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0045.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0046.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0047.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0048.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0049.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0050.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0051.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0052.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0053.jpg",
+"http://www.allaboutfrogs.org/funstuff/random/0054.jpg"
+]
+
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -749,6 +810,29 @@ def boop(update, context):
     update.message.reply_photo(image.content)
 
 
+def meow(update, context):
+    bot_id = str(update.message.chat['id'])
+    if bot_id not in registred_ids:
+        new_register(bot_id, data)
+
+    page = "https://cataas.com/cat"
+    content = requests.get(page)
+    if content.status_code == 200:
+        update.message.reply_photo(content.content)
+
+
+def ribbit(update, context):
+    bot_id = str(update.message.chat['id'])
+    if bot_id not in registred_ids:
+        new_register(bot_id, data)
+
+    random_num = randint(0, (len(list_of_frogs) - 1))
+    page = list_of_frogs[random_num]
+    content = requests.get(page)
+    if content.status_code == 200:
+        update.message.reply_photo(content.content)
+
+
 def sendboop(update, context):
     bot_id = str(update.message.chat['id'])
     if bot_id not in registred_ids:
@@ -1089,7 +1173,7 @@ def help_personal(update, context):
 
 - */join + "facción"*: para unirte a tu facción. _Ejemplos: /joinanomalis o /joincorruptus_ 
 
-- */boop*: El bot te mandará un boop!"""
+- */boop o /meow o /ribbit*: El bot te mandará un boop! o un meow! o un ribbit!"""
     update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
 
 
@@ -1451,6 +1535,8 @@ def main():
     dp.add_handler(CommandHandler("joincorruptus", join_corruptus))
     dp.add_handler(CommandHandler("setlanguage", set_language))
     dp.add_handler(CommandHandler("boop", boop))
+    dp.add_handler(CommandHandler("meow", meow))
+    dp.add_handler(CommandHandler("ribbit", ribbit))
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
