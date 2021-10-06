@@ -218,6 +218,57 @@ def user_points(df, user_id):
     return total_points.values[0]
 
 
+def dict_of_missions(ams, ret={}):
+    ams = list(filter(lambda x: x != ' ', ams))
+    for p in ams:
+        ms = p.split(", ")
+        for m in ms:
+            try:
+                ret[m] += 1
+            except:
+                ret[m] = 1
+
+    return ret
+
+
+def dict_missions_in_zone(zone, ret={}):
+    m = data[zone]
+    return dict_of_missions(m, ret)
+
+
+def anomalis_missions_in_zone(zone, ret={}):
+    m = data[data['FACTION'] == 'Anomalis'][zone]
+    return dict_of_missions(m, ret)
+
+
+def corruptus_missions_in_zone(zone, ret={}):
+    m = data[data['FACTION'] == 'Corruptus'][zone]
+    return dict_of_missions(m, ret)
+
+
+def humanize_mission_dict(d):
+    d = dict(sorted(d.items(), key=lambda item: item[1], reverse=True))
+    output_text = ""
+    for key, value in d.items():
+        try:
+            npc = str(mission_data[mission_data['MISSION_ID'] == key]['NPC'].values[0])
+        except:
+            npc = ' '
+
+        output_text += "NPC: *" + npc + "* - " + str(value) + " (" + str(key) +")\n"
+
+    return output_text
+
+
+def active_players(df):
+    all_ids = df['BOT_ID'].tolist()
+    count = 0
+    for i in all_ids:
+        m = amount_of_missions_done(df, i)
+        if m > 0:
+            count += 1
+    return count
+
 # FUNNY FUNCTIONS
 def get_boop():
     page = "https://random.dog/"
@@ -1478,6 +1529,72 @@ def message_all(update, context):
             pass
 
 
+def allmissionstats(update, context):
+    ret = dict()
+    ret = dict_missions_in_zone('DM_Aulari', ret)
+    ret = dict_missions_in_zone('DM_Carpa', ret)
+    ret = dict_missions_in_zone('DM_Civica', ret)
+    ret = dict_missions_in_zone('DM_Comunicacio', ret)
+    ret = dict_missions_in_zone('DM_EB_Sud', ret)
+    ret = dict_missions_in_zone('DM_EB_Nord', ret)
+    ret = dict_missions_in_zone('DM_EB_Central', ret)
+    ret = dict_missions_in_zone('DM_ETSE', ret)
+    ret = dict_missions_in_zone('DM_FTI', ret)
+    ret = dict_missions_in_zone('DM_Med', ret)
+    ret = dict_missions_in_zone('DM_SAF', ret)
+    ret = dict_missions_in_zone('DM_EC', ret)
+    ret = dict_missions_in_zone('DM_Torres', ret)
+    ret = dict_missions_in_zone('DM_Vet', ret)
+
+    output_text = "Active players: " + str(active_players(data) - 2)
+    update.message.reply_text(output_text)
+    update.message.reply_text(humanize_mission_dict(ret), parse_mode=telegram.ParseMode.MARKDOWN)
+
+
+def allanomalismissions(update, context):
+    ret = dict()
+    ret = anomalis_missions_in_zone('DM_Aulari', ret)
+    ret = anomalis_missions_in_zone('DM_Carpa', ret)
+    ret = anomalis_missions_in_zone('DM_Civica', ret)
+    ret = anomalis_missions_in_zone('DM_Comunicacio', ret)
+    ret = anomalis_missions_in_zone('DM_EB_Sud', ret)
+    ret = anomalis_missions_in_zone('DM_EB_Nord', ret)
+    ret = anomalis_missions_in_zone('DM_EB_Central', ret)
+    ret = anomalis_missions_in_zone('DM_ETSE', ret)
+    ret = anomalis_missions_in_zone('DM_FTI', ret)
+    ret = anomalis_missions_in_zone('DM_Med', ret)
+    ret = anomalis_missions_in_zone('DM_SAF', ret)
+    ret = anomalis_missions_in_zone('DM_EC', ret)
+    ret = anomalis_missions_in_zone('DM_Torres', ret)
+    ret = anomalis_missions_in_zone('DM_Vet', ret)
+
+    output_text = "Active players: " + str(active_players(data[data['FACTION'] == 'Anomalis']))
+    update.message.reply_text(output_text)
+    update.message.reply_text(humanize_mission_dict(ret), parse_mode=telegram.ParseMode.MARKDOWN)
+
+
+def allcorruptusmissions(update, context):
+    ret = dict()
+    ret = corruptus_missions_in_zone('DM_Aulari', ret)
+    ret = corruptus_missions_in_zone('DM_Carpa', ret)
+    ret = corruptus_missions_in_zone('DM_Civica', ret)
+    ret = corruptus_missions_in_zone('DM_Comunicacio', ret)
+    ret = corruptus_missions_in_zone('DM_EB_Sud', ret)
+    ret = corruptus_missions_in_zone('DM_EB_Nord', ret)
+    ret = corruptus_missions_in_zone('DM_EB_Central', ret)
+    ret = corruptus_missions_in_zone('DM_ETSE', ret)
+    ret = corruptus_missions_in_zone('DM_FTI', ret)
+    ret = corruptus_missions_in_zone('DM_Med', ret)
+    ret = corruptus_missions_in_zone('DM_SAF', ret)
+    ret = corruptus_missions_in_zone('DM_EC', ret)
+    ret = corruptus_missions_in_zone('DM_Torres', ret)
+    ret = corruptus_missions_in_zone('DM_Vet', ret)
+
+    output_text = "Active players: " + str(active_players(data[data['FACTION'] == 'Corruptus']))
+    update.message.reply_text(output_text)
+    update.message.reply_text(humanize_mission_dict(ret), parse_mode=telegram.ParseMode.MARKDOWN)
+
+
 def help_mod(update, context):
     user_id = str(update.message.chat['id'])
 
@@ -1493,7 +1610,13 @@ def help_mod(update, context):
  
 -*/addpoints + user_id, puntos*: Le suma a ese usuario tantos puntos
 
--*/messageall + texto*: Le manda a todos los jugadores ese texto"""
+-*/messageall + texto*: Le manda a todos los jugadores ese texto
+
+-*/allmissionstats*: Muestra los stats de todas las misiones
+
+-*/allanomalisstats*: Muestra los stats de todas las misiones
+
+-*/allcorruptusstats*: Muestra los stats de todas las misiones"""
     update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
 
 
@@ -1560,6 +1683,9 @@ def main():
     dp.add_handler(CommandHandler("generaltop", general_top))
     dp.add_handler(CommandHandler("addpoints", add_points))
     dp.add_handler(CommandHandler("messageall", message_all))
+    dp.add_handler(CommandHandler("allmissionstats", allmissionstats))
+    dp.add_handler(CommandHandler("allanomalisstats", allanomalismissions))
+    dp.add_handler(CommandHandler("allcorruptusstats", allcorruptusmissions))
     dp.add_handler(CommandHandler("helpmods", help_mod))
 
     # Util class to check the id of the conversation
