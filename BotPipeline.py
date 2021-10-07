@@ -1704,6 +1704,24 @@ def onduty(update, context):
 
     update.message.reply_text(output_text)
 
+
+def complete(update, context):
+    user_id = str(update.message.chat['id'])
+    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
+
+    if level != 'Mod':
+        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
+        return None
+    text = str(update.message.text)[10:]
+    values = text.split(", ")
+    am = all_active_missions(data, values[0])
+    if values[1] in am:
+        mission_accomplished(values[0], values[1])
+        update.message.reply_text("Missió completada amb éxit")
+    else:
+        update.message.reply_text("Aquesta persona no té aquesta missió activada")
+
+
 def help_mod(update, context):
     user_id = str(update.message.chat['id'])
 
@@ -1716,6 +1734,8 @@ def help_mod(update, context):
 -*/generaltop*: Muestra el top 10 de las dos facciones. Se puede añadir un numero para que sea el top ese numero
 
 -*/activate + user_id, mission_id*: Le activa a ese usuario esa mission
+
+-*/complete + user_id, mission_id*: Le hace esa mision a esa persona
 
 -*/donebyuser + user_id*: Te dice todas las misiones que ha hecho esa persona 
 
@@ -1818,6 +1838,7 @@ def main():
     dp.add_handler(CommandHandler("allcorruptusstats", allcorruptusmissions))
     dp.add_handler(CommandHandler("donebyuser", donebyuser))
     dp.add_handler(CommandHandler("onduty", onduty))
+    dp.add_handler(CommandHandler("complete", complete))
     dp.add_handler(CommandHandler("helpmods", help_mod))
 
     # Util class to check the id of the conversation
