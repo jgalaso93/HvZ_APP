@@ -1669,6 +1669,41 @@ def allcorruptusmissions(update, context):
     update.message.reply_text(humanize_mission_dict(ret), parse_mode=telegram.ParseMode.MARKDOWN)
 
 
+def donebyuser(update, context):
+    user_id = str(update.message.chat['id'])
+    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
+
+    if level != 'Mod':
+        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
+        return None
+
+    player_id = str(update.message.text)[12:]
+    udf = data[data['BOT_ID'] == player_id]
+    dm = all_done_missions(udf, player_id)
+    alias = str(udf['ALIAS'].values[0])
+    output_text = "La persona: " + str(alias) + " amb ID: " + str(player_id) + " ha fet les següents missions:\n\n"
+    output_text += str(dm)
+
+    update.message.reply_text(output_text)
+
+
+def onduty(update, context):
+    user_id = str(update.message.chat['id'])
+    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
+
+    if level != 'Mod':
+        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
+        return None
+
+    player_id = str(update.message.text)[8:]
+    udf = data[data['BOT_ID'] == player_id]
+    dm = all_active_missions(udf, player_id)
+    alias = str(udf['ALIAS'].values[0])
+    output_text = "La persona: " + str(alias) + " amb ID: " + str(player_id) + " té les següents missions actives:\n\n"
+    output_text += str(dm)
+
+    update.message.reply_text(output_text)
+
 def help_mod(update, context):
     user_id = str(update.message.chat['id'])
 
@@ -1681,6 +1716,10 @@ def help_mod(update, context):
 -*/generaltop*: Muestra el top 10 de las dos facciones. Se puede añadir un numero para que sea el top ese numero
 
 -*/activate + user_id, mission_id*: Le activa a ese usuario esa mission
+
+-*/donebyuser + user_id*: Te dice todas las misiones que ha hecho esa persona 
+
+-*/onduty + user_id*: Te dice todas las misiones activas de esa persona
  
 -*/addpoints + user_id, puntos*: Le suma a ese usuario tantos puntos
 
@@ -1777,6 +1816,8 @@ def main():
     dp.add_handler(CommandHandler("allmissionstats", allmissionstats))
     dp.add_handler(CommandHandler("allanomalisstats", allanomalismissions))
     dp.add_handler(CommandHandler("allcorruptusstats", allcorruptusmissions))
+    dp.add_handler(CommandHandler("donebyuser", donebyuser))
+    dp.add_handler(CommandHandler("onduty", onduty))
     dp.add_handler(CommandHandler("helpmods", help_mod))
 
     # Util class to check the id of the conversation
