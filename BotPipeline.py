@@ -1326,7 +1326,9 @@ def help(update, context):
 
 💬 *PERSONALIZADOS: /help_personal*
 
-💬 *DE EQUIPO: /help_team*"""
+💬 *DE EQUIPO: /help_team*
+
+⚠️ *REPORTAR UN PROBLEMA:* /report + El problema"""
     update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
 
 # - */help + "otro comando"*: para obtener información más detallada referente al comando. _Ejemplo: /help createteam_. (aun en desarrollo)
@@ -1692,6 +1694,19 @@ def help_mod(update, context):
     update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
 
 
+def reportproblem(update, context):
+    bot_id = str(update.message.chat['id'])
+    if bot_id not in registred_ids:
+        new_register(bot_id, data)
+
+    problem = str(update.message.text)[8:]
+    if problem:
+        output_text = "La persona amb id " + bot_id + " reporta el seqüent problema:\n\n"
+        output_text += problem
+        context.bot.send_message('981802604', output_text)
+        context.bot.send_message('981802604', str(bot_id))
+
+
 def main():
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
@@ -1706,6 +1721,9 @@ def main():
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
+
+    # Command to report a problem
+    dp.add_handler(CommandHandler("report", reportproblem))
 
     # Commands related to competition
     dp.add_handler(CommandHandler("topfaction", topfaction))
