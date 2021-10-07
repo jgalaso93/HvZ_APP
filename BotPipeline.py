@@ -450,8 +450,19 @@ def check_pic(user_id, photo_id):
         return False
 
 
+def guild_points(guild_name):
+    gdf = data[data['GUILD'] == guild_name]
+    gids = gdf['BOT_ID'].tolist()
+    t_points = 0
+    for i in gids:
+        t_points += user_points(gdf, i)
+
+    return t_points
+
+
 def read_QR(update, context):
-    if check_pic(str(update.message.chat['id']), update.message.photo[-1].file_unique_id):
+    bot_id = str(update.message.chat['id'])
+    if check_pic(bot_id, update.message.photo[-1].file_unique_id):
         update.message.reply_text("Aquesta foto ja s'ha fet servir!!")
         return 0
     file = update.message.photo[-1].file_id
@@ -463,6 +474,28 @@ def read_QR(update, context):
     shutil.rmtree(tmp_dir)
     det = cv2.QRCodeDetector()
     val, pts, st_code = det.detectAndDecode(img)
+
+    # Missiones de Lore
+    if "LORE" in val:
+        own_faction = str(data[data['BOT_ID'] == bot_id]['ALIAS'].values[0])
+        if own_faction == "Neutral":
+            update.message.reply_text("Necessites ser d'una facció per fer aquesta missió: /joinanomalis o /joincorruptus")
+            return None
+
+        num = 0
+        for l in val:
+            try:
+                num = int(l)
+                num *= 10
+            except:
+                pass
+        num /= 10
+
+        if own_faction == "Anomalis":
+            val = "ANOMA" + str(num)
+        if own_faction == "Corruptus":
+            val = "CORRU" + str(num)
+
     if val == "":
         update.message.reply_text("Esta imagen no contiene ningún QR!")
     else:
@@ -1127,6 +1160,41 @@ def topfaction(update, context):
     update.message.reply_text(output_text)
 
 
+def top_teams(update, context):
+    guilds = data['GUILD'].tolist()
+    guilds = list(filter(lambda x: x != ' ', guilds))
+    guilds = set(guilds)
+    g_score = dict()
+
+    n = str(update.message.text)[10:]
+    try:
+        top = int(n)
+    except ValueError:
+        top = 10
+
+    for g in guilds:
+        g_points = guild_points(g)
+        if g_points > 0:
+            g_score[g] = g_points
+
+    g_score = dict(sorted(g_score.items(), key=lambda item: item[1], reverse=True))
+
+    last_points = max(g_score.values())
+    position = 1
+    counter = 1
+    output_text = "El top " + str(top) + " dels equips és:\n\n"
+    for key, value in g_score.items():
+        if last_points != value:
+            position += 1
+            last_points = value
+        output_text += str(position) + ". " + str(key) + ": " + str(value) + "\n"
+        if counter == top:
+            break
+        counter += 1
+
+    update.message.reply_text(output_text)
+
+
 def top3(update, context):
     all_ids = data['BOT_ID'].tolist()
     score = dict()
@@ -1210,7 +1278,9 @@ def help_competitive(update, context):
     output_text = """💬 *COMPETITIVOS:*
 - */top3*: muestar la puntuación de los 3 jugadores con mayor puntuación
 
-- */topfaction*: muestra el top de vuestra facción. Para entrar en el top requiere alias y más de 0 puntos"""
+- */topfaction*: muestra el top de vuestra facción. Para entrar en el top requiere alias y más de 0 puntos
+
+- */topteams*: mustra el top 10 de los equipos registrados."""
     update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
 
 
@@ -1640,6 +1710,7 @@ def main():
     # Commands related to competition
     dp.add_handler(CommandHandler("topfaction", topfaction))
     dp.add_handler(CommandHandler("top3", top3))
+    dp.add_handler(CommandHandler("topteams", top_teams))
 
     # Commands related to teams
     dp.add_handler(CommandHandler("createteam", create_team))
