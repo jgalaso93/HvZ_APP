@@ -1722,6 +1722,24 @@ def complete(update, context):
         update.message.reply_text("Aquesta persona no té aquesta missió activada")
 
 
+def sendtoplayer(update, context):
+    user_id = str(update.message.chat['id'])
+    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
+
+    if level != 'Mod':
+        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
+        return None
+    text = str(update.message.text)[14:]
+    values = text.split(", ")
+    alias = str(data[data['BOT_ID'] == user_id]['ALIAS'].values[0])
+    if text:
+        output_text = "Li Mod " + alias + " diu el següent:\n\n"
+        output_text += values[1]
+        context.bot.send_message(values[0], output_text)
+
+    update.message.reply_text("Persona contactada correctament")
+
+
 def help_mod(update, context):
     user_id = str(update.message.chat['id'])
 
@@ -1743,6 +1761,8 @@ def help_mod(update, context):
  
 -*/addpoints + user_id, puntos*: Le suma a ese usuario tantos puntos
 
+-*/sendtoplayer + user_id, texto*: Manda el texto a ese usuario
+
 -*/messageall + texto*: Le manda a todos los jugadores ese texto
 
 -*/allmissionstats*: Muestra los stats de todas las misiones
@@ -1758,12 +1778,15 @@ def reportproblem(update, context):
     if bot_id not in registred_ids:
         new_register(bot_id, data)
 
+    alias = str(data[data['BOT_ID'] == bot_id]['ALIAS'].values[0])
     problem = str(update.message.text)[8:]
     if problem:
-        output_text = "La persona amb id " + bot_id + " reporta el seqüent problema:\n\n"
+        output_text = "La persona amb alies: " + alias + " i id: " + bot_id + " reporta el seqüent problema:\n\n"
         output_text += problem
         context.bot.send_message('981802604', output_text)
         context.bot.send_message('981802604', str(bot_id))
+
+    update.message.reply_text("Problema correctamente reportado a @ShaggyGalaso, hablale si tarda mucho en resolverse")
 
 
 def main():
@@ -1839,6 +1862,7 @@ def main():
     dp.add_handler(CommandHandler("donebyuser", donebyuser))
     dp.add_handler(CommandHandler("onduty", onduty))
     dp.add_handler(CommandHandler("complete", complete))
+    dp.add_handler(CommandHandler("sendtoplayer", sendtoplayer))
     dp.add_handler(CommandHandler("helpmods", help_mod))
 
     # Util class to check the id of the conversation
