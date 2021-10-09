@@ -23,7 +23,7 @@ import cv2
 import tempfile
 import shutil
 
-from random import randrange
+from random import randrange, choice
 from googletrans import Translator
 
 import telegram
@@ -126,6 +126,10 @@ conver_data = pd.read_csv(conver_file, sep=';', header=0, dtype={'BOT_ID': str},
 talk_input = conver_data['INPUT'].tolist()
 talk_output = conver_data['OUTPUT'].tolist()
 talk = {k: v for k, v in zip(talk_input, talk_output)}
+
+teams_file = os.path.join(sys.path[0], 'teams_database.csv')
+teams_data = pd.read_csv(teams_file, sep=';', header=0, encoding='cp1252', dtype={'FOUNDER': str})
+
 
 # Functions about all the things of a given user
 def all_active_missions(df, user_id):
@@ -270,6 +274,15 @@ def active_players(df):
         if m > 0:
             count += 1
     return count
+
+
+# TEAM HELPER FUNCTIONS
+def check_is_founder(user_id):
+    founders = teams_data['FOUNDER'].tolist()
+    if user_id in founders:
+        return True
+    else:
+        return False
 
 # FUNNY FUNCTIONS
 def get_boop():
@@ -799,11 +812,80 @@ def create_team(update, context):
 
     data.to_csv(database_file, index=False, sep=';')
 
+    global teams_data
+    founders = teams_data['FOUNDER'].tolist()
+    print(founders)
+
+    if user_id in founders:
+        print(founders)
+        print("YES")
+        old_guild = str(teams_data[teams_data['FOUNDER'] == user_id]['GUILD'].values[0])
+        teams_data.loc[teams_data['FOUNDER'] == user_id, 'GUILD'] = team_name
+
+        all_members = data[data['GUILD'] == old_guild]['BOT_ID'].tolist()
+
+        if len(all_members) == 0:
+            pass
+        else:
+            new_leader = choice(all_members)
+            old_requests = teams_data[teams_data['GUILD'] == old_guild]['REQUESTS'].tolist()
+
+            new_row = dict()
+            new_row['GUILD'] = old_guild
+            new_row['FOUNDER'] = new_leader
+            if len(old_requests) == 0:
+                new_row['REQUESTS'] = 'None'
+            else:
+                new_row['REQUESTS'] = ', '.join(str(r) for r in old_requests)
+
+            teams_data = teams_data.append(new_row, ignore_index=True)
+            teams_data.to_csv(teams_file, index=False, sep=';')
+
+            context.bot.send_message(new_leader, "El fundador del teu equip ha marxat, ara ets el nou fundador!")
+
+    else:
+        new_row = dict()
+        new_row['GUILD'] = team_name
+        new_row['FOUNDER'] = user_id
+        new_row['REQUESTS'] = 'None'
+
+        teams_data = teams_data.append(new_row, ignore_index=True)
+        teams_data.to_csv(teams_file,  index=False, sep=';')
+
     reply_message = "L'equip " + team_name + " s'ha creat correctament!!! El teu rang és \"Founder\""
     update.message.reply_text(reply_message)
 
 
 def join_team(update, context):
+    global teams_data
+    team_name = str(update.message.text)[10:]
+    user_id = str(update.message.chat['id'])
+    if user_id not in registred_ids:
+        new_register(user_id, data)
+    own_alias = str(data[data['BOT_ID'] == user_id]['ALIAS'].values[0])
+
+    if team_name in teams_data['GUILD'].tolist():
+        actual_requests = teams_data[teams_data['GUILD'] == team_name]['REQUESTS'].tolist()
+        actual_requests.append(user_id)
+        actual_requests = ', '.join(str(r) for r in actual_requests)
+        teams_data.loc[data['GUILD'] == team_name, 'REQUESTS'] = actual_requests
+        update.message.reply_text("La teva solucitud s'ha completat correctament!!")
+
+        team_leader = str(teams_data[teams_data['GUILD'] == team_name]['FOUNDER'].values[0])
+        leader_text = "La persona amb alias: " + own_alias + " es vol unir al teu equip! Per acceptar copia la següent comanda:"
+        context.bot.send_message(team_leader, leader_text)
+        leader_text = "/admit " + user_id
+        context.bot.send_message(team_leader, leader_text)
+        leader_text = "Per reubitjar-la, copia la següent comanda: "
+        context.bot.send_message(team_leader, leader_text)
+        leader_text = "/decline " + user_id
+        context.bot.send_message(team_leader, leader_text)
+
+    else:
+        update.message.reply_text("No hi ha cap equip amb aquest nom!!")
+
+
+def join_team_old(update, context):
     global data
     team_name = str(update.message.text)[10:]
     user_id = str(update.message.chat['id'])
@@ -865,14 +947,15 @@ def promote(update, context):
         update.message.reply_text("No formes part de cap equip!")
         return 0
 
-    guild_level = str(data[data['BOT_ID'] == bot_id]['GUILD_LEVEL'].values[0])
-    if guild_level != "Founder":
+    # guild_level = str(data[data['BOT_ID'] == bot_id]['GUILD_LEVEL'].values[0])
+    founders = teams_data['FOUNDER'].tolist()
+    if bot_id not in founders:
         update.message.reply_text("Només els \"Founders\" poden promocionar gent del seu equip!")
         return 0
 
-    if values[0] == own_alias:
-        update.message.reply_text("Els \"Founders\" no poden canviar el seu propi rang!")
-        return 0
+    # if values[0] == own_alias:
+    #     update.message.reply_text("Els \"Founders\" no poden canviar el seu propi rang!")
+    #     return 0
 
     data.loc[(data['GUILD'] == guild_name) & (data['ALIAS'] == str(values[0])), 'GUILD_LEVEL'] = str(values[1])
     data.to_csv(database_file, index=False, sep=';')
@@ -880,6 +963,136 @@ def promote(update, context):
     output_text = "Totes les persones amb alies " + values[0] + " han sigut ascendides a " + values[1]
     update.message.reply_text(output_text)
 
+
+def kick(update, context):
+    global data
+    text = str(update.message.text)[6:]
+    bot_id = str(update.message.chat['id'])
+    if check_is_founder(bot_id):
+        team_name = str(teams_data[teams_data['FOUNDER'] == bot_id]['GUILD'].values[0])
+        if text == bot_id:
+            update.message.reply_text("No et pots fer fora a tu mateix del teu equip!")
+            return None
+        member_ids = data[data['GUILD'] == team_name]['BOT_ID'].tolist()
+        for i in member_ids:
+            if text == str(i):
+                print("YAS")
+                data.loc[data['BOT_ID'] == i, 'GUILD'] = ' '
+                data.loc[data['BOT_ID'] == i, 'GUILD_LEVEL'] = 'unguilded'
+                data.to_csv(database_file, index=False, sep=';')
+                update.message.reply_text("Has expulsat a la persona del teu equip!")
+                context.bot.send_message(i, "T'han fet fora del teu equip!")
+                return None
+        update.message.reply_text("No hi ha ningú amb aquest id al teu equip!")
+    else:
+        update.message.reply_text("Només els founders poden fer fora a algu de l'equip!")
+
+
+def admit(update, context):
+    global data
+    global teams_data
+    text = str(update.message.text)[7:]
+    bot_id = str(update.message.chat['id'])
+    if check_is_founder(bot_id):
+        team_name = str(teams_data[teams_data['FOUNDER'] == bot_id]['GUILD'].values[0])
+
+        all_ids = data['BOT_ID'].tolist()
+        if text not in all_ids:
+            update.message.reply_text("Aquest id no està registrat al bot!!")
+            return None
+
+        requested_ids = str(teams_data[teams_data['FOUNDER'] == bot_id]['REQUESTS'].values[0])
+        requested_ids = requested_ids.split(", ")
+        if text not in requested_ids:
+            update.message.reply_text("Aquest id no ha demanat entrar al teu equip!")
+            return None
+
+        data.loc[data['BOT_ID'] == text, 'GUILD'] = team_name
+        data.loc[data['BOT_ID'] == text, 'GUILD_LEVEL'] = 'Newbie'
+
+        data.to_csv(database_file, index=False, sep=';')
+
+        actual_requests = teams_data[teams_data['FOUNDER'] == bot_id]['REQUESTS'].tolist()
+        actual_requests.remove(text)
+        if len(actual_requests) == 0:
+            actual_requests = 'None'
+        else:
+            actual_requests = ', '.join(str(r) for r in actual_requests)
+        teams_data.loc[teams_data['FOUNDER'] == bot_id, 'REQUESTS'] = actual_requests
+
+        teams_data.to_csv(teams_file, index=False, sep=';')
+
+        update.message.reply_text("Has acceptat a l'usuari amb id " + text)
+        context.bot.send_message(text, "Has entrat a l'equip: " + team_name)
+    else:
+        update.message.reply_text("Només els founders poden ademtre a algu a l'equip!")
+
+
+def decline(update, context):
+    global data
+    global teams_data
+    text = str(update.message.text)[9:]
+    bot_id = str(update.message.chat['id'])
+    if check_is_founder(bot_id):
+        all_ids = data['BOT_ID'].tolist()
+        if text not in all_ids:
+            update.message.reply_text("Aquest id no està registrat al bot!!")
+            return None
+
+        requested_ids = str(teams_data[teams_data['FOUNDER'] == bot_id]['REQUESTS'].values[0])
+        requested_ids = requested_ids.split(", ")
+        if text not in requested_ids:
+            update.message.reply_text("Aquest id no ha demanat entrar al teu equip!")
+            return None
+
+        actual_requests = teams_data[teams_data['FOUNDER'] == bot_id]['REQUESTS'].tolist()
+        actual_requests.remove(text)
+        if len(actual_requests) == 0:
+            actual_requests = 'None'
+        else:
+            actual_requests = ', '.join(str(r) for r in actual_requests)
+        teams_data.loc[teams_data['FOUNDER'] == bot_id, 'REQUESTS'] = actual_requests
+
+        teams_data.to_csv(teams_file, index=False, sep=';')
+
+        update.message.reply_text("Has denegat a l'usuari amb id " + text + ". No se li comunicarà res a aquesta persona")
+    else:
+        update.message.reply_text("Només els founders poden ademtre a algu a l'equip!")
+
+
+def mem_ids(update, context):
+    bot_id = str(update.message.chat['id'])
+    if check_is_founder(bot_id):
+        team_name = str(teams_data[teams_data['FOUNDER'] == bot_id]['GUILD'].values[0])
+        m_ids = data[data['GUILD'] == team_name]['BOT_ID'].tolist()
+        output_text = "Els ids del teu equip són els següents:\n\n"
+        for i in m_ids:
+            output_text += "ID: " + str(i)
+            alias = str(data[data['BOT_ID'] == str(i)]['ALIAS'].values[0])
+            output_text += ". Alias: " + alias
+            g_lvl = str(data[data['BOT_ID'] == str(i)]['GUILD_LEVEL'].values[0])
+            output_text += ". Rang: " + g_lvl + "\n"
+        update.message.reply_text(output_text)
+    else:
+        update.message.reply_text("Només els founders poden veure els ids de la gent de l'equip!")
+
+
+def req_ids(update, context):
+    bot_id = str(update.message.chat['id'])
+    if check_is_founder(bot_id):
+        m_ids = str(teams_data[teams_data['FOUNDER'] == bot_id]['REQUESTS'].values[0])
+        m_ids = m_ids.split(", ")
+        if m_ids[0] == 'None':
+            update.message.reply_text("No hi ha peticions pendents!")
+            return None
+        output_text = "Els ids del teu equip són els següents:\n\n"
+        for i in m_ids:
+            output_text += "ID: " + str(i)
+            alias = str(data[data['BOT_ID'] == str(i)]['ALIAS'].values[0])
+            output_text += ". Alias: " + alias + "\n"
+        update.message.reply_text(output_text)
+    else:
+        update.message.reply_text("Només els founders poden veure els ids de la gent de l'equip!")
 
 def create_link(update, context):
     # link = update.create_chat_invite_link(update.message.chat['id'])
@@ -1313,8 +1526,29 @@ def help_team(update, context):
 
 - */sendall + "mensaje"*: mandar un mensaje a todo el mundo de tu equipo
 
-- */promote + "alias", "rango"*: para otorgar cargos dentro del equipo. _Ejemplo: /promote antonio, veterano_."""
+- */help_founder*: Comandos que solo los fundadores pueden usar"""
     update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
+
+
+def help_founder(update, context):
+    bot_id = str(update.message.chat['id'])
+    if check_is_founder(bot_id):
+        output_text = """💬 *DE FUNDADORAS DE EQUIPO:*
+        
+- */promote + "alias", "rango"*: para otorgar cargos dentro del equipo. _Ejemplo: /promote antonio, veterano_.
+
+-*/kick + user_id*: Elimina la persona con ese id de tu equipo
+
+-*/admit + user_id*: Admite a la persona con ese id a tu equipo
+
+-*/decline + user_id*: Rechaza a la persona con ese id de tu equipo
+
+-*/memberids*: Lista IDs, alias i rangos de todas las personas miembro
+
+-*/requestsids*: Lista IDs i alias de todas las personas que estan pendientes de aprobación para entrar"""
+        update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
+    else:
+        update.message.reply_text("No has fundat cap equip, no pots usar aquesta comanda!")
 
 
 def help(update, context):
@@ -1816,11 +2050,18 @@ def main():
     dp.add_handler(CommandHandler("createteam", create_team))
     dp.add_handler(CommandHandler("jointeam", join_team))
     dp.add_handler(CommandHandler("showteam", show_team))
-    dp.add_handler(CommandHandler("promote", promote))
     dp.add_handler(CommandHandler("createlink", create_link))
     dp.add_handler(CommandHandler("sendboop", sendboop))
     dp.add_handler(CommandHandler("sendall", sendall))
     dp.add_handler(CommandHandler("sendallboop", sendallboop))
+
+    # Commands for team founders
+    dp.add_handler(CommandHandler("promote", promote))
+    dp.add_handler(CommandHandler("kick", kick))
+    dp.add_handler(CommandHandler("admit", admit))
+    dp.add_handler(CommandHandler("decline", decline))
+    dp.add_handler(CommandHandler("memberids", mem_ids))
+    dp.add_handler(CommandHandler("requestsids", req_ids))
 
     # Commands related to personal stuff
     dp.add_handler(CommandHandler("setalias", set_alias))
@@ -1849,6 +2090,7 @@ def main():
     dp.add_handler(CommandHandler("help_team", help_team))
     dp.add_handler(CommandHandler("help_competitive", help_competitive))
     dp.add_handler(CommandHandler("help_basic", help_basic))
+    dp.add_handler(CommandHandler("help_founder", help_founder))
 
     # Mod Commands
     dp.add_handler(CommandHandler("bondiaboop", bdb))
