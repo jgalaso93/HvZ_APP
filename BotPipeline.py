@@ -175,7 +175,12 @@ def all_done_missions(df, user_id):
     done_missions.extend(df[df['BOT_ID'] == user_id]['DM_Torres'])
     done_missions.extend(df[df['BOT_ID'] == user_id]['DM_Vet'])
     done_missions = list(filter(lambda x: x != ' ', done_missions))
-    return done_missions
+    final_missions = []
+    for ms in done_missions:
+        missions_subset = ms.split(", ")
+        for mis in missions_subset:
+            final_missions.append(mis)
+    return final_missions
 
 
 def amount_of_missions_done(df, user_id):
