@@ -451,7 +451,7 @@ def check_answer(user_id, answer):
 
 
 def check_pic(user_id, photo_id):
-    # return False
+    return False
 
     df_pics = os.path.join(sys.path[0], 'fotos_database.csv')
     db_pics = pd.read_csv(df_pics, sep=';', header=0)
@@ -495,7 +495,7 @@ def read_QR(update, context):
 
     # Missiones de Lore
     if "LORE" in val:
-        own_faction = str(data[data['BOT_ID'] == bot_id]['ALIAS'].values[0])
+        own_faction = str(data[data['BOT_ID'] == bot_id]['FACTION'].values[0])
         if own_faction == "Neutral":
             update.message.reply_text("Necessites ser d'una facció per fer aquesta missió: /joinanomalis o /joincorruptus")
             return None
@@ -510,9 +510,9 @@ def read_QR(update, context):
         num /= 10
 
         if own_faction == "Anomalis":
-            val = "ANOMA" + str(num)
+            val = "ANOMA" + str(int(num))
         if own_faction == "Corruptus":
-            val = "CORRU" + str(num)
+            val = "CORRU" + str(int(num))
 
     if val == "":
         update.message.reply_text("Esta imagen no contiene ningún QR!")
@@ -1981,6 +1981,52 @@ def sendtoplayer(update, context):
     update.message.reply_text("Persona contactada correctament")
 
 
+def influence_stats(update, context):
+    all_ids = data['BOT_ID'].tolist()
+    id_faction = dict()
+    id_missions = dict()
+    faction_values = {'Anomalis': 1, 'Corruptus': -1}
+    for i in all_ids:
+        value = all_done_missions(data, i)
+        if len(value) != 0:
+            key = str(data[data['BOT_ID'] == i]['FACTION'].values[0])
+            if key == "Neutral":
+                continue
+            id_faction[i] = key
+            id_missions[i] = value
+
+    all_mission_id = mission_data['MISSION_ID'].tolist()
+
+    mission_npc = dict()
+    for mid in all_mission_id:
+        if str(mid) == 'nan':
+            continue
+        npc = str(mission_data[mission_data['MISSION_ID'] == mid]['NPC'].values[0])
+        if npc == 'nan' or npc == 'None':
+            continue
+        mission_npc[mid] = npc
+
+    npc_influence = dict()
+    for n in mission_npc.values():
+        npc_influence[n] = 0
+
+    for i in id_missions.keys():
+        inf_value = faction_values[id_faction[i]]
+        missions = id_missions[i]
+        for m in missions:
+            if m in mission_npc.keys():
+                npc = mission_npc[m]
+                actual_value = npc_influence[npc]
+                actual_value += inf_value
+                npc_influence[npc] = actual_value
+
+    output_text = "Així està l'actual estat d'influencia: \n(Positiu Anomalis, Negatiu Corruptus)\n\n"
+    for k, v in npc_influence.items():
+        output_text += str(k) + ": " + str(v) + "\n"
+
+    update.message.reply_text(output_text)
+
+
 def help_mod(update, context):
     user_id = str(update.message.chat['id'])
 
@@ -2010,7 +2056,9 @@ def help_mod(update, context):
 
 -*/allanomalisstats*: Muestra los stats de todas las misiones
 
--*/allcorruptusstats*: Muestra los stats de todas las misiones"""
+-*/allcorruptusstats*: Muestra los stats de todas las misiones
+
+-*/influencestats*: Muestra el estado de influencia de todos los NPCS"""
     update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
 
 
@@ -2112,6 +2160,7 @@ def main():
     dp.add_handler(CommandHandler("onduty", onduty))
     dp.add_handler(CommandHandler("complete", complete))
     dp.add_handler(CommandHandler("sendtoplayer", sendtoplayer))
+    dp.add_handler(CommandHandler("influencestats", influence_stats))
     dp.add_handler(CommandHandler("helpmods", help_mod))
 
     # Util class to check the id of the conversation
