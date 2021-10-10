@@ -1017,7 +1017,8 @@ def admit(update, context):
 
         data.to_csv(database_file, index=False, sep=';')
 
-        actual_requests = teams_data[teams_data['FOUNDER'] == bot_id]['REQUESTS'].tolist()
+        actual_requests = str(teams_data[teams_data['FOUNDER'] == bot_id]['REQUESTS'].values[0])
+        actual_requests = actual_requests.split(", ")
         actual_requests.remove(text)
         if len(actual_requests) == 0:
             actual_requests = 'None'
@@ -1050,7 +1051,8 @@ def decline(update, context):
             update.message.reply_text("Aquest id no ha demanat entrar al teu equip!")
             return None
 
-        actual_requests = teams_data[teams_data['FOUNDER'] == bot_id]['REQUESTS'].tolist()
+        actual_requests = str(teams_data[teams_data['FOUNDER'] == bot_id]['REQUESTS'].values[0])
+        actual_requests = actual_requests.split(", ")
         actual_requests.remove(text)
         if len(actual_requests) == 0:
             actual_requests = 'None'
