@@ -530,6 +530,11 @@ def read_QR(update, context):
 def throw_mission(update, mission_id, user_id):
     pending = mission_can_be_done(str(user_id), mission_id)
     aam = all_active_missions(data, str(user_id))
+    adm = all_done_missions(data, str(user_id))
+    if mission_id in adm:
+        update.message.reply_text("Ja has fet aquesta missió! No pots tornar-la a fer!!")
+        return None
+
     if pending:
         ret_text = "Encara et falten les següents missions!"
         for m in pending:
@@ -874,6 +879,7 @@ def join_team(update, context):
         actual_requests.append(user_id)
         actual_requests = ', '.join(str(r) for r in actual_requests)
         teams_data.loc[data['GUILD'] == team_name, 'REQUESTS'] = actual_requests
+        teams_data.to_csv(teams_file, index=False, sep=';')
         update.message.reply_text("La teva solucitud s'ha completat correctament!!")
 
         team_leader = str(teams_data[teams_data['GUILD'] == team_name]['FOUNDER'].values[0])
@@ -1988,7 +1994,7 @@ def influence_stats(update, context):
     if level != 'Mod':
         update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
         return None
-    
+
     all_ids = data['BOT_ID'].tolist()
     id_faction = dict()
     id_missions = dict()
