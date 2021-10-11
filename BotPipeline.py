@@ -281,6 +281,19 @@ def active_players(df):
     return count
 
 
+def lore_text(npc):
+    all_npcs = NPC_data['NAME'].tolist()
+    if npc in all_npcs:
+        favor = int(NPC_data[NPC_data['NAME'] == npc]['FAVOR'].values[0])
+        if favor <= -6:
+            return "CORRUPTUS1"
+        if favor >= 6:
+            return "ANOMALIS1"
+        return "NEUTRAL"
+    else:
+        return False
+
+
 # TEAM HELPER FUNCTIONS
 def check_is_founder(user_id):
     founders = teams_data['FOUNDER'].tolist()
@@ -825,11 +838,8 @@ def create_team(update, context):
 
     global teams_data
     founders = teams_data['FOUNDER'].tolist()
-    print(founders)
 
     if user_id in founders:
-        print(founders)
-        print("YES")
         old_guild = str(teams_data[teams_data['FOUNDER'] == user_id]['GUILD'].values[0])
         teams_data.loc[teams_data['FOUNDER'] == user_id, 'GUILD'] = team_name
 
@@ -870,7 +880,6 @@ def create_team(update, context):
 def join_team(update, context):
     global teams_data
     team_name = str(update.message.text)[10:]
-    print(team_name)
     user_id = str(update.message.chat['id'])
     if user_id not in registred_ids:
         new_register(user_id, data)
@@ -989,7 +998,6 @@ def kick(update, context):
         member_ids = data[data['GUILD'] == team_name]['BOT_ID'].tolist()
         for i in member_ids:
             if text == str(i):
-                print("YAS")
                 data.loc[data['BOT_ID'] == i, 'GUILD'] = ' '
                 data.loc[data['BOT_ID'] == i, 'GUILD_LEVEL'] = 'unguilded'
                 data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
@@ -2042,6 +2050,63 @@ def influence_stats(update, context):
     update.message.reply_text(output_text)
 
 
+def refresh_influences(update, context):
+    user_id = str(update.message.chat['id'])
+    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
+
+    if level != 'Mod':
+        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
+        return None
+
+    all_ids = data['BOT_ID'].tolist()
+    id_faction = dict()
+    id_missions = dict()
+    faction_values = {'Anomalis': 1, 'Corruptus': -1}
+    for i in all_ids:
+        value = all_done_missions(data, i)
+        if len(value) != 0:
+            key = str(data[data['BOT_ID'] == i]['FACTION'].values[0])
+            if key == "Neutral":
+                continue
+            id_faction[i] = key
+            id_missions[i] = value
+
+    all_mission_id = mission_data['MISSION_ID'].tolist()
+
+    mission_npc = dict()
+    for mid in all_mission_id:
+        if str(mid) == 'nan':
+            continue
+        npc = str(mission_data[mission_data['MISSION_ID'] == mid]['NPC'].values[0])
+        if npc == 'nan' or npc == 'None':
+            continue
+        mission_npc[mid] = npc
+
+    npc_influence = dict()
+    for n in mission_npc.values():
+        npc_influence[n] = 0
+
+    for i in id_missions.keys():
+        inf_value = faction_values[id_faction[i]]
+        missions = id_missions[i]
+        for m in missions:
+            if m in mission_npc.keys():
+                npc = mission_npc[m]
+                actual_value = npc_influence[npc]
+                actual_value += inf_value
+                npc_influence[npc] = actual_value
+
+    for npc, influence in npc_influence.items():
+        NPC_data.loc[NPC_data['NAME'] == npc, 'FAVOR'] = influence
+
+    NPC_data.to_csv(NPC_file, index=False, sep=';', encoding='cp1252')
+    update.message.reply_text("Influencia refrescada correctament!")
+
+
+# def influence_from_db(update, context):
+
+
+
 def help_mod(update, context):
     user_id = str(update.message.chat['id'])
 
@@ -2073,8 +2138,45 @@ def help_mod(update, context):
 
 -*/allcorruptusstats*: Muestra los stats de todas las misiones
 
--*/influencestats*: Muestra el estado de influencia de todos los NPCS"""
+-*/influencestats*: Muestra el estado de influencia de todos los NPCS
+
+-*/refreshinfluence*: Refresca en la base de datos la influencia calculada"""
     update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
+
+
+def npcs(update, context):
+    bot_id = str(update.message.chat['id'])
+    if bot_id not in registred_ids:
+        new_register(bot_id, data)
+
+    adm = all_done_missions(data, bot_id)
+    all_npcs = NPC_data['NAME'].tolist()
+    show = dict()
+    for n in all_npcs:
+        reveal_mission = str(NPC_data[NPC_data['NAME'] == n]['ACTIVATION_ID'].values[0])
+        if reveal_mission in adm:
+            show[n] = True
+        else:
+            show[n] = False
+
+    particular_npc = str(update.message.text)[6:]
+    if len(particular_npc) == 0:
+        output_text = "Pots parlar amb els següents personatges:\n"
+        for n, s in show.items():
+            if s:
+                output_text += "/talk " + n + "\n"
+
+        update.message.reply_text(output_text)
+    else:
+        if show[particular_npc]:
+            text_to_use = lore_text(particular_npc)
+            if text_to_use:
+                output_text = str(NPC_data[NPC_data['NAME'] == particular_npc][text_to_use].values[0])
+                update.message.reply_text(output_text)
+            else:
+                update.message.reply_text("Hi ha hagut un error amb la base de dades, si us plau contacta a en @ShaggyGalaso")
+        else:
+            update.message.reply_text("El npc que has triat encara no el coneixes!!")
 
 
 def reportproblem(update, context):
@@ -2110,6 +2212,9 @@ def main():
 
     # Command to report a problem
     dp.add_handler(CommandHandler("report", reportproblem))
+
+    # Commands related to lore
+    dp.add_handler(CommandHandler("talk", npcs))
 
     # Commands related to competition
     dp.add_handler(CommandHandler("topfaction", topfaction))
@@ -2176,6 +2281,7 @@ def main():
     dp.add_handler(CommandHandler("complete", complete))
     dp.add_handler(CommandHandler("sendtoplayer", sendtoplayer))
     dp.add_handler(CommandHandler("influencestats", influence_stats))
+    dp.add_handler(CommandHandler("refreshinfluence", refresh_influences))
     dp.add_handler(CommandHandler("helpmods", help_mod))
 
     # Util class to check the id of the conversation
