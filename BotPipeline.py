@@ -100,9 +100,9 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 database_file = os.path.join(sys.path[0], 'database.csv')
 try:
-    data = pd.read_csv(database_file, sep=';', header=0, dtype={'BOT_ID': str})
+    data = pd.read_csv(database_file, sep=';', header=0, dtype={'BOT_ID': str}, encoding='cp1252')
 except:
-    data = pd.read_csv(database_file, sep=',', header=0, dtype={'BOT_ID': str})
+    data = pd.read_csv(database_file, sep=',', header=0, dtype={'BOT_ID': str}, encoding='cp1252')
 
 registred_ids = data['BOT_ID'].tolist()
 
@@ -353,7 +353,7 @@ def mission_accomplished(user_id, mission_id):
     except IndexError:
         pass
 
-    data.to_csv(database_file, index=False, sep=';')
+    data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
 
     final_text = str(mission_data[mission_data['MISSION_ID'] == mission_id]['FINAL_TEXT'].values[0])
     if final_text != 'None':
@@ -402,7 +402,7 @@ def add_influence(npc_name, influence_points, user_faction):
     actual_points = NPC_data[NPC_data['NAME'] == npc_name]['FAVOR']
     favor_value = position_value(actual_points, user_faction)
     NPC_data.loc[NPC_data['NAME'] == npc_name, 'FAVOR'] = actual_points + (influence_points * favor_value)
-    NPC_data.to_csv(NPC_file, index=False, sep=';')
+    NPC_data.to_csv(NPC_file, index=False, sep=';', encoding='cp1252')
 
 
 def position_value(npc_favor, user_faction):
@@ -451,7 +451,7 @@ def check_answer(user_id, answer):
 
 
 def check_pic(user_id, photo_id):
-    return False
+    # return False
 
     df_pics = os.path.join(sys.path[0], 'fotos_database.csv')
     db_pics = pd.read_csv(df_pics, sep=';', header=0)
@@ -464,7 +464,7 @@ def check_pic(user_id, photo_id):
         new_row['IMAGE_ID'] = photo_id
 
         db_pics = db_pics.append(new_row, ignore_index=True)
-        db_pics.to_csv(df_pics, index=False, sep=';')
+        db_pics.to_csv(df_pics, index=False, sep=';', encoding='cp1252')
         return False
 
 
@@ -551,7 +551,7 @@ def throw_mission(update, mission_id, user_id):
     language = str(data[data['BOT_ID'] == str(user_id)]['LANGUAGE'].values[0])
     am = mission_data[mission_data['MISSION_ID'] == mission_id]['AM_BUILDING']
     data.loc[data['BOT_ID'] == str(user_id), str(am.values[0])] = mission_id
-    data.to_csv(database_file, index=False, sep=';')
+    data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
     if language == 'ca':
         final_text = text
     else:
@@ -627,7 +627,7 @@ def new_register(bot_id, df):
 
     # Save the new data to database
     data = data.append(new_row, ignore_index=True)
-    data.to_csv(database_file, index=False, sep=';')
+    data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
 
     # Update the registred id's
     global registred_ids
@@ -637,19 +637,20 @@ def new_register(bot_id, df):
 # LOGIC AND FUNCTIONALITY
 def missions(update, context):
     # if True:
-    #     update.message.reply_text('Las missiones aun no están activadas, esperate a las 11:00!')
-    # else:
+    #     update.message.reply_text('Les missions estan en manteniment, si us plau, tornau a intentar en unes hores :)')
+    #     return None
     update.message.reply_text('En quina zona vols fer una missio?'
-                          '\n/Comunicacio'
-                          '\n/Edifici_B_central'
-                          '\n/Edifici_B_Nord'
-                          '\n/Edifici_B_Sud'
-                          '\n/Edifici_C'
-                          '\n/Etse'
-                          '\n/FTI'
-                          '\n/Medicina'
-                          '\n/SAF'
-                          '\n/Veterinaria')
+                      '\n/Comunicacio'
+                      '\n/Edifici_B_central'
+                      '\n/Edifici_B_Nord'
+                      '\n/Edifici_B_Sud'
+                      '\n/Edifici_C'
+                      '\n/Etse'
+                      '\n/FTI'
+                      '\n/Medicina'
+                      '\n/SAF'
+                      '\n/Veterinaria'
+                      '\n/Civica')
 
         # '\n/Aulari'
         # '\n/Carpa'
@@ -680,8 +681,8 @@ def Carpa(update, context):
 
 def Civica(update, context):
     foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
-    foto_path = os.path.join(foto_path, 'Civica')
+    foto_path = os.path.join(foto_path, 'QR activos')
+    foto_path = os.path.join(foto_path, 'CIVICA')
     number_of_photos = len(os.listdir(foto_path))
     index = randrange(number_of_photos)
     final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
@@ -820,7 +821,7 @@ def create_team(update, context):
     data.loc[data['BOT_ID'] == user_id, 'GUILD'] = team_name
     data.loc[data['BOT_ID'] == user_id, 'GUILD_LEVEL'] = 'Founder'
 
-    data.to_csv(database_file, index=False, sep=';')
+    data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
 
     global teams_data
     founders = teams_data['FOUNDER'].tolist()
@@ -849,7 +850,7 @@ def create_team(update, context):
                 new_row['REQUESTS'] = ', '.join(str(r) for r in old_requests)
 
             teams_data = teams_data.append(new_row, ignore_index=True)
-            teams_data.to_csv(teams_file, index=False, sep=';')
+            teams_data.to_csv(teams_file, index=False, sep=';', encoding='cp1252')
 
             context.bot.send_message(new_leader, "El fundador del teu equip ha marxat, ara ets el nou fundador!")
 
@@ -860,7 +861,7 @@ def create_team(update, context):
         new_row['REQUESTS'] = 'None'
 
         teams_data = teams_data.append(new_row, ignore_index=True)
-        teams_data.to_csv(teams_file,  index=False, sep=';')
+        teams_data.to_csv(teams_file,  index=False, sep=';', encoding='cp1252')
 
     reply_message = "L'equip " + team_name + " s'ha creat correctament!!! El teu rang és \"Founder\""
     update.message.reply_text(reply_message)
@@ -869,6 +870,7 @@ def create_team(update, context):
 def join_team(update, context):
     global teams_data
     team_name = str(update.message.text)[10:]
+    print(team_name)
     user_id = str(update.message.chat['id'])
     if user_id not in registred_ids:
         new_register(user_id, data)
@@ -878,8 +880,8 @@ def join_team(update, context):
         actual_requests = teams_data[teams_data['GUILD'] == team_name]['REQUESTS'].tolist()
         actual_requests.append(user_id)
         actual_requests = ', '.join(str(r) for r in actual_requests)
-        teams_data.loc[data['GUILD'] == team_name, 'REQUESTS'] = actual_requests
-        teams_data.to_csv(teams_file, index=False, sep=';')
+        teams_data.loc[teams_data['GUILD'] == team_name, 'REQUESTS'] = actual_requests
+        teams_data.to_csv(teams_file, index=False, sep=';', encoding='cp1252')
         update.message.reply_text("La teva solucitud s'ha completat correctament!!")
 
         team_leader = str(teams_data[teams_data['GUILD'] == team_name]['FOUNDER'].values[0])
@@ -907,7 +909,7 @@ def join_team_old(update, context):
         data.loc[data['BOT_ID'] == user_id, 'GUILD'] = team_name
         data.loc[data['BOT_ID'] == user_id, 'GUILD_LEVEL'] = 'Newbie'
 
-        data.to_csv(database_file, index=False, sep=';')
+        data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
 
         reply_message = "T'has unit a l'equip " + team_name + " correctament!!! El teu rang és \"Newbie\""
         update.message.reply_text(reply_message)
@@ -969,7 +971,7 @@ def promote(update, context):
     #     return 0
 
     data.loc[(data['GUILD'] == guild_name) & (data['ALIAS'] == str(values[0])), 'GUILD_LEVEL'] = str(values[1])
-    data.to_csv(database_file, index=False, sep=';')
+    data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
 
     output_text = "Totes les persones amb alies " + values[0] + " han sigut ascendides a " + values[1]
     update.message.reply_text(output_text)
@@ -990,7 +992,7 @@ def kick(update, context):
                 print("YAS")
                 data.loc[data['BOT_ID'] == i, 'GUILD'] = ' '
                 data.loc[data['BOT_ID'] == i, 'GUILD_LEVEL'] = 'unguilded'
-                data.to_csv(database_file, index=False, sep=';')
+                data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
                 update.message.reply_text("Has expulsat a la persona del teu equip!")
                 context.bot.send_message(i, "T'han fet fora del teu equip!")
                 return None
@@ -1021,7 +1023,7 @@ def admit(update, context):
         data.loc[data['BOT_ID'] == text, 'GUILD'] = team_name
         data.loc[data['BOT_ID'] == text, 'GUILD_LEVEL'] = 'Newbie'
 
-        data.to_csv(database_file, index=False, sep=';')
+        data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
 
         actual_requests = str(teams_data[teams_data['FOUNDER'] == bot_id]['REQUESTS'].values[0])
         actual_requests = actual_requests.split(", ")
@@ -1032,7 +1034,7 @@ def admit(update, context):
             actual_requests = ', '.join(str(r) for r in actual_requests)
         teams_data.loc[teams_data['FOUNDER'] == bot_id, 'REQUESTS'] = actual_requests
 
-        teams_data.to_csv(teams_file, index=False, sep=';')
+        teams_data.to_csv(teams_file, index=False, sep=';', encoding='cp1252')
 
         update.message.reply_text("Has acceptat a l'usuari amb id " + text)
         context.bot.send_message(text, "Has entrat a l'equip: " + team_name)
@@ -1066,7 +1068,7 @@ def decline(update, context):
             actual_requests = ', '.join(str(r) for r in actual_requests)
         teams_data.loc[teams_data['FOUNDER'] == bot_id, 'REQUESTS'] = actual_requests
 
-        teams_data.to_csv(teams_file, index=False, sep=';')
+        teams_data.to_csv(teams_file, index=False, sep=';', encoding='cp1252')
 
         update.message.reply_text("Has denegat a l'usuari amb id " + text + ". No se li comunicarà res a aquesta persona")
     else:
@@ -1220,7 +1222,7 @@ def set_alias(update, context):
         update.message.reply_text("L'alias que has escollit no és vàlid!!")
     else:
         data.loc[data['BOT_ID'] == bot_id, 'ALIAS'] = alias
-        data.to_csv(database_file, index=False, sep=';')
+        data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
 
         output_text = 'El teu alias ha canviat correctament a ' + alias
         update.message.reply_text(output_text)
@@ -1293,7 +1295,7 @@ def join_anomalis(update, context):
     actual_faction = str(data[data['BOT_ID'] == bot_id]['FACTION'].values[0])
     if actual_faction == 'Neutral':
         data.loc[data['BOT_ID'] == bot_id, 'FACTION'] = 'Anomalis'
-        data.to_csv(database_file, index=False, sep=';')
+        data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
         output_text = "Ja t'has unit a la facció, ara uneix-te al canal de la teva facció: https://t.me/joinchat/PKx1bv81WUMyMGU0"
         update.message.reply_text(output_text)
     else:
@@ -1310,7 +1312,7 @@ def join_corruptus(update, context):
     actual_faction = str(data[data['BOT_ID'] == bot_id]['FACTION'].values[0])
     if actual_faction == 'Neutral':
         data.loc[data['BOT_ID'] == bot_id, 'FACTION'] = 'Corruptus'
-        data.to_csv(database_file, index=False, sep=';')
+        data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
         output_text = "Ja t'has unit a la facció, uneix-te al canal de la teva facció: https://t.me/joinchat/dLP2gZDhDKUwMmZk"
         update.message.reply_text(output_text)
     else:
@@ -1333,7 +1335,7 @@ def set_language(update, context):
         update.message.reply_text(translated_text.text)
     else:
         data.loc[data['BOT_ID'] == bot_id, 'LANGUAGE'] = new_language
-        data.to_csv(database_file, index=False, sep=';')
+        data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
         output_text = "S'ha actualitzat el teu nou llenguatge per les missions!"
         translated_text = translator.translate(text=output_text, dest=new_language)
         update.message.reply_text(translated_text.text)
@@ -1729,7 +1731,7 @@ def activate_mission(update, context):
 
     am_building = str(mission_data[mission_data['MISSION_ID'] == values[1]]['AM_BUILDING'].values[0])
     data.loc[data['BOT_ID'] == values[0], am_building] = values[1]
-    data.to_csv(database_file, index=False, sep=';')
+    data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
     update.message.reply_text("Missió actualitzada correctament")
 
 
@@ -1828,7 +1830,7 @@ def add_points(update, context):
     am_b = 'P_Aulari'
     actual_points = int(data[data['BOT_ID'] == values[0]][am_b])
     data.loc[data['BOT_ID'] == values[0], am_b] = actual_points + values[1]
-    data.to_csv(database_file, index=False, sep=';')
+    data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
     update.message.reply_text("Punts sumats correctament!!")
 
 
