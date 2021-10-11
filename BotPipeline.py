@@ -1982,6 +1982,13 @@ def sendtoplayer(update, context):
 
 
 def influence_stats(update, context):
+    user_id = str(update.message.chat['id'])
+    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
+
+    if level != 'Mod':
+        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
+        return None
+    
     all_ids = data['BOT_ID'].tolist()
     id_faction = dict()
     id_missions = dict()
