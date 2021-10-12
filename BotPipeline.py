@@ -362,7 +362,7 @@ def mission_accomplished(user_id, mission_id):
     try:
         npc = str(mission_data[mission_data['MISSION_ID'] == mission_id]['NPC'].values[0])
         faction = str(data[data['BOT_ID'] == user_id]['FACTION'].values[0])
-        # add_influence(npc, mission_points % 10, faction)
+        add_influence(npc, 1, faction)
     except IndexError:
         pass
 
@@ -1516,7 +1516,9 @@ def help_competitive(update, context):
 
 - */topfaction*: muestra el top de vuestra facción. Para entrar en el top requiere alias y más de 0 puntos
 
-- */topteams*: mustra el top 10 de los equipos registrados."""
+- */topteams*: mustra el top 10 de los equipos registrados.
+
+- */talk*: muestra los NPCS con los que puedes hablar. Pon el nombre seguido de talk para hablar con algun en particular"""
     update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
 
 
