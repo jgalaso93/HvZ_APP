@@ -32,66 +32,8 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import requests
 from bs4 import BeautifulSoup
 
-from random import randint
-
-# CONTANTS (frogs actually but u know, i don't even care anymore)
-list_of_frogs = [
-"http://www.allaboutfrogs.org/funstuff/random/0001.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0002.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0003.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0004.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0005.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0006.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0007.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0008.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0009.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0010.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0011.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0012.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0013.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0014.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0015.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0016.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0017.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0018.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0019.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0020.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0021.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0022.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0023.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0024.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0025.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0026.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0027.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0028.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0028.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0029.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0030.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0031.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0032.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0033.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0034.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0035.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0036.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0037.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0038.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0039.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0040.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0041.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0042.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0043.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0044.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0045.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0046.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0047.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0048.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0049.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0050.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0051.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0052.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0053.jpg",
-"http://www.allaboutfrogs.org/funstuff/random/0054.jpg"
-]
+from utils.user_values import all_done_missions, all_active_missions, user_points, amount_of_missions_done
+from utils.animals import boop, meow, ribbit
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -129,102 +71,6 @@ talk = {k: v for k, v in zip(talk_input, talk_output)}
 
 teams_file = os.path.join(sys.path[0], 'teams_database.csv')
 teams_data = pd.read_csv(teams_file, sep=';', header=0, encoding='cp1252', dtype={'FOUNDER': str})
-
-
-# Functions about all the things of a given user
-def all_active_missions(df, user_id):
-    """
-    For a given user_id returns all the active missions as a list of strings
-    """
-    active_missions = []
-    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_Aulari'])
-    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_Carpa'])
-    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_Civica'])
-    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_Comunicacio'])
-    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_EB_Sud'])
-    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_EB_Nord'])
-    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_EB_Central'])
-    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_ETSE'])
-    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_FTI'])
-    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_Med'])
-    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_SAF'])
-    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_EC'])
-    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_Torres'])
-    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_Vet'])
-    active_missions = list(filter(lambda x: x != ' ', active_missions))
-    return active_missions
-
-
-def all_done_missions(df, user_id):
-    """
-    For a given user_id returns all the done missions as a list of strings
-    """
-    done_missions = []
-    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_Aulari'])
-    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_Carpa'])
-    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_Civica'])
-    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_Comunicacio'])
-    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_EB_Sud'])
-    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_EB_Nord'])
-    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_EB_Central'])
-    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_ETSE'])
-    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_FTI'])
-    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_Med'])
-    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_SAF'])
-    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_EC'])
-    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_Torres'])
-    done_missions.extend(df[df['BOT_ID'] == user_id]['DM_Vet'])
-    done_missions = list(filter(lambda x: x != ' ', done_missions))
-    final_missions = []
-    for ms in done_missions:
-        missions_subset = ms.split(", ")
-        for mis in missions_subset:
-            final_missions.append(mis)
-    return final_missions
-
-
-def amount_of_missions_done(df, user_id):
-    """
-    For a given user_id returns the amount of missions done by this user
-    """
-    amount_missions = 0
-    amount_missions += df[df['BOT_ID'] == user_id]['TM_Aulari']
-    amount_missions += df[df['BOT_ID'] == user_id]['TM_Carpa']
-    amount_missions += df[df['BOT_ID'] == user_id]['TM_Civica']
-    amount_missions += df[df['BOT_ID'] == user_id]['TM_Comunicacio']
-    amount_missions += df[df['BOT_ID'] == user_id]['TM_EB_Sud']
-    amount_missions += df[df['BOT_ID'] == user_id]['TM_EB_Nord']
-    amount_missions += df[df['BOT_ID'] == user_id]['TM_EB_Central']
-    amount_missions += df[df['BOT_ID'] == user_id]['TM_ETSE']
-    amount_missions += df[df['BOT_ID'] == user_id]['TM_FTI']
-    amount_missions += df[df['BOT_ID'] == user_id]['TM_Med']
-    amount_missions += df[df['BOT_ID'] == user_id]['TM_SAF']
-    amount_missions += df[df['BOT_ID'] == user_id]['TM_EC']
-    amount_missions += df[df['BOT_ID'] == user_id]['TM_Torres']
-    amount_missions += df[df['BOT_ID'] == user_id]['TM_Vet']
-    return amount_missions.values[0]
-
-
-def user_points(df, user_id):
-    """
-    For a given user_id returns the amount of points achieved due to missions
-    """
-    total_points = 0
-    total_points += df[df['BOT_ID'] == user_id]['P_Aulari']
-    total_points += df[df['BOT_ID'] == user_id]['P_Carpa']
-    total_points += df[df['BOT_ID'] == user_id]['P_Civica']
-    total_points += df[df['BOT_ID'] == user_id]['P_Comunicacio']
-    total_points += df[df['BOT_ID'] == user_id]['P_EB_Sud']
-    total_points += df[df['BOT_ID'] == user_id]['P_EB_Nord']
-    total_points += df[df['BOT_ID'] == user_id]['P_EB_Central']
-    total_points += df[df['BOT_ID'] == user_id]['P_ETSE']
-    total_points += df[df['BOT_ID'] == user_id]['P_FTI']
-    total_points += df[df['BOT_ID'] == user_id]['P_Med']
-    total_points += df[df['BOT_ID'] == user_id]['P_SAF']
-    total_points += df[df['BOT_ID'] == user_id]['P_EC']
-    total_points += df[df['BOT_ID'] == user_id]['P_Torres']
-    total_points += df[df['BOT_ID'] == user_id]['P_Vet']
-    return total_points.values[0]
 
 
 def dict_of_missions(ams, ret={}):
@@ -1122,39 +968,6 @@ def create_link(update, context):
     print(telegram.ChatInviteLink(invite_link='https://t.me/joinchat/r7Cj1ej7vvg4NWE0', creator="Shaggy", is_primary=True, is_revoked=False))
 
 
-def boop(update, context):
-    bot_id = str(update.message.chat['id'])
-    if bot_id not in registred_ids:
-        new_register(bot_id, data)
-
-    image_url = get_boop()
-    image = requests.get(image_url)
-    update.message.reply_photo(image.content)
-
-
-def meow(update, context):
-    bot_id = str(update.message.chat['id'])
-    if bot_id not in registred_ids:
-        new_register(bot_id, data)
-
-    page = "https://cataas.com/cat"
-    content = requests.get(page)
-    if content.status_code == 200:
-        update.message.reply_photo(content.content)
-
-
-def ribbit(update, context):
-    bot_id = str(update.message.chat['id'])
-    if bot_id not in registred_ids:
-        new_register(bot_id, data)
-
-    random_num = randint(0, (len(list_of_frogs) - 1))
-    page = list_of_frogs[random_num]
-    content = requests.get(page)
-    if content.status_code == 200:
-        update.message.reply_photo(content.content)
-
-
 def sendboop(update, context):
     bot_id = str(update.message.chat['id'])
     if bot_id not in registred_ids:
@@ -1261,7 +1074,7 @@ def activity(update, context):
         new_register(bot_id, data)
 
     am = all_active_missions(data, bot_id)
-    output_text = "Missions actives acutals, codi i enunciat\n"
+    output_text = "Missions actives actuals, codi i enunciat\n"
     for m in am:
         output_text += str(m) + ": "
         output_text += str(mission_data[mission_data['MISSION_ID'] == m]['MISSION_P1'].values[0])
@@ -2330,5 +2143,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-    #hola hehehehhe
