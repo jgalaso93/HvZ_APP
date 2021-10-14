@@ -2,43 +2,25 @@
 # -*- coding: utf-8 -*-
 # This program is dedicated to the public domain under the CC0 license.
 
-"""
-Simple Bot to reply to Telegram messages.
-
-First, ada few handler functions are defined. Then, those functions are passed to
-the Dispatcher and registered at their respective places.
-Then, the bot is started and runs until we press Ctrl-C on the command line.
-
-Usage:
-Basic Echobot example, repeats messages.
-Press Ctrl-C on the command line or send a signal to the process to stop the
-bot.
-"""
-
 import logging
 import os
 import sys
 import pandas as pd
 
-from googletrans import Translator
-
-import telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 from databases.db_paths import teams_db_file, player_db_file, \
     npc_db_file, conversation_db_file, missions_db_file
 
-from utils.user_values import all_done_missions, all_active_missions, user_points, amount_of_missions_done
+from utils.user_values import all_done_missions
 
-from utils.animals import boop, meow, ribbit, get_boop
+from utils.animals import boop, meow, ribbit
 
-from utils.missions import dict_missions_in_zone, anomalis_missions_in_zone,\
-    corruptus_missions_in_zone, humanize_mission_dict, active_players, lore_text, \
-    mission_accomplished_ext, check_answer_ext, read_qr_ext, missions
+from utils.missions import lore_text, mission_accomplished_ext, check_answer_ext, read_qr_ext, missions
 
-from utils.guild import guild_points, show_team_ext, mem_ids_ext, req_ids_ext, \
-    create_team_ext, join_team_ext, promote_ext, kick_ext, admit_ext, decline_ext, \
-    sendboop_ext, sendall_ext, sendallboop_ext
+from utils.guild import show_team_ext, mem_ids_ext, req_ids_ext, create_team_ext, \
+    join_team_ext, promote_ext, kick_ext, admit_ext, decline_ext, sendboop_ext, \
+    sendall_ext, sendallboop_ext
 
 from utils.database_functions import new_register_ext, set_alias_ext, show_me_ext, \
     activity_ext, hint_ext, join_anomalis_ext, join_corruptus_ext, set_language_ext
@@ -56,7 +38,6 @@ from utils.pic_sender import Civica, Veterinaria, Aulari, Carpa, Comunicacio, Ed
 from utils.bot_help import contact, help_basic, help_mod_ext, help_team, help, help_personal, \
     help_competitive, help_founder_ext, start_ext, rules, use
 
-
 #---------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
 #----------------------DATABASE VARIABLES-----------------------------------------------------------
@@ -68,7 +49,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
-# database_file = os.path.join(sys.path[0], 'database.csv')
+
 try:
     data = pd.read_csv(player_db_file, sep=';', header=0, dtype={'BOT_ID': str}, encoding='cp1252')
 except:
@@ -76,28 +57,18 @@ except:
 
 registred_ids = data['BOT_ID'].tolist()
 
-# mission_database_file = os.path.join(sys.path[0], 'mission_database.csv')
 mission_data = pd.read_csv(missions_db_file, sep=';', header=0,
                            dtype={'MISSION': str, 'RESULT_POOL': str},
                            encoding='cp1252')
 mission_ids = mission_data['MISSION_ID'].tolist()
 
-# NPC_file = os.path.join(sys.path[0], 'NPC_database.csv')
 NPC_data = pd.read_csv(npc_db_file, sep=';', header=0, encoding='cp1252')
 
-translator = Translator(service_urls=[
-      'translate.google.com',
-      'translate.google.co.kr',
-    ])
-
-
-# conver_file = os.path.join(sys.path[0], 'conversation_database.csv')
 conver_data = pd.read_csv(conversation_db_file, sep=';', header=0, dtype={'BOT_ID': str}, encoding='cp1252')
 talk_input = conver_data['INPUT'].tolist()
 talk_output = conver_data['OUTPUT'].tolist()
 talk = {k: v for k, v in zip(talk_input, talk_output)}
 
-# teams_file = os.path.join(sys.path[0], 'teams_database.csv')
 teams_data = pd.read_csv(teams_db_file, sep=';', header=0, encoding='cp1252', dtype={'FOUNDER': str})
 
 
@@ -251,7 +222,6 @@ def start(update, context):
     start_ext(update, context)
 
 
-# Personal stuff related methods
 def set_alias(update, context):
     global data
     data = set_alias_ext(update, context, data)
@@ -322,7 +292,7 @@ def help_mod(update, context):
 
 #---------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
-#----------------------ANSWER FUNCTIONs-------------------------------------------------------------
+#----------------------ANSWER FUNCTIONS-------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
 
@@ -504,9 +474,6 @@ def reportproblem(update, context):
 
 def main():
     """Start the bot."""
-    # Create the Updater and pass it your bot's token.
-    # Make sure to set use_context=True to use the new context based callbacks
-    # Post version 12 this will no longer be necessary
     updater = Updater("1975748853:AAG2-lzGxFToo0d2-hVwQQ7f_t499SEU_fk", use_context=True)
     path = os.path.join(sys.path[0], 'zarigueyas.txt')
     file = open(path, "r")
@@ -556,15 +523,6 @@ def main():
     dp.add_handler(CommandHandler("meow", meow))
     dp.add_handler(CommandHandler("ribbit", ribbit))
 
-    # on different commands - answer in Telegram
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("rules", rules))
-    dp.add_handler(CommandHandler("halal", halal))
-    dp.add_handler(CommandHandler("corruptus", corruptus))
-    dp.add_handler(CommandHandler("test", test))
-    dp.add_handler(CommandHandler("use", use))
-    dp.add_handler(CommandHandler("contact", contact))
-
     # Commands for help
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("help_personal", help_personal))
@@ -572,6 +530,10 @@ def main():
     dp.add_handler(CommandHandler("help_competitive", help_competitive))
     dp.add_handler(CommandHandler("help_basic", help_basic))
     dp.add_handler(CommandHandler("help_founder", help_founder))
+    dp.add_handler(CommandHandler("contact", contact))
+    dp.add_handler(CommandHandler("use", use))
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("rules", rules))
 
     # Mod Commands
     dp.add_handler(CommandHandler("bondiaboop", bdb))
@@ -589,6 +551,11 @@ def main():
     dp.add_handler(CommandHandler("influencestats", influence_stats))
     dp.add_handler(CommandHandler("refreshinfluence", refresh_influences))
     dp.add_handler(CommandHandler("helpmods", help_mod))
+
+    # Other Commands
+    dp.add_handler(CommandHandler("halal", halal))
+    dp.add_handler(CommandHandler("corruptus", corruptus))
+    dp.add_handler(CommandHandler("test", test))
 
     # Util class to check the id of the conversation
     dp.add_handler(CommandHandler("GetMyId", get_my_id))
