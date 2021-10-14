@@ -17,3 +17,6 @@ missions_db_file = os.path.join(database_folder, 'mission_database.csv')
 
 # Database for the general conversation with the bot
 conversation_db_file = os.path.join(database_folder, 'conversation_database.csv')
+
+# Database for the general conversation with the bot
+npc_conversation_db_file = os.path.join(database_folder, 'NPC_conversation_database.csv')

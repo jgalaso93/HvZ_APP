@@ -10,7 +10,7 @@ import pandas as pd
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 from databases.db_paths import teams_db_file, player_db_file, \
-    npc_db_file, conversation_db_file, missions_db_file
+    npc_db_file, conversation_db_file, missions_db_file, npc_conversation_db_file
 
 from utils.user_values import all_done_missions
 
@@ -71,6 +71,7 @@ talk = {k: v for k, v in zip(talk_input, talk_output)}
 
 teams_data = pd.read_csv(teams_db_file, sep=';', header=0, encoding='cp1252', dtype={'FOUNDER': str})
 
+npc_conversation_data = pd.read_csv(npc_conversation_db_file, sep=';', header=0, encoding='cp1252')
 
 #---------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
@@ -338,6 +339,10 @@ def npcs(update, context):
             show[n] = False
 
     particular_npc = str(update.message.text)[6:]
+    values = particular_npc.split(", ")
+    if len(values) == 2:
+        update.message.reply_text(talktome(values[0], values[1]))
+        return None
     if len(particular_npc) == 0:
         output_text = "Pots parlar amb els següents personatges:\n"
         for n, s in show.items():
@@ -355,6 +360,14 @@ def npcs(update, context):
                 update.message.reply_text("Hi ha hagut un error amb la base de dades, si us plau contacta a en @ShaggyGalaso")
         else:
             update.message.reply_text("El npc que has triat encara no el coneixes!!")
+
+
+def talktome(npc, word):
+    try:
+        output = str(npc_conversation_data[npc_conversation_data['INPUT'] == word][npc].values[0])
+    except IndexError:
+        output = "No conec el que m'estàs dient, però pots intentar alguna altra frase"
+    return output
 
 
 #---------------------------------------------------------------------------------------------------
