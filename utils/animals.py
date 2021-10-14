@@ -96,3 +96,15 @@ def ribbit(update, context):
     if content.status_code == 200:
         update.message.reply_photo(content.content)
 
+def get_boop():
+    page = "https://random.dog/"
+    content = requests.get(page)
+
+    if content.status_code == 200:
+        soup = BeautifulSoup(content.content, "html.parser")
+
+    while soup.img is None:
+        content = requests.get(page)
+        soup = BeautifulSoup(content.content, "html.parser")
+
+    return page + str(soup.img)[23:-3]

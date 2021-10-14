@@ -19,21 +19,37 @@ import logging
 import os
 import sys
 import pandas as pd
-import cv2
-import tempfile
-import shutil
 
-from random import randrange, choice
+from random import choice
 from googletrans import Translator
 
 import telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
-import requests
-from bs4 import BeautifulSoup
-
 from utils.user_values import all_done_missions, all_active_missions, user_points, amount_of_missions_done
-from utils.animals import boop, meow, ribbit
+
+from utils.animals import boop, meow, ribbit, get_boop
+
+from utils.missions import dict_missions_in_zone, anomalis_missions_in_zone,\
+    corruptus_missions_in_zone, humanize_mission_dict, active_players, lore_text, \
+    mission_accomplished_ext, check_answer_ext, read_qr_ext, missions
+
+from utils.guild import guild_points, show_team_ext, mem_ids_ext, req_ids_ext
+
+from utils.pic_sender import Civica, Veterinaria, Aulari, Carpa, Comunicacio, Edifici_B_central, Edifici_B_Nord, \
+    Edifici_B_Sud, Edifici_C, Educacio, Etse, FTI, Medicina, SAF, Torres
+
+from utils.bot_help import contact, help_basic, help_mod_ext, help_team, help, help_personal, \
+    help_competitive, help_founder_ext, start_ext, rules, use
+
+from utils.helpers import check_is_founder, select_language, create_new_row
+
+
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#----------------------DATABASE VARIABLES-----------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -73,145 +89,15 @@ teams_file = os.path.join(sys.path[0], 'teams_database.csv')
 teams_data = pd.read_csv(teams_file, sep=';', header=0, encoding='cp1252', dtype={'FOUNDER': str})
 
 
-def dict_of_missions(ams, ret={}):
-    ams = list(filter(lambda x: x != ' ', ams))
-    for p in ams:
-        ms = p.split(", ")
-        for m in ms:
-            try:
-                ret[m] += 1
-            except:
-                ret[m] = 1
-
-    return ret
-
-
-def dict_missions_in_zone(zone, ret={}):
-    m = data[zone]
-    return dict_of_missions(m, ret)
-
-
-def anomalis_missions_in_zone(zone, ret={}):
-    m = data[data['FACTION'] == 'Anomalis'][zone]
-    return dict_of_missions(m, ret)
-
-
-def corruptus_missions_in_zone(zone, ret={}):
-    m = data[data['FACTION'] == 'Corruptus'][zone]
-    return dict_of_missions(m, ret)
-
-
-def humanize_mission_dict(d):
-    d = dict(sorted(d.items(), key=lambda item: item[1], reverse=True))
-    output_text = ""
-    counter = 1
-    for key, value in d.items():
-        try:
-            npc = str(mission_data[mission_data['MISSION_ID'] == key]['NPC'].values[0])
-        except:
-            npc = ' '
-
-        output_text += str(counter) + ". *" + npc + "* - " + str(value) + " (" + str(key) + ")\n"
-        counter += 1
-
-    return output_text
-
-
-def active_players(df):
-    all_ids = df['BOT_ID'].tolist()
-    count = 0
-    for i in all_ids:
-        m = amount_of_missions_done(df, i)
-        if m > 0:
-            count += 1
-    return count
-
-
-def lore_text(npc):
-    all_npcs = NPC_data['NAME'].tolist()
-    if npc in all_npcs:
-        favor = int(NPC_data[NPC_data['NAME'] == npc]['FAVOR'].values[0])
-        if favor <= -6:
-            return "CORRUPTUS1"
-        if favor >= 6:
-            return "ANOMALIS1"
-        return "NEUTRAL"
-    else:
-        return False
-
-
-# TEAM HELPER FUNCTIONS
-def check_is_founder(user_id):
-    founders = teams_data['FOUNDER'].tolist()
-    if user_id in founders:
-        return True
-    else:
-        return False
-
-# FUNNY FUNCTIONS
-def get_boop():
-    page = "https://random.dog/"
-    content = requests.get(page)
-
-    if content.status_code == 200:
-        soup = BeautifulSoup(content.content, "html.parser")
-
-    while soup.img is None:
-        content = requests.get(page)
-        soup = BeautifulSoup(content.content, "html.parser")
-
-    return page + str(soup.img)[23:-3]
-
-
-# TOOLS
-def select_language(l):
-    if l == 'Català':
-        return 'ca'
-    elif l == "Castellano":
-        return 'es'
-    elif l == 'English':
-        return 'en'
-    else:
-        return l
-
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#----------------------MISSIONS STRUCTURE-----------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
 
 def mission_accomplished(user_id, mission_id):
-    """
-    Function that handles an accomplished mission:
-     - Erases the active mission to empty
-     - Added the accomplished mission to the done pile
-     - Adds one the total mission accomplished
-     - Adds the points value to the total value points of the user
-    """
-    building = mission_data[mission_data['MISSION_ID'] == mission_id]['AM_BUILDING']
-    am_filed = building.values[0]
-    dm_field = 'D' + am_filed[1:]
-    tm_field = 'T' + am_filed[1:]
-    p_field = 'P' + am_filed[2:]
-    done_missions = data[data['BOT_ID'] == user_id][dm_field]
-    total_missions = data[data['BOT_ID'] == user_id][tm_field]
-    mission_points = mission_data[mission_data['MISSION_ID'] == mission_id]['POINTS']
-    total_points = data[data['BOT_ID'] == user_id][p_field]
-    try:
-        if done_missions.values[0] == ' ':
-            updated_done_missions = mission_id
-        else:
-            updated_done_missions = done_missions.values[0] + ', ' + mission_id
-    except:
-        updated_done_missions = mission_id
-
-    data.loc[data['BOT_ID'] == user_id, am_filed] = ' '
-    data.loc[data['BOT_ID'] == user_id, dm_field] = updated_done_missions
-    data.loc[data['BOT_ID'] == user_id, tm_field] = int(total_missions.values[0]) + 1
-    data.loc[data['BOT_ID'] == user_id, p_field] = int(total_points.values[0]) + int(mission_points)
-
-    try:
-        npc = str(mission_data[mission_data['MISSION_ID'] == mission_id]['NPC'].values[0])
-        faction = str(data[data['BOT_ID'] == user_id]['FACTION'].values[0])
-        add_influence(npc, 1, faction)
-    except IndexError:
-        pass
-
+    global data
+    data = mission_accomplished_ext(user_id, mission_id, mission_data, data, NPC_data)
     data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
 
     final_text = str(mission_data[mission_data['MISSION_ID'] == mission_id]['FINAL_TEXT'].values[0])
@@ -221,92 +107,23 @@ def mission_accomplished(user_id, mission_id):
         return None
 
 
-def mission_can_be_done(user_id, mission_id):
-    """
-    Function that checks requirements for a mission and a person
-     - Checks that missions indeed has requirements
-     - In case yes, checks if one or multiple
-       - For multiple checks all of them
-       - If all done return None
-       - If else returns all pending
-     - In case not, checks if it's done
-       - If it's done returns None
-       - If else returns pending mission
-    """
-    dm = all_done_missions(data, user_id)
-    mr = str(mission_data[mission_data['MISSION_ID'] == mission_id]['REQUIREMENTS'].values[0])
-    if mr == 'None':
-        return None
-
-    if ',' in mr:
-        mr = mr.split(", ")
-        ret_list = []
-        for m in mr:
-            if m not in dm:
-                ret_list.append(m)
-
-        if len(ret_list) == 0:
-            return None
-        else:
-            return ret_list
-
-    else:
-        if mr in dm:
-            return None
-        else:
-            return [mr]
-
-
-def add_influence(npc_name, influence_points, user_faction):
-    actual_points = NPC_data[NPC_data['NAME'] == npc_name]['FAVOR']
-    favor_value = position_value(actual_points, user_faction)
-    NPC_data.loc[NPC_data['NAME'] == npc_name, 'FAVOR'] = actual_points + (influence_points * favor_value)
-    NPC_data.to_csv(NPC_file, index=False, sep=';', encoding='cp1252')
-
-
-def position_value(npc_favor, user_faction):
-    if user_faction == 'Anomalis':
-        return 1
-    if user_faction == 'Corruptus':
-        return -1
-
-    if user_faction == 'Neutral':
-        if npc_favor > 0:
-            return -1
-        if npc_favor < 0:
-            return 1
-        if npc_favor == 0:
-            return 0
-
-
-def valid_answers(df, tam):
-    """
-    For a given list of strings containing mission_id returns a dit with the mission_id as key and the possible
-    answers as value of the dict
-    """
-    va = dict()
-    for am in tam:
-        result_pool = df[df['MISSION_ID'] == am]['RESULT_POOL']
-        try:
-            va[am] = result_pool.values[0].split(", ")
-        except IndexError:
-            pass
-    return va
+def read_QR(update, context):
+    global data
+    bot_id = str(update.message.chat['id'])
+    if check_pic(bot_id, update.message.photo[-1].file_unique_id):
+        update.message.reply_text("Aquesta foto ja s'ha fet servir!!")
+        return 0
+    data = read_qr_ext(update, context, bot_id, mission_ids, data, mission_data)
 
 
 def check_answer(user_id, answer):
-    """
-    For a given user_id and answer, check if the answer is part of a mission or not.
-    In case it is returns the mission_id for the given answer's mission
-    In case it is not, returns None
-    """
-    tam = all_active_missions(data, str(user_id))
-    va = valid_answers(mission_data, tam)
-    for key, value in va.items():
-        if answer in value:
-            return key
+    check_answer_ext(user_id, answer, data, mission_data)
 
-    return None
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#----------------------ANTICHEAT CODE---------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
 
 
 def check_pic(user_id, photo_id):
@@ -327,347 +144,22 @@ def check_pic(user_id, photo_id):
         return False
 
 
-def guild_points(guild_name):
-    gdf = data[data['GUILD'] == guild_name]
-    gids = gdf['BOT_ID'].tolist()
-    t_points = 0
-    for i in gids:
-        t_points += user_points(gdf, i)
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#----------------------GUILD FUNCTIONS--------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
 
-    return t_points
-
-
-def read_QR(update, context):
-    bot_id = str(update.message.chat['id'])
-    if check_pic(bot_id, update.message.photo[-1].file_unique_id):
-        update.message.reply_text("Aquesta foto ja s'ha fet servir!!")
-        return 0
-    file = update.message.photo[-1].file_id
-    obj = context.bot.get_file(file)
-    tmp_dir = tempfile.mkdtemp()
-    filename = os.path.join(tmp_dir, 'tmp_file.jpg')
-    obj.download(filename)
-    img = cv2.imread(filename=filename)
-    shutil.rmtree(tmp_dir)
-    det = cv2.QRCodeDetector()
-    val, pts, st_code = det.detectAndDecode(img)
-
-    # Missiones de Lore
-    if "LORE" in val:
-        own_faction = str(data[data['BOT_ID'] == bot_id]['FACTION'].values[0])
-        if own_faction == "Neutral":
-            update.message.reply_text("Necessites ser d'una facció per fer aquesta missió: /joinanomalis o /joincorruptus")
-            return None
-
-        num = 0
-        for l in val:
-            try:
-                num = int(l)
-                num *= 10
-            except:
-                pass
-        num /= 10
-
-        if own_faction == "Anomalis":
-            val = "ANOMA" + str(int(num))
-        if own_faction == "Corruptus":
-            val = "CORRU" + str(int(num))
-
-    if val == "":
-        update.message.reply_text("Esta imagen no contiene ningún QR!")
-    else:
-        if val in mission_ids:
-            done_missions = all_done_missions(data, update.message.chat['id'])
-            if val in done_missions:
-                update.message.reply_text("Ja has fet aquesta missió!!")
-            else:
-                throw_mission(update, val, update.message.chat['id'])
-        else:
-            update.message.reply_text("Aquest QR no té cap missió associada!")
+def mem_ids(update, context):
+    mem_ids_ext(update, data, teams_data)
 
 
-def throw_mission(update, mission_id, user_id):
-    pending = mission_can_be_done(str(user_id), mission_id)
-    aam = all_active_missions(data, str(user_id))
-    adm = all_done_missions(data, str(user_id))
-    if mission_id in adm:
-        update.message.reply_text("Ja has fet aquesta missió! No pots tornar-la a fer!!")
-        return None
-
-    if pending:
-        ret_text = "Encara et falten les següents missions!"
-        for m in pending:
-            ret_text += str(m) +": "
-            if m in aam:
-                ret_text += str(mission_data[mission_data['MISSION_ID'] == mission_id]['TEXT'].values[0])
-                ret_text += "\n"
-            else:
-                ret_text += "Encara no has trobat aquesta missio!\n"
-        update.message.reply_text(ret_text)
-        return None
-
-    text = str(mission_data[mission_data['MISSION_ID'] == mission_id]['MISSION_P1'].values[0])
-    language = str(data[data['BOT_ID'] == str(user_id)]['LANGUAGE'].values[0])
-    am = mission_data[mission_data['MISSION_ID'] == mission_id]['AM_BUILDING']
-    data.loc[data['BOT_ID'] == str(user_id), str(am.values[0])] = mission_id
-    data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
-    if language == 'ca':
-        final_text = text
-    else:
-        translated_text = translator.translate(text=text, dest=language)
-        final_text = translated_text.text
-
-    try:
-        update.message.reply_text(final_text)
-    except:
-        update.message.reply_text("Hi ha un problema amb la base de dades d'aquesta missió, si us plau contacta amb el moderador Shaggy, gracies :)")
+def show_team(update, context):
+    show_team_ext(update, context, data)
 
 
-def write_in_db(bot_id, field, value):
-    if bot_id in registred_ids:
-        pass
-    else:
-        new_register(bot_id, data)
-
-
-def new_register(bot_id, df):
-    global data
-    new_row = dict()
-    field = 'BOT_ID'
-    for column in data.columns:
-        if column == field:
-            new_row[column] = str(bot_id)
-        else:
-            new_row[column] = 0
-
-    # Registration for new players
-    new_row['ALIAS'] = 'no_alias'
-    new_row['LANGUAGE'] = 'ca'
-    new_row['GUILD'] = ' '
-    new_row['GUILD_LEVEL'] = 'unguilded'
-    new_row['Level'] = 'Player'
-    new_row['FACTION'] = 'Neutral'
-
-    # Set missions to a empty value
-    new_row['AM_Aulari'] = ' '
-    new_row['AM_Carpa'] = ' '
-    new_row['AM_Civica'] = ' '
-    new_row['AM_Comunicacio'] = ' '
-    new_row['AM_EB_Sud'] = ' '
-    new_row['AM_EB_Nord'] = ' '
-    new_row['AM_EB_Central'] = ' '
-    new_row['AM_Educacio'] = ' '
-    new_row['AM_ETSE'] = ' '
-    new_row['AM_FTI'] = ' '
-    new_row['AM_Med'] = ' '
-    new_row['AM_SAF'] = ' '
-    new_row['AM_EC'] = ' '
-    new_row['AM_Torres'] = ' '
-    new_row['AM_Vet'] = ' '
-
-    new_row['DM_Aulari'] = ' '
-    new_row['DM_Carpa'] = ' '
-    new_row['DM_Civica'] = ' '
-    new_row['DM_Comunicacio'] = ' '
-    new_row['DM_EB_Sud'] = ' '
-    new_row['DM_EB_Nord'] = ' '
-    new_row['DM_EB_Central'] = ' '
-    new_row['DM_Educacio'] = ' '
-    new_row['DM_ETSE'] = ' '
-    new_row['DM_FTI'] = ' '
-    new_row['DM_Med'] = ' '
-    new_row['DM_SAF'] = ' '
-    new_row['DM_EC'] = ' '
-    new_row['DM_Torres'] = ' '
-    new_row['DM_Vet'] = ' '
-
-    # ID registration
-    new_row['ID'] = max(data['ID']) + 1
-
-    # Save the new data to database
-    data = data.append(new_row, ignore_index=True)
-    data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
-
-    # Update the registred id's
-    global registred_ids
-    registred_ids = data['BOT_ID'].tolist()
-
-
-# LOGIC AND FUNCTIONALITY
-def missions(update, context):
-    # if True:
-    #     update.message.reply_text('Les missions estan en manteniment, si us plau, tornau a intentar en unes hores :)')
-    #     return None
-    update.message.reply_text('En quina zona vols fer una missio?'
-                      '\n/Comunicacio'
-                      '\n/Edifici_B_central'
-                      '\n/Edifici_B_Nord'
-                      '\n/Edifici_B_Sud'
-                      '\n/Edifici_C'
-                      '\n/Etse'
-                      '\n/FTI'
-                      '\n/Medicina'
-                      '\n/SAF'
-                      '\n/Veterinaria'
-                      '\n/Civica')
-
-        # '\n/Aulari'
-        # '\n/Carpa'
-        # '\n/Civica'
-        # '\n/Torres'
-        # '\n/Educacio'
-
-
-def Aulari(update, context):
-    foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'QR activos')
-    foto_path = os.path.join(foto_path, 'MED')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
-
-def Carpa(update, context):
-    foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
-    foto_path = os.path.join(foto_path, 'Carpa letras')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
-
-def Civica(update, context):
-    foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'QR activos')
-    foto_path = os.path.join(foto_path, 'CIVICA')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
-
-def Comunicacio(update, context):
-    foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'QR activos')
-    foto_path = os.path.join(foto_path, 'COM')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
-
-def Edifici_B_central(update, context):
-    foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'QR activos')
-    foto_path = os.path.join(foto_path, 'BCEN')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
-
-def Edifici_B_Nord(update, context):
-    foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'QR activos')
-    foto_path = os.path.join(foto_path, 'BNORD')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
-
-def Edifici_B_Sud(update, context):
-    foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'QR activos')
-    foto_path = os.path.join(foto_path, 'BSUD')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
-
-def Edifici_C(update, context):
-    foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'QR activos')
-    foto_path = os.path.join(foto_path, 'Ciencies')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
-
-def Educacio(update, context):
-    foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
-    foto_path = os.path.join(foto_path, 'Educació')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
-
-def Etse(update, context):
-    foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'QR activos')
-    foto_path = os.path.join(foto_path, 'ETSE')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
-
-def FTI(update, context):
-    foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'QR activos')
-    foto_path = os.path.join(foto_path, 'FTI')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
-
-def Medicina(update, context):
-    foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'QR activos')
-    foto_path = os.path.join(foto_path, 'MED')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
-
-def SAF(update, context):
-    foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'QR activos')
-    foto_path = os.path.join(foto_path, 'SAF')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
-
-def Torres(update, context):
-    foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'Fotos de llocs a la uab')
-    foto_path = os.path.join(foto_path, 'Torres Applus')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
-
-def Veterinaria(update, context):
-    foto_path = sys.path[0]
-    foto_path = os.path.join(foto_path, 'QR activos')
-    foto_path = os.path.join(foto_path, 'VET')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
-
+def req_ids(update, context):
+    req_ids(update, data, teams_data)
 
 # Team related functions
 def create_team(update, context):
@@ -753,49 +245,6 @@ def join_team(update, context):
         update.message.reply_text("No hi ha cap equip amb aquest nom!!")
 
 
-def join_team_old(update, context):
-    global data
-    team_name = str(update.message.text)[10:]
-    user_id = str(update.message.chat['id'])
-    if user_id not in registred_ids:
-        new_register(user_id, data)
-
-    if team_name in data['GUILD'].tolist():
-        data.loc[data['BOT_ID'] == user_id, 'GUILD'] = team_name
-        data.loc[data['BOT_ID'] == user_id, 'GUILD_LEVEL'] = 'Newbie'
-
-        data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
-
-        reply_message = "T'has unit a l'equip " + team_name + " correctament!!! El teu rang és \"Newbie\""
-        update.message.reply_text(reply_message)
-
-    else:
-        reply_message = "L'equip " + team_name + " no existeix!!! Comproba que ho hagis escrit correctament! Majúscules incloses!"
-        update.message.reply_text(reply_message)
-
-
-def show_team(update, context):
-    bot_id = str(update.message.chat['id'])
-    guild_name = str(data[data['BOT_ID'] == bot_id]['GUILD'].values[0])
-    if bot_id not in registred_ids:
-        new_register(bot_id, data)
-
-    if guild_name == ' ':
-        update.message.reply_text("No estàs a cap equip!")
-    else:
-        guild_ids = data[data['GUILD'] == guild_name]['BOT_ID'].tolist()
-        output_text = ""
-        for bid in guild_ids:
-            output_text += "La persona amb alies: " + str(data[data['BOT_ID'] == bid]["ALIAS"].values[0])
-            done_missions = amount_of_missions_done(data, bid)
-            tp = user_points(data, bid)
-            output_text += " ha fet " + str(done_missions) + " missions"
-            output_text += "\nTé acumulats " + str(tp)
-            output_text += " punts per la seva faccio\n\n"
-
-        update.message.reply_text(output_text)
-
-
 def promote(update, context):
     text = str(update.message.text)[9:]
     values = text.split(", ")
@@ -809,21 +258,15 @@ def promote(update, context):
         update.message.reply_text("El teu registre no estava complert! Si us plau uneix-te a un equip primer")
         return 0
 
-    own_alias = str(data[data['BOT_ID'] == bot_id]['ALIAS'].values[0])
     guild_name = str(data[data['BOT_ID'] == bot_id]['GUILD'].values[0])
     if guild_name == " ":
         update.message.reply_text("No formes part de cap equip!")
         return 0
 
-    # guild_level = str(data[data['BOT_ID'] == bot_id]['GUILD_LEVEL'].values[0])
     founders = teams_data['FOUNDER'].tolist()
     if bot_id not in founders:
         update.message.reply_text("Només els \"Founders\" poden promocionar gent del seu equip!")
         return 0
-
-    # if values[0] == own_alias:
-    #     update.message.reply_text("Els \"Founders\" no poden canviar el seu propi rang!")
-    #     return 0
 
     data.loc[(data['GUILD'] == guild_name) & (data['ALIAS'] == str(values[0])), 'GUILD_LEVEL'] = str(values[1])
     data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
@@ -836,7 +279,7 @@ def kick(update, context):
     global data
     text = str(update.message.text)[6:]
     bot_id = str(update.message.chat['id'])
-    if check_is_founder(bot_id):
+    if check_is_founder(bot_id, teams_data):
         team_name = str(teams_data[teams_data['FOUNDER'] == bot_id]['GUILD'].values[0])
         if text == bot_id:
             update.message.reply_text("No et pots fer fora a tu mateix del teu equip!")
@@ -860,7 +303,7 @@ def admit(update, context):
     global teams_data
     text = str(update.message.text)[7:]
     bot_id = str(update.message.chat['id'])
-    if check_is_founder(bot_id):
+    if check_is_founder(bot_id, teams_data):
         team_name = str(teams_data[teams_data['FOUNDER'] == bot_id]['GUILD'].values[0])
 
         all_ids = data['BOT_ID'].tolist()
@@ -901,7 +344,7 @@ def decline(update, context):
     global teams_data
     text = str(update.message.text)[9:]
     bot_id = str(update.message.chat['id'])
-    if check_is_founder(bot_id):
+    if check_is_founder(bot_id, teams_data):
         all_ids = data['BOT_ID'].tolist()
         if text not in all_ids:
             update.message.reply_text("Aquest id no està registrat al bot!!")
@@ -927,45 +370,6 @@ def decline(update, context):
         update.message.reply_text("Has denegat a l'usuari amb id " + text + ". No se li comunicarà res a aquesta persona")
     else:
         update.message.reply_text("Només els founders poden ademtre a algu a l'equip!")
-
-
-def mem_ids(update, context):
-    bot_id = str(update.message.chat['id'])
-    if check_is_founder(bot_id):
-        team_name = str(teams_data[teams_data['FOUNDER'] == bot_id]['GUILD'].values[0])
-        m_ids = data[data['GUILD'] == team_name]['BOT_ID'].tolist()
-        output_text = "Els ids del teu equip són els següents:\n\n"
-        for i in m_ids:
-            output_text += "ID: " + str(i)
-            alias = str(data[data['BOT_ID'] == str(i)]['ALIAS'].values[0])
-            output_text += ". Alias: " + alias
-            g_lvl = str(data[data['BOT_ID'] == str(i)]['GUILD_LEVEL'].values[0])
-            output_text += ". Rang: " + g_lvl + "\n"
-        update.message.reply_text(output_text)
-    else:
-        update.message.reply_text("Només els founders poden veure els ids de la gent de l'equip!")
-
-
-def req_ids(update, context):
-    bot_id = str(update.message.chat['id'])
-    if check_is_founder(bot_id):
-        m_ids = str(teams_data[teams_data['FOUNDER'] == bot_id]['REQUESTS'].values[0])
-        m_ids = m_ids.split(", ")
-        if m_ids[0] == 'None':
-            update.message.reply_text("No hi ha peticions pendents!")
-            return None
-        output_text = "Els ids del teu equip són els següents:\n\n"
-        for i in m_ids:
-            output_text += "ID: " + str(i)
-            alias = str(data[data['BOT_ID'] == str(i)]['ALIAS'].values[0])
-            output_text += ". Alias: " + alias + "\n"
-        update.message.reply_text(output_text)
-    else:
-        update.message.reply_text("Només els founders poden veure els ids de la gent de l'equip!")
-
-def create_link(update, context):
-    # link = update.create_chat_invite_link(update.message.chat['id'])
-    print(telegram.ChatInviteLink(invite_link='https://t.me/joinchat/r7Cj1ej7vvg4NWE0', creator="Shaggy", is_primary=True, is_revoked=False))
 
 
 def sendboop(update, context):
@@ -1031,6 +435,26 @@ def sendallboop(update, context):
         context.bot.send_photo(receiver_id, image_url)
 
     update.message.reply_text("Has enviat un boop a tot el teu equip!")
+
+
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#----------------------DATABASE FUNCTIONS-----------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+
+
+def new_register(bot_id, df):
+    global data
+    new_row = create_new_row(bot_id, data)
+    # Save the new data to database
+    data = data.append(new_row, ignore_index=True)
+    data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
+
+    # Update the registred id's
+    global registred_ids
+    registred_ids = data['BOT_ID'].tolist()
+
 
 # Personal stuff related methods
 def set_alias(update, context):
@@ -1162,7 +586,12 @@ def set_language(update, context):
         update.message.reply_text(translated_text.text)
 
 
-# Commands related to competition
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#----------------------COMPETITIVE FUNCTIONS--------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+
 def topfaction(update, context):
     bot_id = str(update.message.chat['id'])
     if bot_id not in registred_ids:
@@ -1267,33 +696,11 @@ def top3(update, context):
     update.message.reply_text(output_text)
 
 
-# Define a few command handlers. These usually take the two arguments update and
-# context. Error handlers also receive the raised TelegramError object in error.
 def start(update, context):
-    """Send a message when the command /start is issued."""
     bot_id = str(update.message.chat['id'])
     if bot_id not in registred_ids:
         new_register(bot_id, data)
-    output_text = """Hola, ¡soy el bot que os va a estar ayudando esta edición!
-
-Os voy a hacer un pequeño resumen de como usarme, no os preocupéis, ¡es muy fácil!
-
-Para registraros, el formulario de inscripción os pedirá el ID, tu ID es: {}. Para tener vuestro ID con un formato fácil de copiar, escribid /getmyid. Si no sabes de qué formulario te hablo, sigue este link: https://bit.ly/3meBpHL
-
-Si tenéis cualquier duda sobre qué comandos utilizar, escribid /help. Allí os explicaré los comandos principales que tengo y como usarlos. 
-
-Si queréis saber como funcionan las normas, escribid /use. Allí os explicaré como hacer y resolver las misiones. 
-
-Si tenéis dudas que yo no os pueda responder, escribid /contact. Allí os pasaremos el contacto de algún moderador que os podrá resolver la duda personalmente. 
-
-Si queréis volver a leer este mensaje en algún momento, escribid /start. 
-
-No hace falta que siempre escribáis los comandos, podéis pulsar encima del comando y se activará automáticamente. 
-
-Por último, si ya sabéis a qué Facción pertenecéis, usad el comando /joincorruptus o /joinanomalis. 
-
-¡Muchas gracias por participar, a jugar!""".format(bot_id)
-    update.message.reply_text(output_text)
+    start_ext(update, context)
 
 
 def register(update, context):
@@ -1305,166 +712,8 @@ def register(update, context):
         update.message.reply_text('Te has registrado!')
 
 
-def help_basic(update, context):
-    output_text = """💬 *BÁSICOS:*
-- */start:* para recordar la información inicial.
-
-- */rules:* para saber las normas del juego
-
-- */help*: para volver a ver esta información.
-
-- */use:* para obtener un tutorial de las misiones. 
-
-- */getmyid:* para obtener tu ID, el número de identificación como jugador.
-
-- */missions*: para saber dónde puedes encontrar misiones. 
-
-- */contact*: si tienes dudas o problemas usa este comando para contactarnos!"""
-    update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
-
-
-def help_competitive(update, context):
-    output_text = """💬 *COMPETITIVOS:*
-- */top3*: muestar la puntuación de los 3 jugadores con mayor puntuación
-
-- */topfaction*: muestra el top de vuestra facción. Para entrar en el top requiere alias y más de 0 puntos
-
-- */topteams*: mustra el top 10 de los equipos registrados.
-
-- */talk*: muestra los NPCS con los que puedes hablar. Pon el nombre seguido de talk para hablar con algun en particular"""
-    update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
-
-
-def help_personal(update, context):
-    output_text ="""💬 *PERSONALIZADOS:*
-- */setalias + "el nombre de tu elección"*: para cambiar tu alias de registro. _Ejemplo: /setalias TimeEscapeBot_.
-
-- */stats*: para conocer tus logros dentro del juego.
-
-- */activity*: para saber las misiones activas que te quedan por resolver.
-
-- */hint + "id de la misión"*: para obtener una pista de la misión. _Ejemplo: /hint C1_
-
-- */join + "facción"*: para unirte a tu facción. _Ejemplos: /joinanomalis o /joincorruptus_ 
-
-- */boop o /meow o /ribbit*: El bot te mandará un boop! o un meow! o un ribbit!"""
-    update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
-
-
-def help_team(update, context):
-    output_text = """💬 *DE EQUIPO:* Los equipos sirven para jugar con tus amigos y acumular puntos.
-
-- */createteam + "nombre"*: para ser la fundadora de un equipo. _Ejemplo: /createteam HvZ_
-
-- */jointeam + "nombre"*: para unirte a un equipo que ya exista. _Ejemplo: /jointeam HvZ_
-
-- */showteam*: para obtener el ranking de tu equipo.
-
-- */sendboop + "alias"*: mandar un boop a alguien con ese alias que esté en tu equipo. Boop!
-
-- */sendall + "mensaje"*: mandar un mensaje a todo el mundo de tu equipo
-
-- */help_founder*: Comandos que solo los fundadores pueden usar"""
-    update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
-
-
 def help_founder(update, context):
-    bot_id = str(update.message.chat['id'])
-    if check_is_founder(bot_id):
-        output_text = """💬 *DE FUNDADORAS DE EQUIPO:*
-        
-- */promote + "alias", "rango"*: para otorgar cargos dentro del equipo. _Ejemplo: /promote antonio, veterano_.
-
--*/kick + user_id*: Elimina la persona con ese id de tu equipo
-
--*/admit + user_id*: Admite a la persona con ese id a tu equipo
-
--*/decline + user_id*: Rechaza a la persona con ese id de tu equipo
-
--*/memberids*: Lista IDs, alias i rangos de todas las personas miembro
-
--*/requestsids*: Lista IDs i alias de todas las personas que estan pendientes de aprobación para entrar"""
-        update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
-    else:
-        update.message.reply_text("No has fundat cap equip, no pots usar aquesta comanda!")
-
-
-def help(update, context):
-    """Send a message when the command /help is issued."""
-    output_text = """Para ver los comandos basicos pulsa en:
-💬 *BÁSICOS: /help_basic*
-
-💬 *COMPETITIVOS: /help_competitive*
-
-💬 *PERSONALIZADOS: /help_personal*
-
-💬 *DE EQUIPO: /help_team*
-
-⚠️ *REPORTAR UN PROBLEMA:* /report + El problema"""
-    update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
-
-# - */help + "otro comando"*: para obtener información más detallada referente al comando. _Ejemplo: /help createteam_. (aun en desarrollo)
-
-
-def use(update, context):
-    output_text = """HOLA JUGADOR!!👋🏼
-👀Leeme atentamente para saber cómo jugar a TIME ESCAPE y ganar puntos para tu facción.
-
-*1. Encuentra un QR*
-Ve por el campus y busca por todas partes hasta que veas un codigo QR.
-
-*2. Hazle una foto*
-Haz una foto del QR y mándamela por aquí. Puedes sacar la foto directamente desde este chat.
-
-*3. Recibe la misión*
-Después de asegurarme de que tu foto sea original, leeré el QR y te mandaré tu misión. 
-⚠️ ¡Paciencia! Sóis muchos jugando y puede que me bloquee un poco. 
-_Si en el momento no puedes realizar la misión, simpre podrás volver a ella usando el comando /activity_.
-
-*4. Resuelve la misión*
-Responde a la misión por este chat. Si tu respuesta es correcta, ganarás puntos para tu facción💪🏿
-
-*5. Vuelta a empezar*
-Repite este proceso con todos los QRs que encuentres para acumular puntos y cambiar la historia."""
-    update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
-
-
-def rules(update, context):
-    output_text = """*NORMAS:*
-_Con tal de garantizar que TIME ESCAPE sea un juego divertido para todes, deberéis seguir la siguiente normativa_.
-
-😷 En TIME ESCAPE respetaremos las medidas vigentes del Procicat y sus medidas para protegernos de la Covid-19.
-
-❌ *No arranques QRs*: arrancar un QR será penalizado con la inmediata expulsión del juego.
-
-❌ *No hagas spoilers*: revelar la ubicación de un QR o la solución de una misión por el grupo será penalizado con la expulsión del jugador en dicho grupo. _Esta norma no se aplica si se trata de tu equipo_.
-
-❌ *No compartas el QR*: si una misma imagen se sube 2 veces, nuestro Bot todo poderoso lo sabrá y dicha imagen quedará inutilizada.
-
-💕 *Treat people with kindness*: los demás jugadores (corruptus o anomalis), los moderadores (los de la bandana roja en la pierna) y las personas no jugadoras del campus merecen ser tratadas con respeto. El mobiliario y las instalaciones de la UAB también.
-
-💕 *Stay safe*: todas las misiones se encuentran en sitios accesibles. No hagais burradas.
-
-🛡️ *Escudos*: en TIME ESCAPE los escudos estan permitidos.
-
-
-Y, para terminar...
-✨ *NO SEAIS IDIOTES* ✨"""
-    update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
-
-
-def contact(update, context):
-    output_text = """Contacta con el Mod correspondiente según tu problema:
-    
-- *Problemas o dudas con el bot:* @ShaggyGalaso
-- *Problemas con los QR:* @Nelaso
-- *Problemas con la misión:* @Janadsb99
-- *Problemas fuera del campus:* @AlexNevado
-- *Dudas de normas:* @Sargento\_Zorro
-- *Dudas de telegram:* @GuillemMoya
-- *Problemas con otros jugadores:* @mar\_clua
-- *Problemas por discriminación:* @AiHysteric"""
-    update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
+    help_founder_ext(update, context, teams_data)
 
 
 def halal(update, context):
@@ -1517,7 +766,12 @@ def error(update, context):
     # update.message.reply_text("Alguna cosa ha anat malament! Torna-ho a intentar o contacte amb @ShaggyGalaso")
 
 
-# Mod commands
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#----------------------MODS FUNCTIONS---------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+
 def bdb(update, context):
     image_url = get_boop()
 
@@ -1677,68 +931,68 @@ def message_all(update, context):
 
 def allmissionstats(update, context):
     ret = dict()
-    ret = dict_missions_in_zone('DM_Aulari', ret)
-    ret = dict_missions_in_zone('DM_Carpa', ret)
-    ret = dict_missions_in_zone('DM_Civica', ret)
-    ret = dict_missions_in_zone('DM_Comunicacio', ret)
-    ret = dict_missions_in_zone('DM_EB_Sud', ret)
-    ret = dict_missions_in_zone('DM_EB_Nord', ret)
-    ret = dict_missions_in_zone('DM_EB_Central', ret)
-    ret = dict_missions_in_zone('DM_ETSE', ret)
-    ret = dict_missions_in_zone('DM_FTI', ret)
-    ret = dict_missions_in_zone('DM_Med', ret)
-    ret = dict_missions_in_zone('DM_SAF', ret)
-    ret = dict_missions_in_zone('DM_EC', ret)
-    ret = dict_missions_in_zone('DM_Torres', ret)
-    ret = dict_missions_in_zone('DM_Vet', ret)
+    ret = dict_missions_in_zone(data, 'DM_Aulari', ret)
+    ret = dict_missions_in_zone(data, 'DM_Carpa', ret)
+    ret = dict_missions_in_zone(data, 'DM_Civica', ret)
+    ret = dict_missions_in_zone(data, 'DM_Comunicacio', ret)
+    ret = dict_missions_in_zone(data, 'DM_EB_Sud', ret)
+    ret = dict_missions_in_zone(data, 'DM_EB_Nord', ret)
+    ret = dict_missions_in_zone(data, 'DM_EB_Central', ret)
+    ret = dict_missions_in_zone(data, 'DM_ETSE', ret)
+    ret = dict_missions_in_zone(data, 'DM_FTI', ret)
+    ret = dict_missions_in_zone(data, 'DM_Med', ret)
+    ret = dict_missions_in_zone(data, 'DM_SAF', ret)
+    ret = dict_missions_in_zone(data, 'DM_EC', ret)
+    ret = dict_missions_in_zone(data, 'DM_Torres', ret)
+    ret = dict_missions_in_zone(data, 'DM_Vet', ret)
 
     output_text = "Active players: " + str(active_players(data) - 2)
     update.message.reply_text(output_text)
-    update.message.reply_text(humanize_mission_dict(ret), parse_mode=telegram.ParseMode.MARKDOWN)
+    update.message.reply_text(humanize_mission_dict(ret, mission_data), parse_mode=telegram.ParseMode.MARKDOWN)
 
 
 def allanomalismissions(update, context):
     ret = dict()
-    ret = anomalis_missions_in_zone('DM_Aulari', ret)
-    ret = anomalis_missions_in_zone('DM_Carpa', ret)
-    ret = anomalis_missions_in_zone('DM_Civica', ret)
-    ret = anomalis_missions_in_zone('DM_Comunicacio', ret)
-    ret = anomalis_missions_in_zone('DM_EB_Sud', ret)
-    ret = anomalis_missions_in_zone('DM_EB_Nord', ret)
-    ret = anomalis_missions_in_zone('DM_EB_Central', ret)
-    ret = anomalis_missions_in_zone('DM_ETSE', ret)
-    ret = anomalis_missions_in_zone('DM_FTI', ret)
-    ret = anomalis_missions_in_zone('DM_Med', ret)
-    ret = anomalis_missions_in_zone('DM_SAF', ret)
-    ret = anomalis_missions_in_zone('DM_EC', ret)
-    ret = anomalis_missions_in_zone('DM_Torres', ret)
-    ret = anomalis_missions_in_zone('DM_Vet', ret)
+    ret = anomalis_missions_in_zone(data, 'DM_Aulari', ret)
+    ret = anomalis_missions_in_zone(data, 'DM_Carpa', ret)
+    ret = anomalis_missions_in_zone(data, 'DM_Civica', ret)
+    ret = anomalis_missions_in_zone(data, 'DM_Comunicacio', ret)
+    ret = anomalis_missions_in_zone(data, 'DM_EB_Sud', ret)
+    ret = anomalis_missions_in_zone(data, 'DM_EB_Nord', ret)
+    ret = anomalis_missions_in_zone(data, 'DM_EB_Central', ret)
+    ret = anomalis_missions_in_zone(data, 'DM_ETSE', ret)
+    ret = anomalis_missions_in_zone(data, 'DM_FTI', ret)
+    ret = anomalis_missions_in_zone(data, 'DM_Med', ret)
+    ret = anomalis_missions_in_zone(data, 'DM_SAF', ret)
+    ret = anomalis_missions_in_zone(data, 'DM_EC', ret)
+    ret = anomalis_missions_in_zone(data, 'DM_Torres', ret)
+    ret = anomalis_missions_in_zone(data, 'DM_Vet', ret)
 
     output_text = "Active players: " + str(active_players(data[data['FACTION'] == 'Anomalis']))
     update.message.reply_text(output_text)
-    update.message.reply_text(humanize_mission_dict(ret), parse_mode=telegram.ParseMode.MARKDOWN)
+    update.message.reply_text(humanize_mission_dict(ret, mission_data), parse_mode=telegram.ParseMode.MARKDOWN)
 
 
 def allcorruptusmissions(update, context):
     ret = dict()
-    ret = corruptus_missions_in_zone('DM_Aulari', ret)
-    ret = corruptus_missions_in_zone('DM_Carpa', ret)
-    ret = corruptus_missions_in_zone('DM_Civica', ret)
-    ret = corruptus_missions_in_zone('DM_Comunicacio', ret)
-    ret = corruptus_missions_in_zone('DM_EB_Sud', ret)
-    ret = corruptus_missions_in_zone('DM_EB_Nord', ret)
-    ret = corruptus_missions_in_zone('DM_EB_Central', ret)
-    ret = corruptus_missions_in_zone('DM_ETSE', ret)
-    ret = corruptus_missions_in_zone('DM_FTI', ret)
-    ret = corruptus_missions_in_zone('DM_Med', ret)
-    ret = corruptus_missions_in_zone('DM_SAF', ret)
-    ret = corruptus_missions_in_zone('DM_EC', ret)
-    ret = corruptus_missions_in_zone('DM_Torres', ret)
-    ret = corruptus_missions_in_zone('DM_Vet', ret)
+    ret = corruptus_missions_in_zone(data, 'DM_Aulari', ret)
+    ret = corruptus_missions_in_zone(data, 'DM_Carpa', ret)
+    ret = corruptus_missions_in_zone(data, 'DM_Civica', ret)
+    ret = corruptus_missions_in_zone(data, 'DM_Comunicacio', ret)
+    ret = corruptus_missions_in_zone(data, 'DM_EB_Sud', ret)
+    ret = corruptus_missions_in_zone(data, 'DM_EB_Nord', ret)
+    ret = corruptus_missions_in_zone(data, 'DM_EB_Central', ret)
+    ret = corruptus_missions_in_zone(data, 'DM_ETSE', ret)
+    ret = corruptus_missions_in_zone(data, 'DM_FTI', ret)
+    ret = corruptus_missions_in_zone(data, 'DM_Med', ret)
+    ret = corruptus_missions_in_zone(data, 'DM_SAF', ret)
+    ret = corruptus_missions_in_zone(data, 'DM_EC', ret)
+    ret = corruptus_missions_in_zone(data, 'DM_Torres', ret)
+    ret = corruptus_missions_in_zone(data, 'DM_Vet', ret)
 
     output_text = "Active players: " + str(active_players(data[data['FACTION'] == 'Corruptus']))
     update.message.reply_text(output_text)
-    update.message.reply_text(humanize_mission_dict(ret), parse_mode=telegram.ParseMode.MARKDOWN)
+    update.message.reply_text(humanize_mission_dict(ret, mission_data), parse_mode=telegram.ParseMode.MARKDOWN)
 
 
 def donebyuser(update, context):
@@ -1918,45 +1172,8 @@ def refresh_influences(update, context):
     update.message.reply_text("Influencia refrescada correctament!")
 
 
-# def influence_from_db(update, context):
-
-
-
 def help_mod(update, context):
-    user_id = str(update.message.chat['id'])
-
-    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
-    if level != 'Mod':
-        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
-        return None
-
-    output_text = """💬 *COMANDOS DE SOLO MODS:*
--*/generaltop*: Muestra el top 10 de las dos facciones. Se puede añadir un numero para que sea el top ese numero
-
--*/activate + user_id, mission_id*: Le activa a ese usuario esa mission
-
--*/complete + user_id, mission_id*: Le hace esa mision a esa persona
-
--*/donebyuser + user_id*: Te dice todas las misiones que ha hecho esa persona 
-
--*/onduty + user_id*: Te dice todas las misiones activas de esa persona
- 
--*/addpoints + user_id, puntos*: Le suma a ese usuario tantos puntos
-
--*/sendtoplayer + user_id, texto*: Manda el texto a ese usuario
-
--*/messageall + texto*: Le manda a todos los jugadores ese texto
-
--*/allmissionstats*: Muestra los stats de todas las misiones
-
--*/allanomalisstats*: Muestra los stats de todas las misiones
-
--*/allcorruptusstats*: Muestra los stats de todas las misiones
-
--*/influencestats*: Muestra el estado de influencia de todos los NPCS
-
--*/refreshinfluence*: Refresca en la base de datos la influencia calculada"""
-    update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
+    help_mod_ext(update, context, data)
 
 
 def npcs(update, context):
@@ -1984,7 +1201,7 @@ def npcs(update, context):
         update.message.reply_text(output_text)
     else:
         if show[particular_npc]:
-            text_to_use = lore_text(particular_npc)
+            text_to_use = lore_text(particular_npc, NPC_data)
             if text_to_use:
                 output_text = str(NPC_data[NPC_data['NAME'] == particular_npc][text_to_use].values[0])
                 update.message.reply_text(output_text)
@@ -2040,7 +1257,6 @@ def main():
     dp.add_handler(CommandHandler("createteam", create_team))
     dp.add_handler(CommandHandler("jointeam", join_team))
     dp.add_handler(CommandHandler("showteam", show_team))
-    dp.add_handler(CommandHandler("createlink", create_link))
     dp.add_handler(CommandHandler("sendboop", sendboop))
     dp.add_handler(CommandHandler("sendall", sendall))
     dp.add_handler(CommandHandler("sendallboop", sendallboop))
