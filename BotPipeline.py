@@ -117,7 +117,7 @@ def read_QR(update, context):
 
 
 def check_answer(user_id, answer):
-    check_answer_ext(user_id, answer, data, mission_data)
+    return check_answer_ext(user_id, answer, data, mission_data)
 
 #---------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
@@ -160,6 +160,7 @@ def show_team(update, context):
 
 def req_ids(update, context):
     req_ids(update, data, teams_data)
+
 
 # Team related functions
 def create_team(update, context):
