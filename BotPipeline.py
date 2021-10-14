@@ -43,13 +43,18 @@ from utils.guild import guild_points, show_team_ext, mem_ids_ext, req_ids_ext, \
 from utils.database_functions import new_register_ext, set_alias_ext, show_me_ext, \
     activity_ext, hint_ext, join_anomalis_ext, join_corruptus_ext, set_language_ext
 
+from utils.competitive_functions import topfaction_ext, top_teams_ext, top3_ext
+
+from utils.mods import bdb_ext, activate_mission_ext, general_top_ext, add_points_ext, \
+    message_all_ext, allmissionstats_ext, allanomalismissions_ext, allcorruptusmissions_ext, \
+    donebyuser_ext, onduty_ext, complete_ext, sendtoplayer_ext, influence_stats_ext, \
+    refresh_influences_ext
+
 from utils.pic_sender import Civica, Veterinaria, Aulari, Carpa, Comunicacio, Edifici_B_central, Edifici_B_Nord, \
     Edifici_B_Sud, Edifici_C, Educacio, Etse, FTI, Medicina, SAF, Torres
 
 from utils.bot_help import contact, help_basic, help_mod_ext, help_team, help, help_personal, \
     help_competitive, help_founder_ext, start_ext, rules, use
-
-from utils.helpers import select_language, create_new_row
 
 
 #---------------------------------------------------------------------------------------------------
@@ -114,7 +119,7 @@ def mission_accomplished(user_id, mission_id):
         return None
 
 
-def read_QR(update, context):
+def read_qr(update, context):
     global data
     bot_id = str(update.message.chat['id'])
     if check_pic(bot_id, update.message.photo[-1].file_unique_id):
@@ -230,10 +235,30 @@ def new_register(bot_id, df):
     registred_ids = data['BOT_ID'].tolist()
 
 
+def register(update, context):
+    bot_id = update.message.chat['id']
+    if str(bot_id) in registred_ids:
+        update.message.reply_text('Tu registro ya está completado')
+    else:
+        new_register(bot_id, data)
+        update.message.reply_text('Te has registrado!')
+
+
+def start(update, context):
+    bot_id = str(update.message.chat['id'])
+    if bot_id not in registred_ids:
+        new_register(bot_id, data)
+    start_ext(update, context)
+
+
 # Personal stuff related methods
 def set_alias(update, context):
     global data
     data = set_alias_ext(update, context, data)
+
+
+def get_my_id(update, context):
+    update.message.reply_text(update.message.chat['id'])
 
 
 def show_me(update, context):
@@ -270,137 +295,36 @@ def set_language(update, context):
 #---------------------------------------------------------------------------------------------------
 
 def topfaction(update, context):
-    bot_id = str(update.message.chat['id'])
-    if bot_id not in registred_ids:
-        new_register(bot_id, data)
-
-    n = str(update.message.text)[12:]
-    try:
-        top = int(n)
-    except ValueError:
-        top = 10
-
-    own_faction = str(data[data['BOT_ID'] == str(bot_id)]['FACTION'].values[0])
-    if own_faction == 'Neutral':
-        update.message.reply_text("Primer t'has d'unir a una facció! /joinanomalis o /joincorruptus")
-        return None
-
-    faction_df = data[(data['FACTION'] == own_faction) & ((data['Level'] == 'Player') | (data['BOT_ID'] == '1972795833' ) | (data['BOT_ID'] == '750747669'))]
-    a_ids = faction_df['BOT_ID'].tolist()
-    score = dict()
-    for ai in a_ids:
-        points = user_points(faction_df, ai)
-        if points > 0:
-            score[ai] = points
-    score = dict(sorted(score.items(), key=lambda item: item[1], reverse=True))
-
-    output_text = "Les millors puntuacions de la vostra facció són:\n"
-    last_points = max(score.values())
-    position = 1
-    counter = 1
-
-    for key, value in score.items():
-        alias = str(faction_df[faction_df['BOT_ID'] == key]['ALIAS'].values[0])
-        if alias == 'no_alias':
-            continue
-        if last_points != value:
-            position += 1
-            last_points = value
-        output_text += str(position) + ". " + alias + ": " + str(value) + "\n"
-        if counter == top:
-            break
-        counter += 1
-
-    output_text += "\nRecordeu: només les persones amb alies surten al top! useu /setalias + \"alias\" per tenir-ne un"
-    update.message.reply_text(output_text)
+    topfaction_ext(update, context, data)
 
 
 def top_teams(update, context):
-    guilds = data['GUILD'].tolist()
-    guilds = list(filter(lambda x: x != ' ', guilds))
-    guilds = set(guilds)
-    g_score = dict()
-
-    n = str(update.message.text)[10:]
-    try:
-        top = int(n)
-    except ValueError:
-        top = 10
-
-    for g in guilds:
-        g_points = guild_points(g, data)
-        if g_points > 0:
-            g_score[g] = g_points
-
-    g_score = dict(sorted(g_score.items(), key=lambda item: item[1], reverse=True))
-
-    last_points = max(g_score.values())
-    position = 1
-    counter = 1
-    output_text = "El top " + str(top) + " dels equips és:\n\n"
-    for key, value in g_score.items():
-        if last_points != value:
-            position += 1
-            last_points = value
-        output_text += str(position) + ". " + str(key) + ": " + str(value) + "\n"
-        if counter == top:
-            break
-        counter += 1
-
-    update.message.reply_text(output_text)
+    top_teams_ext(update, context, data)
 
 
 def top3(update, context):
-    all_ids = data['BOT_ID'].tolist()
-    score = dict()
-    for i in all_ids:
-        points = user_points(data, i)
-        if points > 0:
-            score[i] = points
-
-    score = dict(sorted(score.items(), key=lambda item: item[1], reverse=True))
-    output_text = "El top 3 del joc tenen les següents puntuacions:\n\n"
-
-    counter = 1
-    for k, v in score.items():
-        output_text += str(counter) + ": " + str(v) + "\n"
-        if counter >= 3:
-            break
-        counter += 1
-
-    output_text += "\nEnhorabona i seguiu així!!!!"
-
-    update.message.reply_text(output_text)
+    top3_ext(update, context, data)
 
 
-def start(update, context):
-    bot_id = str(update.message.chat['id'])
-    if bot_id not in registred_ids:
-        new_register(bot_id, data)
-    start_ext(update, context)
-
-
-def register(update, context):
-    bot_id = update.message.chat['id']
-    if str(bot_id) in registred_ids:
-        update.message.reply_text('Tu registro ya está completado')
-    else:
-        new_register(bot_id, data)
-        update.message.reply_text('Te has registrado!')
-
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#----------------------HELP FUNCTIONS---------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
 
 def help_founder(update, context):
     help_founder_ext(update, context, teams_data)
 
 
-def halal(update, context):
-    """Send a halal message when the command /halal is issued"""
-    update.message.reply_text('القرآن')
+def help_mod(update, context):
+    help_mod_ext(update, context, data)
 
 
-def corruptus(update, context):
-    """Send corruptus description when the command /corruptus is issued"""
-    update.message.reply_text('Des de temps immemorials del passat, la diversitat d’idees ha portat a la Humanitat a viure grans guerres i conflictes que només han acabat amb la masacre de vides i amb la pèrdua dels nostres iguals. És hora de deixar enrere el individualisme egoista i el benestar personal i unir-nos sota un nou líder que alliberi finalment als éssers humans de la seva càrrega. No més desigualtat, no més destrucció. Volem un món pacífic per tots i això només ho aconseguirem plegats. La heterogeneïtat present en la societat és l’origen de tots els problemes actuals! És hora de canviar, uneix-te per preservar i salvar el planeta!')
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#----------------------ANSWER FUNCTIONs-------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
 
 
 def echo(update, context):
@@ -426,431 +350,6 @@ def echo(update, context):
     else:
         update.message.reply_text("El missatge que has enviat no és cap resposta de les teves missions actives!")
         update.message.reply_text("Escriu /help per saber més de com funciona el bot")
-
-
-def get_my_id(update, context):
-    update.message.reply_text(update.message.chat['id'])
-
-
-def test(update, context):
-    """Send link to the aliniation test"""
-    update.message.reply_text('https://bit.ly/3urA0S0')
-
-
-def error(update, context):
-    """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
-    # update.message.reply_text("Alguna cosa ha anat malament! Torna-ho a intentar o contacte amb @ShaggyGalaso")
-
-
-#---------------------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------------------
-#----------------------MODS FUNCTIONS---------------------------------------------------------------
-#---------------------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------------------
-
-def bdb(update, context):
-    image_url = get_boop()
-
-    user_id = update.message.chat['id']
-    if user_id < 0:
-        return None
-
-    if str(user_id) != '981802604':
-        update.message.reply_text("Només el meu pare pot fer servir aquesta comanda")
-
-    all_ids = data['BOT_ID'].tolist()
-    for i in all_ids:
-        try:
-            context.bot.send_message(str(i), "Que tinguis un bon dia")
-            context.bot.send_photo(str(i), image_url)
-            context.bot.send_message(str(i), "boop! /boop per més")
-        except:
-            pass
-
-
-def activate_mission(update, context):
-    user_id = str(update.message.chat['id'])
-
-    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
-    if level != 'Mod':
-        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
-        return None
-
-    text = str(update.message.text)[10:]
-    values = text.split(", ")
-    if len(values) != 2:
-        update.message.reply_text("Cal entrar el user_id i el mission id separats per una coma i un espai")
-        return None
-
-    am_building = str(mission_data[mission_data['MISSION_ID'] == values[1]]['AM_BUILDING'].values[0])
-    data.loc[data['BOT_ID'] == values[0], am_building] = values[1]
-    data.to_csv(player_db_file, index=False, sep=';', encoding='cp1252')
-    update.message.reply_text("Missió actualitzada correctament")
-
-
-def general_top(update, context):
-    user_id = str(update.message.chat['id'])
-
-    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
-    if level != 'Mod':
-        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
-        return None
-
-    update.message.reply_text("No me pienso esforzar en esto (:\n")
-    n = str(update.message.text)[12:]
-    try:
-        top = int(n)
-    except ValueError:
-        top = 10
-
-    anomalis_df = data[(data['FACTION'] == 'Anomalis') & ((data['Level'] == 'Player') | (data['BOT_ID'] == '1972795833') | (data['BOT_ID'] == '750747669'))]
-    corruptus_df = data[(data['FACTION'] == 'Corruptus') & ((data['Level'] == 'Player') | (data['BOT_ID'] == '1972795833') | (data['BOT_ID'] == '750747669'))]
-    a_ids = anomalis_df['BOT_ID'].tolist()
-    score = dict()
-    for ai in a_ids:
-        points = user_points(anomalis_df, ai)
-        if points > 0:
-            score[ai] = points
-    score = dict(sorted(score.items(), key=lambda item: item[1], reverse=True))
-
-    output_text = "Les millors puntuacions d'anomalis són:\n"
-    last_points = max(score.values())
-    position = 1
-    counter = 1
-
-    for key, value in score.items():
-        alias = str(anomalis_df[anomalis_df['BOT_ID'] == key]['ALIAS'].values[0])
-        if alias == 'no_alias':
-            continue
-        if last_points != value:
-            position += 1
-            last_points = value
-        output_text += str(position) + ". " + alias + ": " + str(value) + "\n"
-        if counter == top:
-            break
-        counter += 1
-
-    update.message.reply_text(output_text)
-
-    a_ids = corruptus_df['BOT_ID'].tolist()
-    score = dict()
-    for ai in a_ids:
-        points = user_points(corruptus_df, ai)
-        if points > 0:
-            score[ai] = points
-    score = dict(sorted(score.items(), key=lambda item: item[1], reverse=True))
-
-    output_text = "Les millors puntuacions de corruptus són:\n"
-    last_points = max(score.values())
-    position = 1
-    counter = 1
-
-    for key, value in score.items():
-        alias = str(corruptus_df[corruptus_df['BOT_ID'] == key]['ALIAS'].values[0])
-        if alias == 'no_alias':
-            continue
-        if last_points != value:
-            position += 1
-            last_points = value
-        output_text += str(position) + ". " + alias + ": " + str(value) + "\n"
-        if counter == top:
-            break
-        counter += 1
-
-    update.message.reply_text(output_text)
-
-
-def add_points(update, context):
-    user_id = str(update.message.chat['id'])
-
-    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
-    if level != 'Mod':
-        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
-        return None
-
-    text = str(update.message.text)[11:]
-    values = text.split(", ")
-    if len(values) != 2:
-        update.message.reply_text("Cal entrar el user_id i els punts per separats per una coma i un espai")
-        return None
-
-    try:
-        values[1] = int(values[1])
-    except:
-        update.message.reply_text("***ERROR***:El segon valor ha de ser un número enter")
-        return None
-
-    am_b = 'P_Aulari'
-    actual_points = int(data[data['BOT_ID'] == values[0]][am_b])
-    data.loc[data['BOT_ID'] == values[0], am_b] = actual_points + values[1]
-    data.to_csv(player_db_file, index=False, sep=';', encoding='cp1252')
-    update.message.reply_text("Punts sumats correctament!!")
-
-
-def message_all(update, context):
-    user_id = str(update.message.chat['id'])
-
-    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
-    if level != 'Mod':
-        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
-        return None
-
-    text = str(update.message.text)[12:]
-
-    all_ids = data['BOT_ID'].tolist()
-    for i in all_ids:
-        try:
-            context.bot.send_message(str(i), text)
-        except:
-            pass
-
-
-def allmissionstats(update, context):
-    ret = dict()
-    ret = dict_missions_in_zone(data, 'DM_Aulari', ret)
-    ret = dict_missions_in_zone(data, 'DM_Carpa', ret)
-    ret = dict_missions_in_zone(data, 'DM_Civica', ret)
-    ret = dict_missions_in_zone(data, 'DM_Comunicacio', ret)
-    ret = dict_missions_in_zone(data, 'DM_EB_Sud', ret)
-    ret = dict_missions_in_zone(data, 'DM_EB_Nord', ret)
-    ret = dict_missions_in_zone(data, 'DM_EB_Central', ret)
-    ret = dict_missions_in_zone(data, 'DM_ETSE', ret)
-    ret = dict_missions_in_zone(data, 'DM_FTI', ret)
-    ret = dict_missions_in_zone(data, 'DM_Med', ret)
-    ret = dict_missions_in_zone(data, 'DM_SAF', ret)
-    ret = dict_missions_in_zone(data, 'DM_EC', ret)
-    ret = dict_missions_in_zone(data, 'DM_Torres', ret)
-    ret = dict_missions_in_zone(data, 'DM_Vet', ret)
-
-    output_text = "Active players: " + str(active_players(data) - 2)
-    update.message.reply_text(output_text)
-    update.message.reply_text(humanize_mission_dict(ret, mission_data), parse_mode=telegram.ParseMode.MARKDOWN)
-
-
-def allanomalismissions(update, context):
-    ret = dict()
-    ret = anomalis_missions_in_zone(data, 'DM_Aulari', ret)
-    ret = anomalis_missions_in_zone(data, 'DM_Carpa', ret)
-    ret = anomalis_missions_in_zone(data, 'DM_Civica', ret)
-    ret = anomalis_missions_in_zone(data, 'DM_Comunicacio', ret)
-    ret = anomalis_missions_in_zone(data, 'DM_EB_Sud', ret)
-    ret = anomalis_missions_in_zone(data, 'DM_EB_Nord', ret)
-    ret = anomalis_missions_in_zone(data, 'DM_EB_Central', ret)
-    ret = anomalis_missions_in_zone(data, 'DM_ETSE', ret)
-    ret = anomalis_missions_in_zone(data, 'DM_FTI', ret)
-    ret = anomalis_missions_in_zone(data, 'DM_Med', ret)
-    ret = anomalis_missions_in_zone(data, 'DM_SAF', ret)
-    ret = anomalis_missions_in_zone(data, 'DM_EC', ret)
-    ret = anomalis_missions_in_zone(data, 'DM_Torres', ret)
-    ret = anomalis_missions_in_zone(data, 'DM_Vet', ret)
-
-    output_text = "Active players: " + str(active_players(data[data['FACTION'] == 'Anomalis']))
-    update.message.reply_text(output_text)
-    update.message.reply_text(humanize_mission_dict(ret, mission_data), parse_mode=telegram.ParseMode.MARKDOWN)
-
-
-def allcorruptusmissions(update, context):
-    ret = dict()
-    ret = corruptus_missions_in_zone(data, 'DM_Aulari', ret)
-    ret = corruptus_missions_in_zone(data, 'DM_Carpa', ret)
-    ret = corruptus_missions_in_zone(data, 'DM_Civica', ret)
-    ret = corruptus_missions_in_zone(data, 'DM_Comunicacio', ret)
-    ret = corruptus_missions_in_zone(data, 'DM_EB_Sud', ret)
-    ret = corruptus_missions_in_zone(data, 'DM_EB_Nord', ret)
-    ret = corruptus_missions_in_zone(data, 'DM_EB_Central', ret)
-    ret = corruptus_missions_in_zone(data, 'DM_ETSE', ret)
-    ret = corruptus_missions_in_zone(data, 'DM_FTI', ret)
-    ret = corruptus_missions_in_zone(data, 'DM_Med', ret)
-    ret = corruptus_missions_in_zone(data, 'DM_SAF', ret)
-    ret = corruptus_missions_in_zone(data, 'DM_EC', ret)
-    ret = corruptus_missions_in_zone(data, 'DM_Torres', ret)
-    ret = corruptus_missions_in_zone(data, 'DM_Vet', ret)
-
-    output_text = "Active players: " + str(active_players(data[data['FACTION'] == 'Corruptus']))
-    update.message.reply_text(output_text)
-    update.message.reply_text(humanize_mission_dict(ret, mission_data), parse_mode=telegram.ParseMode.MARKDOWN)
-
-
-def donebyuser(update, context):
-    user_id = str(update.message.chat['id'])
-    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
-
-    if level != 'Mod':
-        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
-        return None
-
-    player_id = str(update.message.text)[12:]
-    udf = data[data['BOT_ID'] == player_id]
-    dm = all_done_missions(udf, player_id)
-    alias = str(udf['ALIAS'].values[0])
-    output_text = "La persona: " + str(alias) + " amb ID: " + str(player_id) + " ha fet les següents missions:\n\n"
-    output_text += str(dm)
-
-    update.message.reply_text(output_text)
-
-
-def onduty(update, context):
-    user_id = str(update.message.chat['id'])
-    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
-
-    if level != 'Mod':
-        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
-        return None
-
-    player_id = str(update.message.text)[8:]
-    udf = data[data['BOT_ID'] == player_id]
-    dm = all_active_missions(udf, player_id)
-    alias = str(udf['ALIAS'].values[0])
-    output_text = "La persona: " + str(alias) + " amb ID: " + str(player_id) + " té les següents missions actives:\n\n"
-    output_text += str(dm)
-
-    update.message.reply_text(output_text)
-
-
-def complete(update, context):
-    user_id = str(update.message.chat['id'])
-    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
-
-    if level != 'Mod':
-        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
-        return None
-    text = str(update.message.text)[10:]
-    values = text.split(", ")
-    am = all_active_missions(data, values[0])
-    if values[1] in am:
-        mission_accomplished(values[0], values[1])
-        update.message.reply_text("Missió completada amb éxit")
-    else:
-        update.message.reply_text("Aquesta persona no té aquesta missió activada")
-
-
-def sendtoplayer(update, context):
-    user_id = str(update.message.chat['id'])
-    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
-
-    if level != 'Mod':
-        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
-        return None
-    text = str(update.message.text)[14:]
-    values = text.split(", ")
-    alias = str(data[data['BOT_ID'] == user_id]['ALIAS'].values[0])
-    if text:
-        output_text = "Li Mod " + alias + " diu el següent:\n\n"
-        output_text += values[1]
-        context.bot.send_message(values[0], output_text)
-
-    update.message.reply_text("Persona contactada correctament")
-
-
-def influence_stats(update, context):
-    user_id = str(update.message.chat['id'])
-    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
-
-    if level != 'Mod':
-        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
-        return None
-
-    all_ids = data['BOT_ID'].tolist()
-    id_faction = dict()
-    id_missions = dict()
-    faction_values = {'Anomalis': 1, 'Corruptus': -1}
-    for i in all_ids:
-        value = all_done_missions(data, i)
-        if len(value) != 0:
-            key = str(data[data['BOT_ID'] == i]['FACTION'].values[0])
-            if key == "Neutral":
-                continue
-            id_faction[i] = key
-            id_missions[i] = value
-
-    all_mission_id = mission_data['MISSION_ID'].tolist()
-
-    mission_npc = dict()
-    for mid in all_mission_id:
-        if str(mid) == 'nan':
-            continue
-        npc = str(mission_data[mission_data['MISSION_ID'] == mid]['NPC'].values[0])
-        if npc == 'nan' or npc == 'None':
-            continue
-        mission_npc[mid] = npc
-
-    npc_influence = dict()
-    for n in mission_npc.values():
-        npc_influence[n] = 0
-
-    for i in id_missions.keys():
-        inf_value = faction_values[id_faction[i]]
-        missions = id_missions[i]
-        for m in missions:
-            if m in mission_npc.keys():
-                npc = mission_npc[m]
-                actual_value = npc_influence[npc]
-                actual_value += inf_value
-                npc_influence[npc] = actual_value
-
-    output_text = "Així està l'actual estat d'influencia: \n(Positiu Anomalis, Negatiu Corruptus)\n\n"
-    for k, v in npc_influence.items():
-        output_text += str(k) + ": " + str(v) + "\n"
-
-    update.message.reply_text(output_text)
-
-
-def refresh_influences(update, context):
-    user_id = str(update.message.chat['id'])
-    level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
-
-    if level != 'Mod':
-        update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
-        return None
-
-    all_ids = data['BOT_ID'].tolist()
-    id_faction = dict()
-    id_missions = dict()
-    faction_values = {'Anomalis': 1, 'Corruptus': -1}
-    for i in all_ids:
-        value = all_done_missions(data, i)
-        if len(value) != 0:
-            key = str(data[data['BOT_ID'] == i]['FACTION'].values[0])
-            if key == "Neutral":
-                continue
-            id_faction[i] = key
-            id_missions[i] = value
-
-    all_mission_id = mission_data['MISSION_ID'].tolist()
-
-    mission_npc = dict()
-    for mid in all_mission_id:
-        if str(mid) == 'nan':
-            continue
-        npc = str(mission_data[mission_data['MISSION_ID'] == mid]['NPC'].values[0])
-        if npc == 'nan' or npc == 'None':
-            continue
-        mission_npc[mid] = npc
-
-    npc_influence = dict()
-    for n in mission_npc.values():
-        npc_influence[n] = 0
-
-    for i in id_missions.keys():
-        inf_value = faction_values[id_faction[i]]
-        missions = id_missions[i]
-        for m in missions:
-            if m in mission_npc.keys():
-                npc = mission_npc[m]
-                actual_value = npc_influence[npc]
-                actual_value += inf_value
-                npc_influence[npc] = actual_value
-
-    for npc, influence in npc_influence.items():
-        NPC_data.loc[NPC_data['NAME'] == npc, 'FAVOR'] = influence
-
-    NPC_data.to_csv(npc_db_file, index=False, sep=';', encoding='cp1252')
-    update.message.reply_text("Influencia refrescada correctament!")
-
-
-def help_mod(update, context):
-    help_mod_ext(update, context, data)
 
 
 def npcs(update, context):
@@ -888,6 +387,99 @@ def npcs(update, context):
             update.message.reply_text("El npc que has triat encara no el coneixes!!")
 
 
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#----------------------MODS FUNCTIONS---------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+
+def bdb(update, context):
+    bdb_ext(update, context, data)
+
+
+def activate_mission(update, context):
+    global data
+    data = activate_mission_ext(update, context, data, mission_data)
+
+
+def general_top(update, context):
+    general_top_ext(update, context, data)
+
+
+def add_points(update, context):
+    global data
+    data = add_points_ext(update, context, data)
+
+
+def message_all(update, context):
+    message_all_ext(update, context, data)
+
+
+def allmissionstats(update, context):
+    allmissionstats_ext(update, context, data, mission_data)
+
+
+def allanomalismissions(update, context):
+    allanomalismissions_ext(update, context, data, mission_data)
+
+
+def allcorruptusmissions(update, context):
+    allcorruptusmissions_ext(update, context, data, mission_data)
+
+
+def donebyuser(update, context):
+    donebyuser_ext(update, context, data)
+
+
+def onduty(update, context):
+    onduty_ext(update, context, data)
+
+
+def complete(update, context):
+    global data
+    data = complete_ext(update, context, data, mission_data, NPC_data)
+
+
+def sendtoplayer(update, context):
+    sendtoplayer_ext(update, context, data)
+
+
+def influence_stats(update, context):
+    influence_stats_ext(update, context, data, mission_data)
+
+
+def refresh_influences(update, context):
+    global NPC_data
+    NPC_data = refresh_influences_ext(update, context, data, mission_data, NPC_data)
+
+
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#----------------------OTHER FUNCTIONS--------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+
+def halal(update, context):
+    """Send a halal message when the command /halal is issued"""
+    update.message.reply_text('القرآن')
+
+
+def corruptus(update, context):
+    """Send corruptus description when the command /corruptus is issued"""
+    update.message.reply_text('Des de temps immemorials del passat, la diversitat d’idees ha portat a la Humanitat a viure grans guerres i conflictes que només han acabat amb la masacre de vides i amb la pèrdua dels nostres iguals. És hora de deixar enrere el individualisme egoista i el benestar personal i unir-nos sota un nou líder que alliberi finalment als éssers humans de la seva càrrega. No més desigualtat, no més destrucció. Volem un món pacífic per tots i això només ho aconseguirem plegats. La heterogeneïtat present en la societat és l’origen de tots els problemes actuals! És hora de canviar, uneix-te per preservar i salvar el planeta!')
+
+
+def test(update, context):
+    """Send link to the aliniation test"""
+    update.message.reply_text('https://bit.ly/3urA0S0')
+
+
+def error(update, context):
+    """Log Errors caused by Updates."""
+    logger.warning('Update "%s" caused error "%s"', update, context.error)
+    # update.message.reply_text("Alguna cosa ha anat malament! Torna-ho a intentar o contacte amb @ShaggyGalaso")
+
+
 def reportproblem(update, context):
     bot_id = str(update.message.chat['id'])
     if bot_id not in registred_ids:
@@ -903,6 +495,12 @@ def reportproblem(update, context):
 
     update.message.reply_text("Problema correctamente reportado a @ShaggyGalaso, hablale si tarda mucho en resolverse")
 
+
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#----------------------MAIN LOOP--------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
 
 def main():
     """Start the bot."""
@@ -1020,7 +618,7 @@ def main():
     dp.add_handler(MessageHandler(Filters.text, echo))
 
     # on noncommand i.e pictures - activate QR protocol
-    dp.add_handler(MessageHandler(Filters.photo, read_QR))
+    dp.add_handler(MessageHandler(Filters.photo, read_qr))
 
     # log all errors
     dp.add_error_handler(error)
