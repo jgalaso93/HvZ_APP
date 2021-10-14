@@ -1,0 +1,105 @@
+MISSION_ID;AM_BUILDING;MISSION_P1;MISSION_P2;MISSION_P3;RESULT_POOL;HINT;POINTS;NPC;FINAL_TEXT;REQUIREMENTS;
+C1;AM_EC;Com es diu el centre de recerca instal·lat en aquesta planta;;;ICTA;Esta a l'entrada;10;None;None;None;None
+C2;AM_EC;De quin color és la dutxa que tens a la dreta?;;;Groc, Groga;Dude.. really? En català;10;None;None;None;None
+C3;AM_EC;Quian funció té l’aparell gris metàl·lic gran d’aquest passadís?;;;Refrigerar, Arrefredar;És una paraula d'un sol verb;10;None;None;None;None
+C4;AM_EC;He guanyat un premi nobel gràcies a la radioactivitat del 84;;;Marie Curie;1=H, Mira davant teu;10;Marie Curie;None;None;None
+C5;AM_EC;"Una de les meves frases més celebres és: ""Ne pleure pas, Alfred ! J'ai besoin de tout mon courage pour mourir à vingt ans ! (No ploris Alfred! Em cal tot el meu coratge per a morir a vint anys)""";;;Evariste Galois;Google it;10;Evariste Galois;None;None;None
+C6;AM_EC;Acabo de demostrar que tota acció té una reacció.;;;Sir Isaac Newton, Isaac Newton;The apple is a lie;10;Isaac Newton;None;None;None
+C7;AM_EC;He escrit l’equació que relaciona l’energia d’un cos amb la seva massa i velocitat;;;Albert Einstein;E=mc^2;10;Albert Einstein;None;None;None
+C8;AM_EC;He estat la primera persona del món en fotografiar informació cel·lular i em recorda subtilment a un helicòpter. Tot i això, encara no he rebut cap reconeixement… Estic decepcionada.;;;Rosalind Franklin;Estructura en forma d’hèlix de l’ADN;10;Rosalind Franklin;None;None;None
+C29;AM_EC;Marie Curie: Quin és el grup dels Osetes Polares?;;;Calcògens, calcògens, grup de l'oxigen, Grup de l'oxigen, Calcógenos, calcógenos;OSSeTe;10;Marie Curie;None;None;None
+C212;AM_EC;Isaac Newton: Existeix cert instrument de vidre capaç de descomposar la llum en 7 colors. En la portada d'un àlbum d'un cert grup de música, apareix aquest aparell. Com es diu aquest àlbum?;;;The dark side of the moon;Pink Floyd;10;Isaac Newton;None;None;None
+C213;AM_EC;Evariste Galois: Enigma matemàtic! Resol i indica quina ubicació et marca! -- ((531*3)+598+641)/(23+45-9))º , ((10^2)/2)’ , 17’’ N || (1930 / 965)º , 19’ , (3*5+2*11)’’ E;;;Cementiri de Montparnasse;Coordenades geogràfiques;10;Evariste Galois;None;None;None
+C210;AM_EC;Albert Einstein: Quina és la teoria que causa la paradoxa dels bessons?;;;Relativitat especial, La relativitat especial, relativitat especial, la relativitat especial;La vaig formular jo;10;Albert Einstein;None;None;None
+C211;AM_EC;Rosalind Franklin: A qui se li ha atribuït durant molt temps la definició de l’estructura de doble hèlix de l’ADN?;;;Watson i Crick, Crick i Watson;Sóc Rosalind Franklin. Són els dos cognoms;10;Rosalind Franklin;None;None;None
+;;;;;;;;;None;;None
+BNORD1;AM_EB_Nord;Reconeixes aquest fragment d’una obra de teatre? L’he escrit jo! “Te lo ruego buen Mercucio, vámonos. Hace calor, los Capuletos han salido y, si los encontramos, tendremos pelea, pues este calor inflama la sangre.”. Qui sóc?;;;William Shakespeare;Autor anglès, 23 d’abril;10;William Shakespeare;None;None;None
+BNORD2;AM_EB_Nord;Em considero molt bona escriptora i n’estic molt ORGULLOSA, sobretot de comèdies, però publico en anònim per por als PREJUDICIS. Qui sóc?;;;Jane Austen;Un llibre sempre comença amb majúscula;10;Jane Austen;None;None;None
+BNORD3;AM_EB_Nord;Pren nota siusplau. La negació del tot és l'afirmació del no res. Qui sóc?;;;Sòcrates, Socrates;El meu deixeble és bon escriptor;10;Sòcrates;None;None;None
+BNORD24;AM_EB_Nord;William Shakespeare: En un futur, una obra de teatre meva serà la base per crear una pel·lícula produïda una malvada multinacional que ho acabarà dominant tot. Quin és el títol d'aquesta?;;;El Rey León, el rey león, El Rei Lleó, El rei lleó, el rei lleó, El rey león;Kimba;10;William Shakespeare;None;None;None
+BNORD25;AM_EB_Nord;Jane Austen: Sabries dir-me quina és la definició que es correspon a comèdia i quina és correspon a sàtira? Sembla que els moderadors no ho saben i necessiten ajuda:  1. Composició poètica que posa al descobert i colpeix, amb l'escarni o amb la burla ridiculitzadora, passions, maneres de viure i comportaments comuns a tota la humanitat, o característics d'una categoria de persones, o d'un sol individu, que contrasten o estan en discordança amb la moral comuna o amb l'ideal ètic de l'escriptor. 2. Gènere dramàtic fonamental de la preceptiva clàssica, caracteritzat pel desenllaç feliç i per la intenció, generalment crítica, moralitzadora o satírica. ;;;1. Sàtira 2. Comèdia, 1) Sàtira 2) Comèdia, 1: Sàtira 2: Comèdia, 1- Sàtira 2- Comèdia, 1. sàtira 2. comèdia;El format de resposta és 1. X 2. Y;10;Jane Austen;None;None;None
+BNORD26;AM_EB_Nord;Sòcrates: He tingut molts deixebles al llarg de la meva vida. Plató, que és un dels molts que va acudir a mi, va tenir un cop una curiosa experiència amb un altre filòsof, que va acabar amb una gallina desplomada dins la seva acadèmia. Amb qui va ser?;;;Diògenes;Síndrome que et fa guardar moltes coses inútils a la teva habitació i no et permet llençar-ne cap;10;Sòcrates;None;None;None
+;;;;;;;;;;;
+COM1;AM_Comunicacio;He llegit un llibre per la ràdio i sóc tan bo que la gent pensa que de veritat ens estan envaint els alienígenes. Qui sóc?;;;Orson Welles;És el director de ciutadà Kane;10;Orson Welles;None;None;None
+COM2;AM_Comunicacio;Tot i que el meu nom de pila és Norma Jeane Baker, pràcticament ningú em coneix com a tal;;;Marilyn Monroe;Sóc la estrella principal de la pel·lícula Niagara (1953);10;Marilyn Monroe;None;None;None
+COM23;AM_Comunicacio;Orson Welles: D’aquestes històries, quines són veritat?  1. Era mag  2. Tinc un fetitxe amb els peus. 3. Em vaig fer un tatuatge en una natja que no es pot revelar.  4. Vaig contractar ambulàncies pq em portessin per NY.  5. Vaig fondre el meu oscar per a fer-me unes sabates d’or. 6. He posat veu a un personatge a The Transformers. ;;;1 4 6, 4 1 6, 6 1 4, 6 4 1, 4 6 1, 1 6 4;Format de la resposta: 1 2 3 4 5 6 (sense comes) ;10;Orson Welles;None;None;None
+COM24;AM_Comunicacio;Marilyn Monroe: He descobert que podeu viatjar en el temps. Tinc la certesa que moriré aviat, em podrieu dir qui el serà el culpable?;;;Norman Hodges, Norman Hogdes;Viquipèdia (cat);10;Marilyn Monroe;None;None;None
+;;;;;;;;;;;
+VET1;AM_Vet;Enfronto cada dia a caçadors furtius per protegir els goril·les de muntanya de l’extinció.;;;Dian Fossey;A 1983 publico “Goril·les en la boira”;10;Diane Fossey;None;None;None
+VET2;AM_Vet;Jugo amb els cocodrils com tu amb el teu gos.;;;Steve Irwin;El Frank de la jungla australiano;10;Steve Irwin;None;None;None
+VET23;AM_Vet;Dian Fossey: Investigo en concret un tipus de goril·la. Em sabries dir el seu nom científic?;;;Gorilla beringei beringei;Mira també la subespècie: són 3 paraules.;10;Diane Fossey;None;None;None
+VET24;AM_Vet;Steve Irwin: Quin animal de riu és capaç de rivalitzar amb els cocodrils?;;;Llúdriga gegant, Hipopòtam, llúdriga gegant, hipopòtam;N’hi ha un a Àfrica i l’altre a l’Amazones (només en cal un);10;Steve Irwin;None;None;None
+;;;;;;;;;None;None;None
+MED1;AM_Med;M’he deixat un cultiu de bacteris tot un finde i quan he tornat me trobat una zona “neta” d’aquests degut a l’acció d’un fong amb el que se’m va embrutar la placa de petri, crec que acabo de descobrir algo molt important.;;;Sir Alexander Fleming, Alexander Fleming;El fong es diu Penicillium notatum;10;Alexander Fleming;None;None;None
+MED2;AM_Med;Llegeix el següent text. Jo s´soc creador: __Per Apol·lo metge i Asclepi, juro: per Hígia, Panacea i tots els déus i deesses als qui poso per testimonis de l'observança d'aquest vot, que m'obligo a complir el que ofereixo amb totes les meves forces i voluntat__;;;Hipòcrates;No es un jurament aleatori: fixa't en quina facultat estàs.;10;Hipòcrates;None;None;None
+MED3;AM_Med;Sóc infermera en les èpoques modernes del segle XX, estic a favor del control de la natalitat i l’eugenèsia. He contribuït a l’estudi de les píldores anticonceptives.;;;Margaret Sanger;Busca per google;10;Margaret Sanger;None;None;None
+MED24;AM_Med;Alexander Fleming: Sóc feliç perquè recentment m’han donat el titol més bàsic de cavalleria anglesa. A veure si saps quin és.;;;Knight Bachelor;Som a l’any 1944;10;Alexander Fleming;None;None;None
+MED25;AM_Med;Hipòcrates: Com a grec, consagro tots els meus èxits al déu de la medicina, però ara no en recordo el nom. Em refresques la memòria?;;;Asclepi, Asklepios, Asclepio;La seva versió romana és Esculapi;10;Hipòcrates;None;None;None
+MED26;AM_Med;Margaret Sanger: Quin és el nom original de la pel·lícula que vaig guionitzar?;;;Birth Control;Massa peixet us hem donat ja, espavila!;10;Margaret Sanger;None;None;None
+;;;;;;;;;;;
+SAF1;AM_SAF;Abans de ser coneguda se’m coneixia sota el cognom de Barbey i l’embarcació que m'ha fet famosa és el Lérina.;;;Hélène de Pourtalès, Helene de Pourtales;Sóc una dona olímpica, concretament la primera;10;Hélène de Pourtalès;None;None;None
+SAF2;AM_SAF;Sóc el primer en guanyar una medalla d’or en una marató.;;;Spiridon Louis;Google it, duh!;10;Spiridon Louis;None;None;None
+SAF23;AM_SAF;Hélène de Pourtalès: Com ja sabreu, cada comité olímpic envia un nombre de persones a cada JJOO. L'any en que vaig participar jo, quin va ser el comité que va enviar a més persones?;;;França, francés, Francés;Allons enfants de la patrie;10;Hélène de Pourtalès;None;None;None
+SAF24;AM_SAF;Spiridon Louis: Abans de ser atleta olímpic tenia una professió molt més humil. Era similar a ser venedor ambulant. Quina era?;;;aiguader, Aiguader;Torna a llegir l’enunciat, potser t’entra set si ho fas en veu alta.;10;Spiridon Louis;None;None;None
+;;;;;;;;;None;None;None
+BSUD1;AM_EB_Sud;Sóc una dona que seient he aconseguit més que molta més gent aixecant-se.;;;Rosa Parks;Drets de les persones afroamericanes;10;Rosa Parks;None;None;None
+BSUD2;AM_EB_Sud;Sóc l'explorador que més s'ha beneficiat de la ruta de la seda. He escrit un llibre i estic segur que inspirarà a molts viatgers en un futur.;;;Marco Polo;"El llibre es diu ""Il Milione""";10;Marco Polo;None;None;None
+BSUD23;AM_EB_Sud;Rosa Parks: Som a 1981. Com es diu el premi artístic que he rebut?;;;Women’s Caucus for Art Lifetime Achievement Award, Women’s Caucus For Art Lifetime Achievement Award, women’s caucus for art lifetime achievement award;És un premi dels racistes que primer no em permetien seure on volia i ara mira, em premien els molt hipòcrites.;10;Rosa Parks;None;None;None
+BSUD24;AM_EB_Sud;Marco Polo: Quina distància recorre la ruta de la seda?;;;4319.65, 4319;Entre 0 i infinites milles nàutiques;10;Marco Polo;None;None;None
+;;;;;;;;;;;
+BCEN1;AM_EB_Central;Si tens algun problema familiar, a mi m’has de visitar. Sóc la primera que ajudo als que tenen conflictes familiars.;;;Virginia Satir;Conjoint Family Therapy (1964), Peoplemaking (1972) i The New Peoplemaking (1988);10;Virginia Satir;None;None;None
+BCEN2;AM_EB_Central;Sóc un metge alemany. Gran part del meu estudi es basa en analitzar la psique de les persones.;;;Sigmund Freud;El pare del psicoanàlisi;10;Sigmund Freud;None;None;None
+BCEN23;AM_EB_Central;Virginia Satir: Un dia arriba un jove a la meva consulta. Em diu que el nét de la seva àvia que és alhora el nebot del seu tiet per part de mare, tenint la seva mare només un germà, li causa problemes. Quin és el parentesc entre aquestes dues persones?;;;Germans, Germà, germans, germà, És el seu germà, és el seu germà, Són germans, són germans;No és ell mateix;10;Virginia Satir;None;None;None
+BCEN24;AM_EB_Central;Sigmund Freud: Com vaig definir l’acte de sentir atracció afectiva cap a un familiar de primer grau?;;;Complex d’Èdip, Èdip, complex d'Èdip, complex d'Electra, Complex d'Electra;Personatge de la mitologia grega;10;Sigmund Freud;None;None;None
+;;;;;;;;;;;
+;;;;;;;;;;;
+;;;;;;;;;;;
+FTI1;AM_FTI;He escrit un gran manual de guerra amb moltes tàctiques militars. Segur que en el futur molta gent l'utilitzarà.;;;Sun Tsu, Sunzi, Sun Tzu;La guerra és un art;10;Sun Tzu;None;None;None
+FTI2;AM_FTI;Em considero de les millors novel·listes d'Espanya. He nascut a Corunya i les meves obres posen a les dones com a persones fortes i independents.;;;Emilia Pedro Bazán, Emilia Pardo Bazán;Un viaje de novios (1881), Los pazos de Ulloa (1886) i La madre naturaleza (1887);10;Emilia Pardo Bazán;None;None;None
+FTI3;AM_FTI;"Sóc alemany, sóc pedagog, i alguns em diuen ""el pedagog de la innovació"".";;;Friederich Fröbel, Freiderich Wilhelm August Fröbel, Friederich Froebel, Friederich Wilhelm August Froebel;Kindergarten;10;Friederich Fröbel;None;None;None
+FTI24;AM_FTI;Sun Tsu: Que tenen en comú les 5 classes d’atac mitjançant el foc?;;;Cremar, Quemar, cremar, quemar;Capítol 12, una sola paraula;10;Sun Tzu;None;None;None
+FTI25;AM_FTI;Emilia Pardo Bazán: Tot i que el meu nom és Emilia, abans es posaven molts noms a les persones que neixien a Espanya, formant el que s’anomena el nom de naixement. Quin és el meu?;;;Emilia Antonia Socorro Josefa Amalia Vicenta Eufemia Pardo-Bazán y de la Rúa-Figueroa;Són 7 noms i 2 cognoms compostos.;10;Emilia Pardo Bazán;None;None;None
+FTI26;AM_FTI;Friederich Fröbel: Com sabreu, sóc educador, i m’han arribat veus de que al lloc on viviu es canvia molt de llei educativa. Sabries dir-me el nom de les que heu tingut des dels anys 70?;;;LGE/LOECE/LRU/LODE/LOGSE/LOPEG/LOCE/LOE/LOMCE/LOMLOE;Hi ha 10 reformes. Escriu les respostes separant-les per una barra així: exemple1/exemple2/exemple3;10;Friederich Fröbel;None;None;None
+;;;;;;;;;;;
+ETSE1;AM_ETSE;Acabo de fer un quadre que, us prometo, et segueix amb la mirada;;;Leonardo da Vinci, da Vinci, Da Vinci;També he creat prototips d’invents de tot tipus.;10;Leonardo da Vinci;None;None;None
+ETSE2;AM_ETSE;Hi ha un boig que afirma que el CC és millor que el CA, vaig a demostrar-l'hi al món que s'equivoca;;;Nikola Tesla, Tesla, Coche espacial;CC=Corrent continu;10;Nikola Tesla;None;None;None
+ETSE3;AM_ETSE;Sóc la primera persona que va programar un ordinador.;;;Ada Lovelace;També he creat el primer algorítme;10;Ada Lovelace;None;None;None
+ETSE24;AM_ETSE;Leonardo da Vinci: Quin tipus d'escriptura faig servir pels meus diaris i notes?;;;escritura especular, Escritura especular, Escriptura especular, escriptura especular;El nom tècnic de l'escritura mirall;10;Leonardo da Vinci;None;None;None
+ETSE25;AM_ETSE;Nikola Tesla: A veure si endevines com acabaria aquesta frase. En un moment de la meva vida, et vas creuar en el meu camí. T'escric poesia, però no m'entens, ja que ets un animal. Per més que volis, mai t’oblidaré, el meu dolç …..;;;Colom, colom;És un animal del qual en vaig estar enamorat.;10;Nikola Tesla;None;None;None
+ETSE26;AM_ETSE;Ada Lovelace: Quina relació de familia política tenia amb la persona que me va delatar quan vaig fugir amb el meu amant al 1833?;;;Sogra, sogra;Podria haver-ho sigut durant molt més temps si no hagués dit res.;10;Ada Lovelace;None;None;None
+;;;;;;;;;;;
+FAKE1;AM_ETSE;Quants mods hi ha?;;;8, vuit, Vuit;mira el grup carapan;10;None;None;None;None
+FAKE2;AM_ETSE;On es juga a TimeScape?;;;A la UAB, UAB, Universitat Autònoma de Barcelona;a la uni loco;10;None;None;None;None
+;;;;;;;;;;;
+;;;;;;;;;;;
+ANOMA1;AM_Civica;Heu vingut fins aquí a jurar lleialtat a anomalis. Per tant, responeu a aquest jurament: Jo, recluta d’anomalis, juro solemnement seguir els ideals de Mirna Tartel tot i que la meva vida estigui en joc. Prometo no qüestionar-los tot i que pugui escoltar rumors inquietants, i servir a la nostra causa fins a haver derrotat a corruptus i aconseguir el nostre objectiu. És pel progrés de la raça humana que ens mourem i per la superació dels humans que lluitarem. Estic segur d’unir-me a la causa? Respondré Si si ho estic.;;;Si;Really? Necessites una pista per això?;0;Mirna Tartel;Et dono la benvinguda definitiva a Anomalis! Com a signe de confiança, et revelaré la nostra contrasenya: VEURE EL MAR. Aquest és un concepte important, no l’oblidis mai!;None;None
+ANOMA2;AM_Civica;Necessitem conèixer les debilitats del nostre enemic. Per fer-ho haureu d’aconseguir la contrasenya del vostre oponent. Com? Negocieu amb ells o aconseguiu robar-les, intenteu-ho de totes les maneres. Sé que està relacionada amb el seu somni, però no us puc explicar molta cosa més. Un cop hagueu obtingut la contrasenya, podreu accedir la base de dades i obtenir tota la informació sobre ell. Bona sort!;;;SER LLIURE;Si necessites ajuda en aquest pas no se si ets digne d'estar al meu bàndol...;0;Mirna Tartel;Corruputs!! Objectiu: l’aniquilació total de l’espècie humana. || Raó: els éssers humans són una plaga que destrueix tot el que toca, planeta inclòs. Si volem que la vida no s'extingeix, la única solució és que nosaltres desapareguem. || Mitjans: acabar amb la vida de tots els humans. No cal que sigui de forma dolorosa, només cal que deixin d’existir || Líder: René Grajé.;None;None
+;;;;;;;;;;;
+CORRU1;AM_Civica;Heu vingut fins aquí a jurar lleialtat a corruptus. Per tant, responeu a aquest jurament: Jo, recluta de corrutpus, juro solemnement seguir els ideals de René Grajé tot i que la meva vida estigui en joc. Prometo no qüestionar-los tot i que pugui escoltar rumors inquietants, i servir a la nostra causa fins a haver derrotat a anomalis i aconseguir el nostre objectiu. És per la preservació del planeta que ens mourem i per l’alliberació definitiva que lluitarem. Estic segur d’unir-me a la causa? Respondré Si si ho estic.;;;Si;Really? Necessites una pista per això?;0;René Grajé;Et dono la benvinguda definitiva a Corruptus! Com a signe de confiança, et revelaré la nostra contrasenya: SER LLIURE. Aquest és un concepte important, no l’oblidis mai!;None;None
+CORRU2;AM_Civica;Necessitem conèixer les debilitats del nostre enemic. Per fer-ho haureu d’aconseguir la contrasenya del vostre oponent. Com? Negocieu amb ells o aconseguiu robar-les, intenteu-ho de totes les maneres. Sé que està relacionada amb el seu somni, però no us puc explicar molta cosa més. Un cop hagueu obtingut la contrasenya, podreu accedir la base de dades i obtenir tota la informació sobre ell. Bona sort!;;;VEURE EL MAR;Si necessites ajuda en aquest pas no se si ets digne d'estar al meu bàndol...;0;René Grajé;Anomalis!! Objectiu: la selecció artificial de l’espècie humana per evolucionar a una espècie superior. || Raó: els éssers humans són massa dèbils per sobreviure a l’entorn que inevitablement estem creant. No evitarem que el planeta empitjori, només poden sobreviure els més adaptats. || Mitjans: experimentació en éssers humans sense cap tipus de control, eugenèsia i d’altres que no cal mencionar. || Líder: Mirna Tartel.;None;None
+;;;;;;;;;;;
+HALAL1;AM_Civica;Halal?;;;Halal;"???????
+?????? ??????? ??????????? ?????????? (???????: 1).
+????????? ??????? ????? ????????????? (???????: 2).
+??????????? ?????????? (???????: 3).
+??????? ?????? ???????? (???????: 4).
+???????? ???????? ?????????? ??????????? (???????: 5).
+???????? ?????????? ?????????????? (???????: 6).
+??????? ????????? ?????????? ?????????? ?????? ???????????? ?????????? ????? ???????????? (???????: 7).
+
+
+2) ???? ??????
+??? (??????: 1).
+?????? ?????????? ??? ?????? ????? ????? ?????????????? (??????: 2).
+????????? ??????????? ??????????? ???????????? ?????????? ???????? ????????????? ?????????? (??????: 3).
+??????????? ??????????? ????? ???????? ???????? ????? ???????? ???? ???????? ????????????? ???? ?????????? (??????: 4).
+?????????? ????? ????? ???? ????????? ???????????? ???? ?????????????? (??????: 5).
+????? ????????? ???????? ??????? ?????????? ?? ????????????? ???? ???? ??????????? ??? ??????????? (??????: 6).
+?????? ??????? ????? ??????????? ??????? ?????????? ??????? ????????????? ????????? ???????? ??????? ??????? (??????: 7).
+?????? ???????? ???? ??????? ??????? ????????? ????????????? ??????? ????? ???? ????????????? (??????: 8).
+???????????? ??????? ??????????? ??????? ????? ??????????? ????? ??????????? ????? ??????????? (??????: 9).
+??? ??????????? ?????? ??????????? ??????? ??????? ???????? ??????? ??????? ????? ??????? ??????????? (??????: 10).
+??????? ????? ?????? ??? ?????????? ??? ???????? ??????? ???????? ?????? ??????????? (??????: 11).
+????? ????????? ???? ?????????????? ???????? ??? ??????????? (??????: 12).
+??????? ????? ?????? ??????? ????? ????? ???????? ??????? ?????????? ????? ????? ???????????? ????? ????????? ???? ???????????? ???????? ??? ???????????";0,69;Evil Reckmana;Keep it halal brother, mashallah!;None;None
+HALAL2;AM_Civica;;;;;;0;;;;

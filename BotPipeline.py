@@ -20,11 +20,13 @@ import os
 import sys
 import pandas as pd
 
-from random import choice
 from googletrans import Translator
 
 import telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+
+from databases.db_paths import teams_db_file, player_db_file, \
+    npc_db_file, conversation_db_file, missions_db_file
 
 from utils.user_values import all_done_missions, all_active_missions, user_points, amount_of_missions_done
 
@@ -34,7 +36,9 @@ from utils.missions import dict_missions_in_zone, anomalis_missions_in_zone,\
     corruptus_missions_in_zone, humanize_mission_dict, active_players, lore_text, \
     mission_accomplished_ext, check_answer_ext, read_qr_ext, missions
 
-from utils.guild import guild_points, show_team_ext, mem_ids_ext, req_ids_ext
+from utils.guild import guild_points, show_team_ext, mem_ids_ext, req_ids_ext, \
+    create_team_ext, join_team_ext, promote_ext, kick_ext, admit_ext, decline_ext, \
+    sendboop_ext, sendall_ext, sendallboop_ext
 
 from utils.pic_sender import Civica, Veterinaria, Aulari, Carpa, Comunicacio, Edifici_B_central, Edifici_B_Nord, \
     Edifici_B_Sud, Edifici_C, Educacio, Etse, FTI, Medicina, SAF, Torres
@@ -42,7 +46,7 @@ from utils.pic_sender import Civica, Veterinaria, Aulari, Carpa, Comunicacio, Ed
 from utils.bot_help import contact, help_basic, help_mod_ext, help_team, help, help_personal, \
     help_competitive, help_founder_ext, start_ext, rules, use
 
-from utils.helpers import check_is_founder, select_language, create_new_row
+from utils.helpers import select_language, create_new_row
 
 
 #---------------------------------------------------------------------------------------------------
@@ -56,22 +60,22 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
-database_file = os.path.join(sys.path[0], 'database.csv')
+# database_file = os.path.join(sys.path[0], 'database.csv')
 try:
-    data = pd.read_csv(database_file, sep=';', header=0, dtype={'BOT_ID': str}, encoding='cp1252')
+    data = pd.read_csv(player_db_file, sep=';', header=0, dtype={'BOT_ID': str}, encoding='cp1252')
 except:
-    data = pd.read_csv(database_file, sep=',', header=0, dtype={'BOT_ID': str}, encoding='cp1252')
+    data = pd.read_csv(player_db_file, sep=',', header=0, dtype={'BOT_ID': str}, encoding='cp1252')
 
 registred_ids = data['BOT_ID'].tolist()
 
-mission_database_file = os.path.join(sys.path[0], 'mission_database.csv')
-mission_data = pd.read_csv(mission_database_file, sep=';', header=0,
+# mission_database_file = os.path.join(sys.path[0], 'mission_database.csv')
+mission_data = pd.read_csv(missions_db_file, sep=';', header=0,
                            dtype={'MISSION': str, 'RESULT_POOL': str},
                            encoding='cp1252')
 mission_ids = mission_data['MISSION_ID'].tolist()
 
-NPC_file = os.path.join(sys.path[0], 'NPC_database.csv')
-NPC_data = pd.read_csv(NPC_file, sep=';', header=0, encoding='cp1252')
+# NPC_file = os.path.join(sys.path[0], 'NPC_database.csv')
+NPC_data = pd.read_csv(npc_db_file, sep=';', header=0, encoding='cp1252')
 
 translator = Translator(service_urls=[
       'translate.google.com',
@@ -79,14 +83,14 @@ translator = Translator(service_urls=[
     ])
 
 
-conver_file = os.path.join(sys.path[0], 'conversation_database.csv')
-conver_data = pd.read_csv(conver_file, sep=';', header=0, dtype={'BOT_ID': str}, encoding='cp1252')
+# conver_file = os.path.join(sys.path[0], 'conversation_database.csv')
+conver_data = pd.read_csv(conversation_db_file, sep=';', header=0, dtype={'BOT_ID': str}, encoding='cp1252')
 talk_input = conver_data['INPUT'].tolist()
 talk_output = conver_data['OUTPUT'].tolist()
 talk = {k: v for k, v in zip(talk_input, talk_output)}
 
-teams_file = os.path.join(sys.path[0], 'teams_database.csv')
-teams_data = pd.read_csv(teams_file, sep=';', header=0, encoding='cp1252', dtype={'FOUNDER': str})
+# teams_file = os.path.join(sys.path[0], 'teams_database.csv')
+teams_data = pd.read_csv(teams_db_file, sep=';', header=0, encoding='cp1252', dtype={'FOUNDER': str})
 
 
 #---------------------------------------------------------------------------------------------------
@@ -98,7 +102,7 @@ teams_data = pd.read_csv(teams_file, sep=';', header=0, encoding='cp1252', dtype
 def mission_accomplished(user_id, mission_id):
     global data
     data = mission_accomplished_ext(user_id, mission_id, mission_data, data, NPC_data)
-    data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
+    data.to_csv(player_db_file, index=False, sep=';', encoding='cp1252')
 
     final_text = str(mission_data[mission_data['MISSION_ID'] == mission_id]['FINAL_TEXT'].values[0])
     if final_text != 'None':
@@ -159,283 +163,52 @@ def show_team(update, context):
 
 
 def req_ids(update, context):
-    req_ids(update, data, teams_data)
+    req_ids_ext(update, data, teams_data)
 
 
-# Team related functions
 def create_team(update, context):
     global data
-    team_name = str(update.message.text)[12:]
-    user_id = str(update.message.chat['id'])
-    if user_id not in registred_ids:
-        new_register(user_id, data)
-
-    data.loc[data['BOT_ID'] == user_id, 'GUILD'] = team_name
-    data.loc[data['BOT_ID'] == user_id, 'GUILD_LEVEL'] = 'Founder'
-
-    data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
-
     global teams_data
-    founders = teams_data['FOUNDER'].tolist()
-
-    if user_id in founders:
-        old_guild = str(teams_data[teams_data['FOUNDER'] == user_id]['GUILD'].values[0])
-        teams_data.loc[teams_data['FOUNDER'] == user_id, 'GUILD'] = team_name
-
-        all_members = data[data['GUILD'] == old_guild]['BOT_ID'].tolist()
-
-        if len(all_members) == 0:
-            pass
-        else:
-            new_leader = choice(all_members)
-            old_requests = teams_data[teams_data['GUILD'] == old_guild]['REQUESTS'].tolist()
-
-            new_row = dict()
-            new_row['GUILD'] = old_guild
-            new_row['FOUNDER'] = new_leader
-            if len(old_requests) == 0:
-                new_row['REQUESTS'] = 'None'
-            else:
-                new_row['REQUESTS'] = ', '.join(str(r) for r in old_requests)
-
-            teams_data = teams_data.append(new_row, ignore_index=True)
-            teams_data.to_csv(teams_file, index=False, sep=';', encoding='cp1252')
-
-            context.bot.send_message(new_leader, "El fundador del teu equip ha marxat, ara ets el nou fundador!")
-
-    else:
-        new_row = dict()
-        new_row['GUILD'] = team_name
-        new_row['FOUNDER'] = user_id
-        new_row['REQUESTS'] = 'None'
-
-        teams_data = teams_data.append(new_row, ignore_index=True)
-        teams_data.to_csv(teams_file,  index=False, sep=';', encoding='cp1252')
-
-    reply_message = "L'equip " + team_name + " s'ha creat correctament!!! El teu rang és \"Founder\""
-    update.message.reply_text(reply_message)
+    data, teams_data = create_team_ext(update, context, data, teams_data)
 
 
 def join_team(update, context):
     global teams_data
-    team_name = str(update.message.text)[10:]
-    user_id = str(update.message.chat['id'])
-    if user_id not in registred_ids:
-        new_register(user_id, data)
-    own_alias = str(data[data['BOT_ID'] == user_id]['ALIAS'].values[0])
-
-    if team_name in teams_data['GUILD'].tolist():
-        actual_requests = teams_data[teams_data['GUILD'] == team_name]['REQUESTS'].tolist()
-        actual_requests.append(user_id)
-        actual_requests = ', '.join(str(r) for r in actual_requests)
-        teams_data.loc[teams_data['GUILD'] == team_name, 'REQUESTS'] = actual_requests
-        teams_data.to_csv(teams_file, index=False, sep=';', encoding='cp1252')
-        update.message.reply_text("La teva solucitud s'ha completat correctament!!")
-
-        team_leader = str(teams_data[teams_data['GUILD'] == team_name]['FOUNDER'].values[0])
-        leader_text = "La persona amb alias: " + own_alias + " es vol unir al teu equip! Per acceptar copia la següent comanda:"
-        context.bot.send_message(team_leader, leader_text)
-        leader_text = "/admit " + user_id
-        context.bot.send_message(team_leader, leader_text)
-        leader_text = "Per reubitjar-la, copia la següent comanda: "
-        context.bot.send_message(team_leader, leader_text)
-        leader_text = "/decline " + user_id
-        context.bot.send_message(team_leader, leader_text)
-
-    else:
-        update.message.reply_text("No hi ha cap equip amb aquest nom!!")
+    teams_data = join_team_ext(update, context, data, teams_data)
 
 
 def promote(update, context):
-    text = str(update.message.text)[9:]
-    values = text.split(", ")
-    if len(values) == 1:
-        update.message.reply_text("Compte! Has de separar l'alias i el rang per una coma i només un espai!")
-        return None
-    bot_id = str(update.message.chat['id'])
-
-    if bot_id not in registred_ids:
-        new_register(bot_id, data)
-        update.message.reply_text("El teu registre no estava complert! Si us plau uneix-te a un equip primer")
-        return 0
-
-    guild_name = str(data[data['BOT_ID'] == bot_id]['GUILD'].values[0])
-    if guild_name == " ":
-        update.message.reply_text("No formes part de cap equip!")
-        return 0
-
-    founders = teams_data['FOUNDER'].tolist()
-    if bot_id not in founders:
-        update.message.reply_text("Només els \"Founders\" poden promocionar gent del seu equip!")
-        return 0
-
-    data.loc[(data['GUILD'] == guild_name) & (data['ALIAS'] == str(values[0])), 'GUILD_LEVEL'] = str(values[1])
-    data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
-
-    output_text = "Totes les persones amb alies " + values[0] + " han sigut ascendides a " + values[1]
-    update.message.reply_text(output_text)
+    global data
+    data = promote_ext(update, context, data, teams_data)
 
 
 def kick(update, context):
     global data
-    text = str(update.message.text)[6:]
-    bot_id = str(update.message.chat['id'])
-    if check_is_founder(bot_id, teams_data):
-        team_name = str(teams_data[teams_data['FOUNDER'] == bot_id]['GUILD'].values[0])
-        if text == bot_id:
-            update.message.reply_text("No et pots fer fora a tu mateix del teu equip!")
-            return None
-        member_ids = data[data['GUILD'] == team_name]['BOT_ID'].tolist()
-        for i in member_ids:
-            if text == str(i):
-                data.loc[data['BOT_ID'] == i, 'GUILD'] = ' '
-                data.loc[data['BOT_ID'] == i, 'GUILD_LEVEL'] = 'unguilded'
-                data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
-                update.message.reply_text("Has expulsat a la persona del teu equip!")
-                context.bot.send_message(i, "T'han fet fora del teu equip!")
-                return None
-        update.message.reply_text("No hi ha ningú amb aquest id al teu equip!")
-    else:
-        update.message.reply_text("Només els founders poden fer fora a algu de l'equip!")
+    data = kick_ext(update, context, data, teams_data)
 
 
 def admit(update, context):
     global data
     global teams_data
-    text = str(update.message.text)[7:]
-    bot_id = str(update.message.chat['id'])
-    if check_is_founder(bot_id, teams_data):
-        team_name = str(teams_data[teams_data['FOUNDER'] == bot_id]['GUILD'].values[0])
-
-        all_ids = data['BOT_ID'].tolist()
-        if text not in all_ids:
-            update.message.reply_text("Aquest id no està registrat al bot!!")
-            return None
-
-        requested_ids = str(teams_data[teams_data['FOUNDER'] == bot_id]['REQUESTS'].values[0])
-        requested_ids = requested_ids.split(", ")
-        if text not in requested_ids:
-            update.message.reply_text("Aquest id no ha demanat entrar al teu equip!")
-            return None
-
-        data.loc[data['BOT_ID'] == text, 'GUILD'] = team_name
-        data.loc[data['BOT_ID'] == text, 'GUILD_LEVEL'] = 'Newbie'
-
-        data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
-
-        actual_requests = str(teams_data[teams_data['FOUNDER'] == bot_id]['REQUESTS'].values[0])
-        actual_requests = actual_requests.split(", ")
-        actual_requests.remove(text)
-        if len(actual_requests) == 0:
-            actual_requests = 'None'
-        else:
-            actual_requests = ', '.join(str(r) for r in actual_requests)
-        teams_data.loc[teams_data['FOUNDER'] == bot_id, 'REQUESTS'] = actual_requests
-
-        teams_data.to_csv(teams_file, index=False, sep=';', encoding='cp1252')
-
-        update.message.reply_text("Has acceptat a l'usuari amb id " + text)
-        context.bot.send_message(text, "Has entrat a l'equip: " + team_name)
-    else:
-        update.message.reply_text("Només els founders poden ademtre a algu a l'equip!")
+    data, teams_data = admit_ext(update, context, data, teams_data)
 
 
 def decline(update, context):
     global data
     global teams_data
-    text = str(update.message.text)[9:]
-    bot_id = str(update.message.chat['id'])
-    if check_is_founder(bot_id, teams_data):
-        all_ids = data['BOT_ID'].tolist()
-        if text not in all_ids:
-            update.message.reply_text("Aquest id no està registrat al bot!!")
-            return None
-
-        requested_ids = str(teams_data[teams_data['FOUNDER'] == bot_id]['REQUESTS'].values[0])
-        requested_ids = requested_ids.split(", ")
-        if text not in requested_ids:
-            update.message.reply_text("Aquest id no ha demanat entrar al teu equip!")
-            return None
-
-        actual_requests = str(teams_data[teams_data['FOUNDER'] == bot_id]['REQUESTS'].values[0])
-        actual_requests = actual_requests.split(", ")
-        actual_requests.remove(text)
-        if len(actual_requests) == 0:
-            actual_requests = 'None'
-        else:
-            actual_requests = ', '.join(str(r) for r in actual_requests)
-        teams_data.loc[teams_data['FOUNDER'] == bot_id, 'REQUESTS'] = actual_requests
-
-        teams_data.to_csv(teams_file, index=False, sep=';', encoding='cp1252')
-
-        update.message.reply_text("Has denegat a l'usuari amb id " + text + ". No se li comunicarà res a aquesta persona")
-    else:
-        update.message.reply_text("Només els founders poden ademtre a algu a l'equip!")
+    data, teams_data = decline_ext(update, context, data, teams_data)
 
 
 def sendboop(update, context):
-    bot_id = str(update.message.chat['id'])
-    if bot_id not in registred_ids:
-        new_register(bot_id, data)
-
-    guild_name = str(data[data['BOT_ID'] == bot_id]['GUILD'].values[0])
-    if guild_name == ' ':
-        update.message.reply_text("No estàs a cap equip! Només pots enviar un boop si estàs a un equip!")
-        return None
-
-    alias = str(update.message.text)[10:]
-    total_alias = data[data['GUILD'] == guild_name]['ALIAS'].tolist()
-    own_alias = str(data[data['BOT_ID'] == bot_id]['ALIAS'].values[0])
-    if alias in total_alias:
-        receiver_id = str(data[(data['GUILD'] == guild_name) & (data['ALIAS'] == alias)]['BOT_ID'].values[0])
-        output_text = own_alias + " sends a boop"
-        context.bot.send_message(receiver_id, output_text)
-        image_url = get_boop()
-        context.bot.send_photo(receiver_id, image_url)
-        update.message.reply_text("Has enviat un boop!")
-    else:
-        update.message.reply_text("No hi ha ningú amb aquest alias al teu equip!!")
+    sendboop_ext(update, context, data)
 
 
 def sendall(update, context):
-    bot_id = str(update.message.chat['id'])
-    if bot_id not in registred_ids:
-        new_register(bot_id, data)
-
-    guild_name = str(data[data['BOT_ID'] == bot_id]['GUILD'].values[0])
-    if guild_name == ' ':
-        update.message.reply_text("No estàs a cap equip! Només pots enviar un missatge si estàs a un equip!")
-        return None
-
-    message = str(update.message.text)[9:]
-    total_alias = data[data['GUILD'] == guild_name]['ALIAS'].tolist()
-    for alias in total_alias:
-        receiver_id = str(data[(data['GUILD'] == guild_name) & (data['ALIAS'] == alias)]['BOT_ID'].values[0])
-        context.bot.send_message(receiver_id, message)
-
-    update.message.reply_text("Has enviat el teu missatge a tothom del teu equip!")
+    sendall_ext(update, context, data)
 
 
 def sendallboop(update, context):
-    bot_id = str(update.message.chat['id'])
-    if bot_id not in registred_ids:
-        new_register(bot_id, data)
-
-    guild_name = str(data[data['BOT_ID'] == bot_id]['GUILD'].values[0])
-    if guild_name == ' ':
-        update.message.reply_text("No estàs a cap equip! Només pots enviar un missatge si estàs a un equip!")
-        return None
-
-    image_url = get_boop()
-    own_alias = str(data[data['BOT_ID'] == bot_id]['ALIAS'].values[0])
-    total_alias = data[data['GUILD'] == guild_name]['ALIAS'].tolist()
-    for alias in total_alias:
-        receiver_id = str(data[(data['GUILD'] == guild_name) & (data['ALIAS'] == alias)]['BOT_ID'].values[0])
-        output_text = own_alias + " sends a boop"
-        context.bot.send_message(receiver_id, output_text)
-        context.bot.send_photo(receiver_id, image_url)
-
-    update.message.reply_text("Has enviat un boop a tot el teu equip!")
+    sendallboop_ext(update, context, data)
 
 
 #---------------------------------------------------------------------------------------------------
@@ -450,7 +223,7 @@ def new_register(bot_id, df):
     new_row = create_new_row(bot_id, data)
     # Save the new data to database
     data = data.append(new_row, ignore_index=True)
-    data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
+    data.to_csv(player_db_file, index=False, sep=';', encoding='cp1252')
 
     # Update the registred id's
     global registred_ids
@@ -468,7 +241,7 @@ def set_alias(update, context):
         update.message.reply_text("L'alias que has escollit no és vàlid!!")
     else:
         data.loc[data['BOT_ID'] == bot_id, 'ALIAS'] = alias
-        data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
+        data.to_csv(player_db_file, index=False, sep=';', encoding='cp1252')
 
         output_text = 'El teu alias ha canviat correctament a ' + alias
         update.message.reply_text(output_text)
@@ -541,7 +314,7 @@ def join_anomalis(update, context):
     actual_faction = str(data[data['BOT_ID'] == bot_id]['FACTION'].values[0])
     if actual_faction == 'Neutral':
         data.loc[data['BOT_ID'] == bot_id, 'FACTION'] = 'Anomalis'
-        data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
+        data.to_csv(player_db_file, index=False, sep=';', encoding='cp1252')
         output_text = "Ja t'has unit a la facció, ara uneix-te al canal de la teva facció: https://t.me/joinchat/PKx1bv81WUMyMGU0"
         update.message.reply_text(output_text)
     else:
@@ -558,7 +331,7 @@ def join_corruptus(update, context):
     actual_faction = str(data[data['BOT_ID'] == bot_id]['FACTION'].values[0])
     if actual_faction == 'Neutral':
         data.loc[data['BOT_ID'] == bot_id, 'FACTION'] = 'Corruptus'
-        data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
+        data.to_csv(player_db_file, index=False, sep=';', encoding='cp1252')
         output_text = "Ja t'has unit a la facció, uneix-te al canal de la teva facció: https://t.me/joinchat/dLP2gZDhDKUwMmZk"
         update.message.reply_text(output_text)
     else:
@@ -581,7 +354,7 @@ def set_language(update, context):
         update.message.reply_text(translated_text.text)
     else:
         data.loc[data['BOT_ID'] == bot_id, 'LANGUAGE'] = new_language
-        data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
+        data.to_csv(player_db_file, index=False, sep=';', encoding='cp1252')
         output_text = "S'ha actualitzat el teu nou llenguatge per les missions!"
         translated_text = translator.translate(text=output_text, dest=new_language)
         update.message.reply_text(translated_text.text)
@@ -652,7 +425,7 @@ def top_teams(update, context):
         top = 10
 
     for g in guilds:
-        g_points = guild_points(g)
+        g_points = guild_points(g, data)
         if g_points > 0:
             g_score[g] = g_points
 
@@ -809,7 +582,7 @@ def activate_mission(update, context):
 
     am_building = str(mission_data[mission_data['MISSION_ID'] == values[1]]['AM_BUILDING'].values[0])
     data.loc[data['BOT_ID'] == values[0], am_building] = values[1]
-    data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
+    data.to_csv(player_db_file, index=False, sep=';', encoding='cp1252')
     update.message.reply_text("Missió actualitzada correctament")
 
 
@@ -908,7 +681,7 @@ def add_points(update, context):
     am_b = 'P_Aulari'
     actual_points = int(data[data['BOT_ID'] == values[0]][am_b])
     data.loc[data['BOT_ID'] == values[0], am_b] = actual_points + values[1]
-    data.to_csv(database_file, index=False, sep=';', encoding='cp1252')
+    data.to_csv(player_db_file, index=False, sep=';', encoding='cp1252')
     update.message.reply_text("Punts sumats correctament!!")
 
 
@@ -1169,7 +942,7 @@ def refresh_influences(update, context):
     for npc, influence in npc_influence.items():
         NPC_data.loc[NPC_data['NAME'] == npc, 'FAVOR'] = influence
 
-    NPC_data.to_csv(NPC_file, index=False, sep=';', encoding='cp1252')
+    NPC_data.to_csv(npc_db_file, index=False, sep=';', encoding='cp1252')
     update.message.reply_text("Influencia refrescada correctament!")
 
 

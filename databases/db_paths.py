@@ -1,8 +1,7 @@
 import os
-import sys
 
 # General folder where databases are stored
-database_folder = 'D:\\Proyectos\\HvZ\\HvZ PvE\\HvZ_APP\\databases\\csv files'
+database_folder = 'D:\\Proyectos\\HvZ\\HvZ PvE\\HvZ_APP\\databases'
 
 # General database of players
 player_db_file = os.path.join(database_folder, 'database.csv')
