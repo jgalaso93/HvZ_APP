@@ -95,3 +95,16 @@ def create_new_row(bot_id, data):
     # ID registration
     new_row['ID'] = max(data['ID']) + 1
     return new_row
+
+
+def m_to_pic(done_missions):
+    ret = dict()
+    for m in done_missions:
+        ret[m] = str(m) + '.jpeg'
+    ret['ANOMA1'] = 'CIVICA1.jpeg'
+    ret['ANOMA2'] = 'CIVICA1.jpeg'
+    ret['CORRU1'] = 'CIVICA1.jpeg'
+    ret['CORRU2'] = 'CIVICA1.jpeg'
+    ret['COM1'] = 'COMU1.jpeg'
+    ret['COM2'] = 'COMU2.jpeg'
+    return ret

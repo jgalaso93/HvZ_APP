@@ -5,6 +5,26 @@ from random import randrange
 pic_folder = os.path.join(sys.path[0], 'QR activos')
 
 
+def send_pic(update, done_pics, folder_path):
+    pics_in_folder = os.listdir(folder_path)
+    pics_aviable = []
+    for p in pics_in_folder:
+        if p in done_pics.values():
+            pass
+        else:
+            pics_aviable.append(p)
+
+    number_of_photos = len(pics_aviable)
+    if number_of_photos == 0:
+        update.message.reply_text("No et queden missions en aquesta zona!")
+        return None
+    else:
+        index = randrange(number_of_photos)
+        final_foto_path = os.path.join(folder_path, pics_aviable[index])
+    with open(final_foto_path, 'rb') as f:
+        update.message.reply_photo(f)
+
+
 def Civica(update, context):
     foto_path = os.path.join(pic_folder, 'CIVICA')
     number_of_photos = len(os.listdir(foto_path))
@@ -36,49 +56,29 @@ def Carpa(update, context):
         update.message.reply_photo(f)
 
 
-def Comunicacio(update, context):
+def Comunicacio_ext(update, context, done_pics):
     foto_path = os.path.join(pic_folder, 'COM')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
+    send_pic(update, done_pics, foto_path)
 
 
-def Edifici_B_central(update, context):
+def Edifici_B_central_ext(update, context, done_pics):
     foto_path = os.path.join(pic_folder, 'BCEN')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
+    send_pic(update, done_pics, foto_path)
 
 
-def Edifici_B_Nord(update, context):
+def Edifici_B_Nord_ext(update, context, done_pics):
     foto_path = os.path.join(pic_folder, 'BNORD')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
+    send_pic(update, done_pics, foto_path)
 
 
-def Edifici_B_Sud(update, context):
+def Edifici_B_Sud_ext(update, context, done_pics):
     foto_path = os.path.join(pic_folder, 'BSUD')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
+    send_pic(update, done_pics, foto_path)
 
 
-def Edifici_C(update, context):
+def Edifici_C_ext(update, context, done_pics):
     foto_path = os.path.join(pic_folder, 'Ciencies')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
+    send_pic(update, done_pics, foto_path)
 
 
 def Educacio(update, context):
@@ -92,40 +92,24 @@ def Educacio(update, context):
         update.message.reply_photo(f)
 
 
-def Etse(update, context):
+def Etse_ext(update, context, done_pics):
     foto_path = os.path.join(pic_folder, 'ETSE')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
+    send_pic(update, done_pics, foto_path)
 
 
-def FTI(update, context):
+def FTI_ext(update, context, done_pics):
     foto_path = os.path.join(pic_folder, 'FTI')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
+    send_pic(update, done_pics, foto_path)
 
 
-def Medicina(update, context):
+def Medicina_ext(update, context, done_pics):
     foto_path = os.path.join(pic_folder, 'MED')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
+    send_pic(update, done_pics, foto_path)
 
 
-def SAF(update, context):
+def SAF_ext(update, context, done_pics):
     foto_path = os.path.join(pic_folder, 'SAF')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
+    send_pic(update, done_pics, foto_path)
 
 
 def Torres(update, context):
@@ -139,10 +123,6 @@ def Torres(update, context):
         update.message.reply_photo(f)
 
 
-def Veterinaria(update, context):
+def Veterinaria_ext(update, context, done_pics):
     foto_path = os.path.join(pic_folder, 'VET')
-    number_of_photos = len(os.listdir(foto_path))
-    index = randrange(number_of_photos)
-    final_foto_path = os.path.join(foto_path, os.listdir(foto_path)[index])
-    with open(final_foto_path, 'rb') as f:
-        update.message.reply_photo(f)
+    send_pic(update, done_pics, foto_path)

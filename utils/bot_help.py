@@ -165,7 +165,7 @@ def help_personal(update, context):
 
 - */join + "facción"*: para unirte a tu facción. _Ejemplos: /joinanomalis o /joincorruptus_ 
 
-- */boop o /meow o /ribbit*: El bot te mandará un boop! o un meow! o un ribbit!"""
+- */boop o /meow o /ribbit o /pok o /ardillita*: El bot te mandará un boop! o un meow! o un ribbit! o un pok! o ponerte sad!"""
     update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
 
 

@@ -108,3 +108,25 @@ def get_boop():
         soup = BeautifulSoup(content.content, "html.parser")
 
     return page + str(soup.img)[23:-3]
+
+
+def ardillita(update, context):
+    update.message.reply_text("La ardillita estará siempre en nuestros corazones. Love you Rigoberta. RIP")
+    rigoberta_path = "D:\\Proyectos\\HvZ\\HvZ PvE\\HvZ_APP\\databases\\Animalicos\\Rigoberta.jpg"
+    with open(rigoberta_path, "rb") as rigoberta:
+        update.message.reply_photo(rigoberta)
+
+
+def pok(update, context):
+    url = 'https://www.generatormix.com/random-turtles'
+    content = requests.get(url)
+    if content.status_code == 200:
+        soup = BeautifulSoup(content.content, "html.parser")
+    values = str(soup.img).split("\"")
+    page = ''
+    for v in values:
+        if 'https' in v:
+            page = v
+            break
+    image = requests.get(page)
+    update.message.reply_photo(image.content)

@@ -14,7 +14,7 @@ from databases.db_paths import teams_db_file, player_db_file, \
 
 from utils.user_values import all_done_missions
 
-from utils.animals import boop, meow, ribbit
+from utils.animals import boop, meow, ribbit, ardillita, pok
 
 from utils.missions import lore_text, mission_accomplished_ext, check_answer_ext, read_qr_ext, missions
 
@@ -32,11 +32,14 @@ from utils.mods import bdb_ext, activate_mission_ext, general_top_ext, add_point
     donebyuser_ext, onduty_ext, complete_ext, sendtoplayer_ext, influence_stats_ext, \
     refresh_influences_ext
 
-from utils.pic_sender import Civica, Veterinaria, Aulari, Carpa, Comunicacio, Edifici_B_central, Edifici_B_Nord, \
-    Edifici_B_Sud, Edifici_C, Educacio, Etse, FTI, Medicina, SAF, Torres
+from utils.pic_sender import Civica, Veterinaria_ext, Aulari, Carpa, Comunicacio_ext, Edifici_B_central_ext, \
+    Edifici_B_Nord_ext, Edifici_B_Sud_ext, Edifici_C_ext, Educacio, Etse_ext, FTI_ext, Medicina_ext, SAF_ext, \
+    Torres
 
 from utils.bot_help import contact, help_basic, help_mod_ext, help_team, help, help_personal, \
     help_competitive, help_founder_ext, start_ext, rules, use
+
+from utils.helpers import m_to_pic
 
 #---------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
@@ -339,10 +342,17 @@ def npcs(update, context):
             show[n] = False
 
     particular_npc = str(update.message.text)[6:]
-    values = particular_npc.split(", ")
+    if particular_npc is not None:
+        values = particular_npc.split(", ")
+    else:
+        values = []
     if len(values) == 2:
-        update.message.reply_text(talktome(values[0], values[1]))
-        return None
+        if show[values[0]]:
+            update.message.reply_text(talktome(values[0], values[1]))
+            return None
+        else:
+            update.message.reply_text("Primer has de trobar aquest NPC per parlar-li!!")
+            return None
     if len(particular_npc) == 0:
         output_text = "Pots parlar amb els següents personatges:\n"
         for n, s in show.items():
@@ -368,6 +378,68 @@ def talktome(npc, word):
     except IndexError:
         output = "No conec el que m'estàs dient, però pots intentar alguna altra frase"
     return output
+
+
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#----------------------SENDERS FUNCTIONS------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+
+def get_done_pics(update):
+    bot_id = str(update.message.chat['id'])
+    adm = all_done_missions(data, bot_id)
+    return m_to_pic(adm)
+
+
+def Comunicacio(update, context):
+    done_pics = get_done_pics(update)
+    Comunicacio_ext(update, context, done_pics)
+
+
+def Edifici_B_central(update, context):
+    done_pics = get_done_pics(update)
+    Edifici_B_central_ext(update, context, done_pics)
+
+
+def Edifici_B_Nord(update, context):
+    done_pics = get_done_pics(update)
+    Edifici_B_Nord_ext(update, context, done_pics)
+
+
+def Edifici_B_Sud(update, context):
+    done_pics = get_done_pics(update)
+    Edifici_B_Sud_ext(update, context, done_pics)
+
+
+def Edifici_C(update, context):
+    done_pics = get_done_pics(update)
+    Edifici_C_ext(update, context, done_pics)
+
+
+def Etse(update, context):
+    done_pics = get_done_pics(update)
+    Etse_ext(update, context, done_pics)
+
+
+def FTI(update, context):
+    done_pics = get_done_pics(update)
+    FTI_ext(update, context, done_pics)
+
+
+def Medicina(update, context):
+    done_pics = get_done_pics(update)
+    Medicina_ext(update, context, done_pics)
+
+
+def SAF(update, context):
+    done_pics = get_done_pics(update)
+    SAF_ext(update, context, done_pics)
+
+
+def Veterinaria(update, context):
+    done_pics = get_done_pics(update)
+    Veterinaria_ext(update, context, done_pics)
 
 
 #---------------------------------------------------------------------------------------------------
@@ -535,6 +607,8 @@ def main():
     dp.add_handler(CommandHandler("boop", boop))
     dp.add_handler(CommandHandler("meow", meow))
     dp.add_handler(CommandHandler("ribbit", ribbit))
+    dp.add_handler(CommandHandler("ardillita", ardillita))
+    dp.add_handler(CommandHandler("pok", pok))
 
     # Commands for help
     dp.add_handler(CommandHandler("help", help))
