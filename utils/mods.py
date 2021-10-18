@@ -281,6 +281,7 @@ def complete_ext(update, context, data, mission_data, npc_data):
     am = all_active_missions(data, values[0])
     if values[1] in am:
         data = mission_accomplished_ext(values[0], values[1], mission_data, data, npc_data)
+        data.to_csv(player_db_file, index=False, sep=';', encoding='cp1252')
         update.message.reply_text("Missió completada amb éxit")
     else:
         update.message.reply_text("Aquesta persona no té aquesta missió activada")

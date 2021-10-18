@@ -14,7 +14,7 @@ from databases.db_paths import teams_db_file, player_db_file, \
 
 from utils.user_values import all_done_missions
 
-from utils.animals import boop, meow, ribbit, ardillita, pok
+from utils.animals import boop, meow, ribbit, ardillita, pok, ezo, slugs, potatoes, snek
 
 from utils.missions import lore_text, mission_accomplished_ext, check_answer_ext, read_qr_ext, missions
 
@@ -609,6 +609,10 @@ def main():
     dp.add_handler(CommandHandler("ribbit", ribbit))
     dp.add_handler(CommandHandler("ardillita", ardillita))
     dp.add_handler(CommandHandler("pok", pok))
+    dp.add_handler(CommandHandler("ezo", ezo))
+    dp.add_handler(CommandHandler("pft", slugs))
+    dp.add_handler(CommandHandler("potato", potatoes))
+    dp.add_handler(CommandHandler("snek", snek))
 
     # Commands for help
     dp.add_handler(CommandHandler("help", help))

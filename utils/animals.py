@@ -96,6 +96,7 @@ def ribbit(update, context):
     if content.status_code == 200:
         update.message.reply_photo(content.content)
 
+
 def get_boop():
     page = "https://random.dog/"
     content = requests.get(page)
@@ -130,3 +131,73 @@ def pok(update, context):
             break
     image = requests.get(page)
     update.message.reply_photo(image.content)
+
+
+def ezo(update, message):
+    file_path = "D:\\Proyectos\\HvZ\\HvZ PvE\\HvZ_APP\\databases\\Animalicos\\pok.png"
+    with open(file_path, "rb") as pok:
+        update.message.reply_photo(pok)
+    update.message.reply_text("pok")
+
+
+def scrap_pics(url):
+    content = requests.get(url)
+
+    if content.status_code == 200:
+        soup = BeautifulSoup(content.content, "html.parser")
+    else:
+        return None
+
+    content = str(soup).split('<')
+    filtered_content = []
+    for v in content:
+        if 'img' in v and 'https' in v:
+            filtered_content.append(v)
+
+    only_pics = []
+    for fv in filtered_content:
+        s = fv.split("\"")
+        for v in s:
+            if 'https' in v:
+                only_pics.append(v)
+    return only_pics
+
+
+def slugs(update, context):
+    urls = ['https://bit.ly/3lThJKB', 'https://bit.ly/3AYihTH', 'https://bit.ly/3FXFB82']
+    random_num = randint(0, (len(urls) - 1))
+    pics = scrap_pics(urls[random_num])
+    if pics:
+        image_sender(update, pics)
+    else:
+        slugs(update, context)
+
+
+def potatoes(update, context):
+    urls = ['https://bit.ly/3aSDcgB', 'https://bit.ly/3vmylO2', 'https://bit.ly/2YZbVqb']
+    random_num = randint(0, (len(urls) - 1))
+    pics = scrap_pics(urls[random_num])
+    if pics:
+        image_sender(update, pics)
+    else:
+        potatoes(update, context)
+
+
+def snek(update, context):
+    urls = ['https://bit.ly/3n7NO0Q', 'https://bit.ly/3AT24PY']
+    random_num = randint(0, (len(urls) - 1))
+    pics = scrap_pics(urls[random_num])
+    if pics:
+        image_sender(update, pics)
+    else:
+        snek(update, context)
+
+
+def image_sender(update, pics):
+    random_pic = randint(0, (len(pics) - 1))
+    content = requests.get(pics[random_pic])
+    if content.status_code == 200:
+        try:
+            update.message.reply_photo(content.content)
+        except:
+            image_sender(update, pics)
