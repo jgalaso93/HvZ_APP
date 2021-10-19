@@ -8,6 +8,7 @@ player_db_file = os.path.join(database_folder, 'database.csv')
 
 # Database where NPC influence reactions are
 npc_db_file = os.path.join(database_folder, 'NPC_database.csv')
+npc_db_file_w2 = os.path.join(database_folder, 'NPC_database_w2.csv')
 
 # Database where general team info is stored
 teams_db_file = os.path.join(database_folder, 'teams_database.csv')

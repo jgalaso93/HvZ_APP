@@ -6,11 +6,13 @@ import logging
 import os
 import sys
 import pandas as pd
+from random import randint
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 from databases.db_paths import teams_db_file, player_db_file, \
-    npc_db_file, conversation_db_file, missions_db_file, npc_conversation_db_file
+    npc_db_file, conversation_db_file, missions_db_file, npc_conversation_db_file, \
+    npc_db_file_w2
 
 from utils.user_values import all_done_missions
 
@@ -66,6 +68,7 @@ mission_data = pd.read_csv(missions_db_file, sep=';', header=0,
 mission_ids = mission_data['MISSION_ID'].tolist()
 
 NPC_data = pd.read_csv(npc_db_file, sep=';', header=0, encoding='cp1252')
+NPC_data2 = pd.read_csv(npc_db_file_w2, sep=';', header=0, encoding='cp1252')
 
 conver_data = pd.read_csv(conversation_db_file, sep=';', header=0, dtype={'BOT_ID': str}, encoding='cp1252')
 talk_input = conver_data['INPUT'].tolist()
@@ -364,7 +367,10 @@ def npcs(update, context):
         if show[particular_npc]:
             text_to_use = lore_text(particular_npc, NPC_data)
             if text_to_use:
-                output_text = str(NPC_data[NPC_data['NAME'] == particular_npc][text_to_use].values[0])
+                dfs = [NPC_data, NPC_data2]
+                rn = randint(0, (len(dfs) - 1))
+                df = dfs[rn]
+                output_text = str(df[df['NAME'] == particular_npc][text_to_use].values[0])
                 update.message.reply_text(output_text)
             else:
                 update.message.reply_text("Hi ha hagut un error amb la base de dades, si us plau contacta a en @ShaggyGalaso")
