@@ -207,9 +207,6 @@ def image_sender(update, pics):
             image_sender(update, pics)
 
 
-
-
-
 #---------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
 #----------------------CATS FUNCTIONS---------------------------------------------------------------
@@ -276,37 +273,33 @@ def showcat(update, cat):
         update.message.reply_photo(pic)
 
 
-#Probabilidades gatos
+# Probabilidades gatos
 def esElCosmos():
-    catList = os.listdir(cat_folder)
-    commonCats=os.listdir(os.path.join(cat_folder,"commonCats"))
-    rareCats=os.listdir(os.path.join(cat_folder,"rareCats"))
-    epicCats=os.listdir(os.path.join(cat_folder,"epicCats"))
-    legendaryCats=os.listdir(os.path.join(cat_folder,"legendaryCats"))
-    theCat=os.listdir(os.path.join(cat_folder,"THECAT"))
+    commonCats = os.listdir(os.path.join(cat_folder, "commonCats"))
+    rareCats = os.listdir(os.path.join(cat_folder, "rareCats"))
+    epicCats = os.listdir(os.path.join(cat_folder, "epicCats"))
+    legendaryCats = os.listdir(os.path.join(cat_folder, "legendaryCats"))
+    theCat = os.listdir(os.path.join(cat_folder, "THECAT"))
 
-    commonProb= 50
-    rareProb= 75
-    epicProb= 90
-    legendaryProb= 98
-    theCatProb= 100
+    commonProb = 50
+    rareProb = 75
+    epicProb = 90
+    legendaryProb = 98
+    theCatProb = 100
 
-    random_num = randint(0,100)
-    if random_num<commonProb:
-        random_cat=randint(0,len(commonCats)-1)
-        return os.path.join("commonCats",commonCats[random_cat])
-    elif random_num<rareProb:
-        random_cat=randint(0,len(rareCats)-1)
-        return os.path.join("rareCats",rareCats[random_cat])
-    elif random_num<epicProb:
-        random_cat=randint(0,len(epicCats)-1)
-        return os.path.join("epicCats",epicCats[random_cat])
-    elif random_num<legendaryProb:
-        random_cat=randint(0,len(legendaryCats)-1)
-        return os.path.join("legendaryCats",legendaryCats[random_cat])
-    elif random_num<theCatProb:
-        random_cat=randint(0,len(theCat)-1)
-        return os.path.join("THECAT",theCat[random_cat])
-
-
-
+    random_num = randint(0, 100)
+    if random_num < commonProb:
+        random_cat = randint(0, len(commonCats)-1)
+        return os.path.join("commonCats", commonCats[random_cat])
+    elif random_num < rareProb:
+        random_cat = randint(0, len(rareCats)-1)
+        return os.path.join("rareCats", rareCats[random_cat])
+    elif random_num < epicProb:
+        random_cat = randint(0, len(epicCats)-1)
+        return os.path.join("epicCats", epicCats[random_cat])
+    elif random_num < legendaryProb:
+        random_cat = randint(0, len(legendaryCats)-1)
+        return os.path.join("legendaryCats", legendaryCats[random_cat])
+    elif random_num < theCatProb:
+        random_cat = randint(0, len(theCat)-1)
+        return os.path.join("THECAT", theCat[random_cat])

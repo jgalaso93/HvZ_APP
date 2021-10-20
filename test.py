@@ -34,31 +34,56 @@ teams_data = pd.read_csv(teams_db_file, sep=';', header=0, encoding='cp1252', dt
 npc_conversation_data = pd.read_csv(npc_conversation_db_file, sep=';', header=0, encoding='cp1252')
 
 
-url = 'https://www.generatormix.com/random-turtles'
-content = requests.get(url)
-
-if content.status_code == 200:
-    soup = BeautifulSoup(content.content, "html.parser")
-
+# url = 'https://www.google.com/search?q=babosas&tbm=isch&ved=2ahUKEwiWy8qF_NTzAhUJQhoKHT1ECF0Q2-cCegQIABAA&oq=babosas&gs_lcp=CgNpbWcQAzIFCAAQgAQyBQgAEIAEMgQIABAeMgQIABAeMgQIABAeMgQIABAeMgQIABAeMgQIABAeMgQIABAeMgQIABAeOgcIIxDvAxAnOgYIABAHEB46BAgAEEM6CAgAEIAEELEDOggIABCxAxCDAVCrngFYsacBYKaoAWgAcAB4AIABWIgBkgWSAQE4mAEAoAEBqgELZ3dzLXdpei1pbWfAAQE&sclient=img&ei=0-9tYdaVFYmEab2IoegF&bih=665&biw=1300&rlz=1C1CHBF_esES843ES843'
+# content = requests.get(url)
+#
+# if content.status_code == 200:
+#     soup = BeautifulSoup(content.content, "html.parser")
+#
 # print(soup)
-print(soup.img)
-values = str(soup.img).split("\"")
-print(values)
-page = ''
-for v in values:
-    if 'https' in v:
-        page = v
-        break
+# content = str(soup).split('<')
+# print(content)
+# filtred_content = []
+# for v in content:
+#     if 'img' in v and 'https' in v:
+#         filtred_content.append(v)
+#
+# print(len(filtred_content))
+#
+# print(filtred_content)
+# only_pics = []
+# for fv in filtred_content:
+#     s = fv.split("\"")
+#     for v in s:
+#         if 'https' in v:
+#             only_pics.append(v)
+#
+# print(only_pics)
 
-print(page)
 
-image = requests.get(page)
-print(image.content)
+def scrap_pics(url):
+    content = requests.get(url)
+
+    if content.status_code == 200:
+        soup = BeautifulSoup(content.content, "html.parser")
+
+    content = str(soup).split('<')
+    filtred_content = []
+    for v in content:
+        if 'img' in v and 'https' in v:
+            filtred_content.append(v)
+
+    only_pics = []
+    for fv in filtred_content:
+        s = fv.split("\"")
+        for v in s:
+            if 'https' in v:
+                only_pics.append(v)
+    return only_pics
 
 
-
-
-
+a = scrap_pics('https://bit.ly/3lThJKB')
+print(a)
 
 # def m_to_pic(done_missions):
 #     ret = dict()

@@ -23,6 +23,7 @@ def send_pic(update, done_pics, folder_path):
         final_foto_path = os.path.join(folder_path, pics_aviable[index])
     with open(final_foto_path, 'rb') as f:
         update.message.reply_photo(f)
+        # update.message.reply_text(pics_aviable[index][:-5])
 
 
 def Civica(update, context):
