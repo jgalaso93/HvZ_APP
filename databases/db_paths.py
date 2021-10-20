@@ -3,6 +3,8 @@ import os
 # General folder where databases are stored
 database_folder = 'D:\\Proyectos\\HvZ\\HvZ PvE\\HvZ_APP\\databases'
 
+cat_folder = 'D:\\Proyectos\\HvZ\\HvZ PvE\\HvZ_APP\\databases\\CATS'
+
 # General database of players
 player_db_file = os.path.join(database_folder, 'database.csv')
 
@@ -21,3 +23,6 @@ conversation_db_file = os.path.join(database_folder, 'conversation_database.csv'
 
 # Database for the general conversation with the bot
 npc_conversation_db_file = os.path.join(database_folder, 'NPC_conversation_database.csv')
+
+# CATS database
+cats_db_file = os.path.join(database_folder, 'poke_cats.csv')

@@ -1,6 +1,8 @@
+import os
 import requests
 from random import randint
 from bs4 import BeautifulSoup
+from databases.db_paths import cats_db_file, cat_folder
 
 
 list_of_frogs = [
@@ -201,3 +203,71 @@ def image_sender(update, pics):
             update.message.reply_photo(content.content)
         except:
             image_sender(update, pics)
+
+
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#----------------------CATS FUNCTIONS---------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+
+
+def getcat_ext(update, data_cat):
+    bot_id = str(update.message.chat['id'])
+    visitor_ids = data_cat['BOT_ID'].tolist()
+    print(visitor_ids)
+
+    if bot_id not in visitor_ids:
+        data_cat = addvisitor(bot_id, data_cat)
+
+    # AQUI VA LA PARTE EN LA QUE ELIGES GATO AL AZAR
+    cat = 'angryCat_.jpeg'
+
+    if not visitedcat(bot_id, data_cat, cat):
+        addcat(bot_id, data_cat, cat)
+
+    showcat(update, cat)
+
+    return data_cat
+
+
+# Funcion que mira si ya tienes ese gato
+def visitedcat(bot_id, data_cat, cat):
+    visited_cats = str(data_cat[data_cat['BOT_ID'] == bot_id]['CATS'].values[0]).split(", ")
+    if cat in visited_cats:
+        return True
+    else:
+        return False
+
+
+# Funcion que añade un gato a una persona a la base de datos de los gatos que se han visitado
+def addcat(bot_id, data_cat, cat):
+    visited_cats = str(data_cat[data_cat['BOT_ID'] == bot_id]['CATS'].values[0])
+
+    if visited_cats == ' ':
+        visited_cats = cat
+    else:
+        visited_cats = visited_cats.split(", ")
+        visited_cats.append(cat)
+        visited_cats = ', '.join(visited_cats)
+
+    data_cat.loc[data_cat['BOT_ID'] == bot_id, 'CATS'] = visited_cats
+    data_cat.to_csv(cats_db_file, index=False, sep=';', encoding='cp1252')
+    return data_cat
+
+
+# Funcion que añade una persona a la base de datos sin gatos
+def addvisitor(bot_id, data_cat):
+    new_row = dict()
+    new_row['BOT_ID'] = bot_id
+    new_row['CATS'] = ' '
+    data_cat = data_cat.append(new_row, ignore_index=True)
+    data_cat.to_csv(cats_db_file, index=False, sep=';', encoding='cp1252')
+    return data_cat
+
+
+# Funcion que enseña un gato
+def showcat(update, cat):
+    file_path = os.path.join(cat_folder, cat)
+    with open(file_path, "rb") as pic:
+        update.message.reply_photo(pic)
