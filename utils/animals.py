@@ -282,13 +282,13 @@ def esElCosmos():
     legendaryCats = os.listdir(os.path.join(cat_folder, "legendaryCats"))
     theCat = os.listdir(os.path.join(cat_folder, "THECAT"))
 
-    commonProb = 50
-    rareProb = 75
-    epicProb = 90
-    legendaryProb = 98
-    theCatProb = 100
+    commonProb = 250
+    rareProb = 375
+    epicProb = 450
+    legendaryProb = 499
+    theCatProb = 500
 
-    random_num = randint(0, 100)
+    random_num = randint(0, 500)
     if random_num < commonProb:
         random_cat = randint(0, len(commonCats)-1)
         return os.path.join("commonCats", commonCats[random_cat])
