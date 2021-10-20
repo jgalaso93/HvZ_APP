@@ -271,6 +271,7 @@ def showcat(update, cat):
     file_path = os.path.join(cat_folder, cat)
     with open(file_path, "rb") as pic:
         update.message.reply_photo(pic)
+        update.message.reply_text("You've found a "+cat)
 
 
 # Probabilidades gatos
