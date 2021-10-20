@@ -637,7 +637,6 @@ def main():
     dp.add_handler(CommandHandler("pft", slugs))
     dp.add_handler(CommandHandler("potato", potatoes))
     dp.add_handler(CommandHandler("snek", snek))
-    dp.add_handler(CommandHandler("pokecat", pokecat))
 
     # Commands for help
     dp.add_handler(CommandHandler("help", help))
