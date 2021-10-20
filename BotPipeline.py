@@ -12,11 +12,11 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 from databases.db_paths import teams_db_file, player_db_file, \
     npc_db_file, conversation_db_file, missions_db_file, npc_conversation_db_file, \
-    npc_db_file_w2
+    npc_db_file_w2, cats_db_file
 
 from utils.user_values import all_done_missions
 
-from utils.animals import boop, meow, ribbit, ardillita, pok, ezo, slugs, potatoes, snek
+from utils.animals import boop, meow, ribbit, ardillita, pok, ezo, slugs, potatoes, snek, getcat_ext
 
 from utils.missions import lore_text, mission_accomplished_ext, check_answer_ext, read_qr_ext, missions
 
@@ -78,6 +78,9 @@ talk = {k: v for k, v in zip(talk_input, talk_output)}
 teams_data = pd.read_csv(teams_db_file, sep=';', header=0, encoding='cp1252', dtype={'FOUNDER': str})
 
 npc_conversation_data = pd.read_csv(npc_conversation_db_file, sep=';', header=0, encoding='cp1252')
+
+data_cat = pd.read_csv(cats_db_file, sep=';', header=0, encoding='cp1252', dtype={'BOT_ID': str})
+
 
 #---------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
@@ -263,6 +266,10 @@ def join_corruptus(update, context):
 def set_language(update, context):
     global data
     data = set_language_ext(update, context, data)
+
+
+def getcat(update, context):
+    getcat_ext(update, data_cat)
 
 
 #---------------------------------------------------------------------------------------------------
@@ -677,6 +684,9 @@ def main():
     dp.add_handler(CommandHandler("SAF", SAF))
     dp.add_handler(CommandHandler("Torres", Torres))
     dp.add_handler(CommandHandler("Veterinaria", Veterinaria))
+
+    # Commands about CATS of Menor
+    dp.add_handler(CommandHandler("getcat", getcat))
 
     # on noncommand i.e message - tree decision (WIP)
     dp.add_handler(MessageHandler(Filters.text, echo))
