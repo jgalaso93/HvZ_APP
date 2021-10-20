@@ -25,7 +25,8 @@ from utils.guild import show_team_ext, mem_ids_ext, req_ids_ext, create_team_ext
     sendall_ext, sendallboop_ext
 
 from utils.database_functions import new_register_ext, set_alias_ext, show_me_ext, \
-    activity_ext, hint_ext, join_anomalis_ext, join_corruptus_ext, set_language_ext
+    activity_ext, hint_ext, join_anomalis_ext, join_corruptus_ext, set_language_ext, \
+    donebyme_ext
 
 from utils.competitive_functions import topfaction_ext, top_teams_ext, top3_ext
 
@@ -270,6 +271,10 @@ def set_language(update, context):
 
 def getcat(update, context):
     getcat_ext(update, data_cat)
+
+
+def donebyme(update, context):
+    donebyme_ext(update, data)
 
 
 #---------------------------------------------------------------------------------------------------
@@ -613,6 +618,7 @@ def main():
     dp.add_handler(CommandHandler("setalias", set_alias))
     dp.add_handler(CommandHandler("stats", show_me))
     dp.add_handler(CommandHandler("activity", activity))
+    dp.add_handler(CommandHandler("donebyme", donebyme))
     dp.add_handler(CommandHandler("hint", hint))
     dp.add_handler(CommandHandler("joinanomalis", join_anomalis))
     dp.add_handler(CommandHandler("joincorruptus", join_corruptus))

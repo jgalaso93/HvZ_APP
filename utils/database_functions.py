@@ -1,5 +1,5 @@
 from utils.helpers import create_new_row, select_language
-from utils.user_values import amount_of_missions_done, user_points, all_active_missions
+from utils.user_values import amount_of_missions_done, user_points, all_active_missions, all_done_missions
 from databases.db_paths import player_db_file
 
 from googletrans import Translator
@@ -138,3 +138,14 @@ def set_language_ext(update, context, data):
         update.message.reply_text(translated_text.text)
 
     return data
+
+
+def donebyme_ext(update, data):
+    user_id = str(update.message.chat['id'])
+
+    udf = data[data['BOT_ID'] == user_id]
+    dm = all_done_missions(udf, user_id)
+    output_text = "Has fet les següents missions:\n\n"
+    output_text += str(dm)
+
+    update.message.reply_text(output_text)
