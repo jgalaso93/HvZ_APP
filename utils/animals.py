@@ -215,7 +215,6 @@ def image_sender(update, pics):
 def getcat_ext(update, data_cat):
     bot_id = str(update.message.chat['id'])
     visitor_ids = data_cat['BOT_ID'].tolist()
-    print(visitor_ids)
 
     if bot_id not in visitor_ids:
         data_cat = addvisitor(bot_id, data_cat)
