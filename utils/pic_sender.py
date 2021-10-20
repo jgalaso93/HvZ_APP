@@ -126,3 +126,8 @@ def Torres(update, context):
 def Veterinaria_ext(update, context, done_pics):
     foto_path = os.path.join(pic_folder, 'VET')
     send_pic(update, done_pics, foto_path)
+
+
+def Ocult_ext(update, context, done_pics):
+    foto_path = os.path.join(pic_folder, 'OCULT')
+    send_pic(update, done_pics, foto_path)

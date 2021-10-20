@@ -37,7 +37,7 @@ from utils.mods import bdb_ext, activate_mission_ext, general_top_ext, add_point
 
 from utils.pic_sender import Civica, Veterinaria_ext, Aulari, Carpa, Comunicacio_ext, Edifici_B_central_ext, \
     Edifici_B_Nord_ext, Edifici_B_Sud_ext, Edifici_C_ext, Educacio, Etse_ext, FTI_ext, Medicina_ext, SAF_ext, \
-    Torres
+    Torres, Ocult_ext
 
 from utils.bot_help import contact, help_basic, help_mod_ext, help_team, help, help_personal, \
     help_competitive, help_founder_ext, start_ext, rules, use
@@ -460,6 +460,11 @@ def Veterinaria(update, context):
     Veterinaria_ext(update, context, done_pics)
 
 
+def Ocult(update, context):
+    done_pics = get_done_pics(update)
+    Ocult_ext(update, context, done_pics)
+
+
 #---------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
 #----------------------MODS FUNCTIONS---------------------------------------------------------------
@@ -690,6 +695,7 @@ def main():
     dp.add_handler(CommandHandler("SAF", SAF))
     dp.add_handler(CommandHandler("Torres", Torres))
     dp.add_handler(CommandHandler("Veterinaria", Veterinaria))
+    dp.add_handler(CommandHandler("Ocult", Ocult))
 
     # Commands about CATS of Menor
     dp.add_handler(CommandHandler("getcat", getcat))

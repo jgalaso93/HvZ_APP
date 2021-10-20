@@ -311,4 +311,5 @@ def missions(update, context):
                       '\n/Medicina'
                       '\n/SAF'
                       '\n/Veterinaria'
-                      '\n/Civica')
+                      '\n/Civica'
+                      '\n/Ocult')
