@@ -7,6 +7,7 @@ from googletrans import Translator
 from utils.user_values import amount_of_missions_done, all_done_missions, all_active_missions
 from databases.db_paths import player_db_file, npc_db_file
 from utils.helpers import decode_lore
+from utils.user_values import user_points
 
 translator = Translator(service_urls=[
       'translate.google.com',
@@ -290,7 +291,7 @@ def throw_mission(update, mission_id, user_id, data, mission_data):
     return data
 
 
-def missions(update, context):
+def missions_ext(update, context, data):
     # '\n/Aulari'
     # '\n/Carpa'
     # '\n/Civica'
@@ -313,3 +314,8 @@ def missions(update, context):
                       '\n/Veterinaria'
                       '\n/Civica'
                       '\n/Ocult')
+
+    bot_id = str(update.message.chat['id'])
+    id_points = user_points(data, bot_id)
+    if id_points > 375:
+        update.message.reply_text("Espera... qui sóc? què esta passant? Ajudam /wake")

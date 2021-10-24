@@ -17,6 +17,7 @@ def all_active_missions(df, user_id):
     active_missions.extend(df[df['BOT_ID'] == user_id]['AM_EC'])
     active_missions.extend(df[df['BOT_ID'] == user_id]['AM_Torres'])
     active_missions.extend(df[df['BOT_ID'] == user_id]['AM_Vet'])
+    active_missions.extend(df[df['BOT_ID'] == user_id]['AM_BOT'])
     active_missions = list(filter(lambda x: x != ' ', active_missions))
     return active_missions
 

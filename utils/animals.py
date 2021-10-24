@@ -101,19 +101,6 @@ def ribbit(update, context):
         update.message.reply_photo(content.content)
 
 
-def get_boop():
-    page = "https://random.dog/"
-    content = requests.get(page)
-
-    if content.status_code == 200:
-        soup = BeautifulSoup(content.content, "html.parser")
-
-    while soup.img is None:
-        content = requests.get(page)
-        soup = BeautifulSoup(content.content, "html.parser")
-
-    return page + str(soup.img)[23:-3]
-
 
 def ardillita(update, context):
     update.message.reply_text("La ardillita estará siempre en nuestros corazones. Love you Rigoberta. RIP")
@@ -288,7 +275,7 @@ def esElCosmos():
     legendaryProb = 999
     theCatProb = 1000
 
-    random_num = randint(0, 500)
+    random_num = randint(0, 1000)
     if random_num < commonProb:
         random_cat = randint(0, len(commonCats)-1)
         return os.path.join("commonCats", commonCats[random_cat])
@@ -304,3 +291,20 @@ def esElCosmos():
     elif random_num < theCatProb:
         random_cat = randint(0, len(theCat)-1)
         return os.path.join("THECAT", theCat[random_cat])
+
+
+def missing_cats_ext(update, context, data_cat):
+    bot_id = str(update.message.chat['id'])
+    visitor_ids = data_cat['BOT_ID'].tolist()
+
+    if bot_id not in visitor_ids:
+        update.message.reply_text("AUN NO HAS COGIDO NINGÚN GATO. /getcat")
+        return None
+
+    user_cats = str(data_cat[data_cat['BOT_ID'] == bot_id]['CATS'].values[0]).split(", ")
+    missing_cats = str(63 - len(user_cats))
+    if missing_cats == 0:
+        output_text = "HAS TROBAT TOTS ELS GATS, AVISA A @AlexNevado POR OBTENIR EL TEU PREMI!!"
+    else:
+        output_text = "Encara et falten: " + missing_cats + " gats. Segueix buscant!!"
+    update.message.reply_text(output_text)

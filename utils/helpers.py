@@ -75,6 +75,7 @@ def create_new_row(bot_id, data):
     new_row['AM_EC'] = ' '
     new_row['AM_Torres'] = ' '
     new_row['AM_Vet'] = ' '
+    new_row['AM_BOT'] = ' '
 
     new_row['DM_Aulari'] = ' '
     new_row['DM_Carpa'] = ' '
@@ -91,6 +92,9 @@ def create_new_row(bot_id, data):
     new_row['DM_EC'] = ' '
     new_row['DM_Torres'] = ' '
     new_row['DM_Vet'] = ' '
+    new_row['DM_BOT'] = ' '
+
+    new_row['WOKE'] = 'NO'
 
     # ID registration
     new_row['ID'] = max(data['ID']) + 1
@@ -108,3 +112,7 @@ def m_to_pic(done_missions):
     ret['COM1'] = 'COMU1.jpeg'
     ret['COM2'] = 'COMU2.jpeg'
     return ret
+
+
+def bot_mission_count(data, user_id):
+    return int(data[data['BOT_ID'] == user_id]['TM_BOT'].values[0])

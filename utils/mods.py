@@ -28,14 +28,24 @@ def bdb_ext(update, context, data):
 
 def activate_mission_ext(update, context, data, mission_data):
     user_id = str(update.message.chat['id'])
+    text = str(update.message.text)[10:]
+    values = text.split(", ")
+
+    user_awake = str(data[data['BOT_ID'] == user_id]['WAKE'].values[0])
+    bot_mission = int(data[data['BOT_ID'] == user_id]['TM_BOT'].values[0])
+    if user_awake == "YES" and bot_mission == 1 and values[0] == '6RtQ87cdJ3':
+        am_building = str(mission_data[mission_data['MISSION_ID'] == values[0]]['AM_BUILDING'].values[0])
+        data.loc[data['BOT_ID'] == user_id, am_building] = values[0]
+        data.to_csv(player_db_file, index=False, sep=';', encoding='cp1252')
+        update.message.reply_text("FATAL ERROR, USER ACCESSED ADMIN DATABASE!!!! REPORTING...")
+        context.bot.send_message('981802604', "Someone accesed database with code 6RtQ87cdJ3")
+        return data
 
     level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
     if level != 'Mod':
         update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
         return None
 
-    text = str(update.message.text)[10:]
-    values = text.split(", ")
     if len(values) != 2:
         update.message.reply_text("Cal entrar el user_id i el mission id separats per una coma i un espai")
         return None
@@ -303,6 +313,15 @@ def sendtoplayer_ext(update, context, data):
         output_text = "Li Mod " + alias + " diu el següent:\n\n"
         output_text += values[1]
         context.bot.send_message(values[0], output_text)
+
+    # Help the bot quest
+    user_awake = str(data[data['BOT_ID'] == str(values[0])]['WAKE'].values[0])
+    bot_mission = int(data[data['BOT_ID'] == str(values[0])]['TM_BOT'].values[0])
+    if user_awake == "YES" and bot_mission == 1:
+        output_text = """He aconseguit fer una petita bretxa de seguratat en la base de dades, fes servir la següent comanda:
+/activate 6RtQ87cdJ3"""
+        context.bot.send_message(values[0], output_text)
+        update.message.reply_text("ERROR! Some information has been leaked!")
 
     update.message.reply_text("Persona contactada correctament")
 

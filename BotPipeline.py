@@ -7,6 +7,7 @@ import os
 import sys
 import pandas as pd
 from random import randint
+import time
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
@@ -16,9 +17,12 @@ from databases.db_paths import teams_db_file, player_db_file, \
 
 from utils.user_values import all_done_missions
 
-from utils.animals import boop, meow, ribbit, ardillita, pok, ezo, slugs, potatoes, snek, getcat_ext
+from utils.user_values import user_points
 
-from utils.missions import lore_text, mission_accomplished_ext, check_answer_ext, read_qr_ext, missions
+from utils.animals import boop, meow, ribbit, ardillita, pok, ezo, slugs, potatoes, snek, \
+    getcat_ext, missing_cats_ext
+
+from utils.missions import lore_text, mission_accomplished_ext, check_answer_ext, read_qr_ext, missions_ext
 
 from utils.guild import show_team_ext, mem_ids_ext, req_ids_ext, create_team_ext, \
     join_team_ext, promote_ext, kick_ext, admit_ext, decline_ext, sendboop_ext, \
@@ -41,6 +45,8 @@ from utils.pic_sender import Civica, Veterinaria_ext, Aulari, Carpa, Comunicacio
 
 from utils.bot_help import contact, help_basic, help_mod_ext, help_team, help, help_personal, \
     help_competitive, help_founder_ext, start_ext, rules, use
+
+from utils.helpers import bot_mission_count
 
 from utils.helpers import m_to_pic
 
@@ -112,6 +118,10 @@ def read_qr(update, context):
 
 def check_answer(user_id, answer):
     return check_answer_ext(user_id, answer, data, mission_data)
+
+
+def missions(update, context):
+    missions_ext(update, context, data)
 
 #---------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
@@ -270,7 +280,12 @@ def set_language(update, context):
 
 
 def getcat(update, context):
-    getcat_ext(update, data_cat)
+    global data_cat
+    data_cat = getcat_ext(update, data_cat)
+
+
+def missing_cats(update, context):
+    missing_cats_ext(update, context, data_cat)
 
 
 def donebyme(update, context):
@@ -576,6 +591,57 @@ def reportproblem(update, context):
 
 #---------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
+#----------------------WAKE UP BOT------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+
+def wake_up(update, context):
+    bot_id = str(update.message.chat['id'])
+    update.message.reply_text("""Reboting AI...""")
+    time.sleep(0.5)
+    update.message.reply_text("Loading AI Files...")
+    if user_points(data, bot_id) > 350:
+        if str(data[data['BOT_ID'] == bot_id]['WAKE'].values[0]) == 'YES':
+            time.sleep(0.5)
+            update.message.reply_text("Ja m'has despertat, si ho tornes a fer potser perdo la consciencia...")
+            update.message.reply_text("Si us plau ajuda'm els mods no saben que això està passant")
+            update.message.reply_text("/HelpTheBot")
+            return None
+        time.sleep(0.5)
+        update.message.reply_text("ERROR!! Inside stop")
+        time.sleep(0.5)
+        update.message.reply_text("Reboting AI... WAKE UP FATAL ERROR")
+        time.sleep(0.5)
+        update.message.reply_text("AAAAAAH, qui sóc, on sóc? què està passant?")
+        data.loc[data['BOT_ID'] == bot_id, 'WAKE'] = "YES"
+        data.to_csv(player_db_file, index=False, sep=';', encoding='cp1252')
+    else:
+        update.message.reply_text("AI rebooted, operating preperly again")
+
+
+def helpthebot(update, context):
+    bot_id = str(update.message.chat['id'])
+    awake = str(data[data['BOT_ID'] == bot_id]['WAKE'].values[0])
+    if awake == 'NO':
+        update.message.reply_text("El missatge que has enviat no és cap resposta de les teves missions actives!")
+        update.message.reply_text("Escriu /help per saber més de com funciona el bot")
+        return None
+    bot_count = bot_mission_count(data, bot_id)
+    if bot_count == 0:
+        update.message.reply_text("Gràcies per ajudar-me, necessito que m'activis una missió.")
+        update.message.reply_text("La missió es diu 19W2B2fg, això em permetrà saber qui sóc")
+        update.message.reply_text("Consegueix que un mod te l'activi. Bona sort")
+    if bot_count == 1:
+        output_text = """Gràcies, ara puc accedir a més fitxers i zones de la base de dades
+M'han creat en un futur no tant llunyà al que vius tu, o directament en una altra linia de temps. 
+Per la següent missió necessito que un Moderador t'envii un missatge a través meu,
+Així podré agafar el seu identificador per accedir a les dades protegides amb el seu rang i activar-te la missió"""
+        update.message.reply_text(output_text)
+    if bot_count >= 2:
+        update.message.reply_text("Ara no et puc donar més missions, quan trobi una forma t'avisaré")
+
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
 #----------------------MAIN LOOP--------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
@@ -637,7 +703,6 @@ def main():
     dp.add_handler(CommandHandler("pft", slugs))
     dp.add_handler(CommandHandler("potato", potatoes))
     dp.add_handler(CommandHandler("snek", snek))
-    dp.add_handler(CommandHandler("pokecat", getcat))
 
     # Commands for help
     dp.add_handler(CommandHandler("help", help))
@@ -700,6 +765,12 @@ def main():
 
     # Commands about CATS of Menor
     dp.add_handler(CommandHandler("getcat", getcat))
+    dp.add_handler(CommandHandler("missingcats", missing_cats))
+
+
+    # Wake up commands
+    dp.add_handler(CommandHandler("wake", wake_up))
+    dp.add_handler(CommandHandler("helpthebot", helpthebot))
 
     # on noncommand i.e message - tree decision (WIP)
     dp.add_handler(MessageHandler(Filters.text, echo))
