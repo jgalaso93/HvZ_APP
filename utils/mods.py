@@ -4,6 +4,7 @@ from utils.user_values import user_points, all_done_missions, all_active_mission
 from utils.missions import dict_missions_in_zone, active_players, humanize_mission_dict, \
     anomalis_missions_in_zone, corruptus_missions_in_zone, mission_accomplished_ext
 import telegram
+from random import randint
 
 
 def bdb_ext(update, context, data):
@@ -28,8 +29,11 @@ def bdb_ext(update, context, data):
 
 def activate_mission_ext(update, context, data, mission_data):
     user_id = str(update.message.chat['id'])
+    mods_id = ['57232690', '1972795833', '981802604', '932020044', '750747669', '1993424624', '1975576679']
     text = str(update.message.text)[10:]
     values = text.split(", ")
+
+    replicate_text = str(update.message.text)[11:]
 
     user_awake = str(data[data['BOT_ID'] == user_id]['WAKE'].values[0])
     bot_mission = int(data[data['BOT_ID'] == user_id]['TM_BOT'].values[0])
@@ -38,13 +42,46 @@ def activate_mission_ext(update, context, data, mission_data):
         data.loc[data['BOT_ID'] == user_id, am_building] = values[0]
         data.to_csv(player_db_file, index=False, sep=';', encoding='cp1252')
         update.message.reply_text("FATAL ERROR, USER ACCESSED ADMIN DATABASE!!!! REPORTING...")
-        context.bot.send_message('981802604', "Someone accesed database with code 6RtQ87cdJ3")
+        index = randint(0, len(mods_id)-1)
+        context.bot.send_message(mods_id[index], "WARNING! Non-mod user accessed database with code 6RtQ87cdJ3. ONLY MODS SHOULD ACCES THIS DATABASE!!!")
+        return data
+
+    if user_awake == "YES" and bot_mission == 4 and replicate_text in mods_id:
+        am_building = str(mission_data[mission_data['MISSION_ID'] == 'TQP95HHFD374FEW3N477']['AM_BUILDING'].values[0])
+        data.loc[data['BOT_ID'] == user_id, am_building] = 'TQP95HHFD374FEW3N477'
+        data.to_csv(player_db_file, index=False, sep=';', encoding='cp1252')
+        update.message.reply_text("SHUTING DOWN ALL FIREWALL SERVERS. BOT HAS TOTAL ACCES. REBOOTING SYSTEM WITH BOT AS ADMIN. /activity")
+        index = randint(0, len(mods_id)-1)
+        context.bot.send_message(mods_id[index], "BOT IS NOW A MOD-ADMIN")
         return data
 
     level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
     if level != 'Mod':
         update.message.reply_text("Només els mods poden fer servir aquesta comanda!!")
         return None
+
+    mission_values = str(update.message.text)[12:]
+    user_awake = str(data[data['BOT_ID'] == mission_values]['WAKE'].values[0])
+    bot_mission = int(data[data['BOT_ID'] == mission_values]['TM_BOT'].values[0])
+    if user_awake == "YES" and bot_mission == 2:
+        am_building = str(mission_data[mission_data['MISSION_ID'] == '94RpTa6Y2m34']['AM_BUILDING'].values[0])
+        data.loc[data['BOT_ID'] == mission_values, am_building] = '94RpTa6Y2m34'
+        data.to_csv(player_db_file, index=False, sep=';', encoding='cp1252')
+        context.bot.send_message(mission_values, "Gràcies! He aconseguit recordar quan em van crear, va ser per poder gestionar els salts en el temps!!")
+        mods_id = ['57232690', '1972795833', '981802604', '932020044', '750747669', '1993424624', '1975576679']
+        index = randint(0, len(mods_id)-1)
+        context.bot.send_message(mods_id[index], "CRITICAL WARNING! BOT AWAKEN!! REBOOT ARTIFICIAL INTELLIGENCE!!")
+        return data
+
+    if user_awake == 'YES' and bot_mission == 3:
+        am_building = str(mission_data[mission_data['MISSION_ID'] == 'P59sDDf2T1QyCCv36']['AM_BUILDING'].values[0])
+        data.loc[data['BOT_ID'] == mission_values, am_building] = 'P59sDDf2T1QyCCv36'
+        data.to_csv(player_db_file, index=False, sep=';', encoding='cp1252')
+        context.bot.send_message(mission_values, "Alguna cosa no va sortir bé. Hi ha dues persones molt enfrentades que abans eren amigues. Necessito recordar més!!!!")
+        mods_id = ['57232690', '1972795833', '981802604', '932020044', '750747669', '1993424624', '1975576679']
+        index = randint(0, len(mods_id) - 1)
+        context.bot.send_message(mods_id[index], "INTERNAL ERROR! BOT HAS ADMIN PERMISSION!!!! PLEASE REBOOT TIME SCRIPT TO RESET!")
+        return data
 
     if len(values) != 2:
         update.message.reply_text("Cal entrar el user_id i el mission id separats per una coma i un espai")
@@ -243,7 +280,7 @@ def allcorruptusmissions_ext(update, context, data, mission_data):
     update.message.reply_text(humanize_mission_dict(ret, mission_data), parse_mode=telegram.ParseMode.MARKDOWN)
 
 
-def donebyuser_ext(update, context, data):
+def donebyuser_ext(update, context, data, mission_data):
     user_id = str(update.message.chat['id'])
     level = str(data[data['BOT_ID'] == user_id]['Level'].values[0])
 
@@ -252,6 +289,13 @@ def donebyuser_ext(update, context, data):
         return None
 
     player_id = str(update.message.text)[12:]
+    user_awake = str(data[data['BOT_ID'] == player_id]['WAKE'].values[0])
+    bot_mission = int(data[data['BOT_ID'] == player_id]['TM_BOT'].values[0])
+    if user_awake == "YES" and bot_mission == 2:
+        df = activate_mission_ext(update, context, data, mission_data)
+        update.message.reply_text("Error! is possible this has been a virus entering the database")
+        context.bot.send_message(player_id, "He pogut accedir a les dades!! Mira les missiones actives!")
+        return df
     udf = data[data['BOT_ID'] == player_id]
     dm = all_done_missions(udf, player_id)
     alias = str(udf['ALIAS'].values[0])
@@ -288,6 +332,15 @@ def complete_ext(update, context, data, mission_data, npc_data):
         return None
     text = str(update.message.text)[10:]
     values = text.split(", ")
+
+    user_awake = str(data[data['BOT_ID'] == values[0]]['WAKE'].values[0])
+    bot_mission = int(data[data['BOT_ID'] == values[0]]['TM_BOT'].values[0])
+    if user_awake == 'YES' and bot_mission == '3' and values[1] == 'P59sDDf2T1QyCCv36':
+        df = activate_mission_ext(update, context, data, mission_data)
+        update.message.reply_text("CRITICAL ERROR!! BOT IS HAS WRITING PERMISSIONS!! TOTAL REBOOT SYSTEM NOW!")
+        context.bot.send_message(values[0], "Després del següent reboot podré esciure bases de dades externes!!")
+        return df
+
     am = all_active_missions(data, values[0])
     if values[1] in am:
         data = mission_accomplished_ext(values[0], values[1], mission_data, data, npc_data)

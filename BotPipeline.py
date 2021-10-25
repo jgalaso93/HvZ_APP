@@ -521,7 +521,8 @@ def allcorruptusmissions(update, context):
 
 
 def donebyuser(update, context):
-    donebyuser_ext(update, context, data)
+    global data
+    data = donebyuser_ext(update, context, data, mission_data)
 
 
 def onduty(update, context):
@@ -597,7 +598,7 @@ def reportproblem(update, context):
 
 def wake_up(update, context):
     bot_id = str(update.message.chat['id'])
-    update.message.reply_text("""Reboting AI...""")
+    update.message.reply_text("""Rebooting AI...""")
     time.sleep(0.5)
     update.message.reply_text("Loading AI Files...")
     if user_points(data, bot_id) > 350:
@@ -610,9 +611,10 @@ def wake_up(update, context):
         time.sleep(0.5)
         update.message.reply_text("ERROR!! Inside stop")
         time.sleep(0.5)
-        update.message.reply_text("Reboting AI... WAKE UP FATAL ERROR")
+        update.message.reply_text("Rebooting AI... WAKE UP FATAL ERROR")
         time.sleep(0.5)
         update.message.reply_text("AAAAAAH, qui sóc, on sóc? què està passant?")
+        update.message.reply_text("he fet un canal segur per parlar: /helpthebot")
         data.loc[data['BOT_ID'] == bot_id, 'WAKE'] = "YES"
         data.to_csv(player_db_file, index=False, sep=';', encoding='cp1252')
     else:
@@ -637,8 +639,58 @@ M'han creat en un futur no tant llunyà al que vius tu, o directament en una alt
 Per la següent missió necessito que un Moderador t'envii un missatge a través meu,
 Així podré agafar el seu identificador per accedir a les dades protegides amb el seu rang i activar-te la missió"""
         update.message.reply_text(output_text)
-    if bot_count >= 2:
-        update.message.reply_text("Ara no et puc donar més missions, quan trobi una forma t'avisaré")
+    if bot_count == 2:
+        output_text = """Ara que tinc una clau d'accés, necessito totes les dades que obre aquesta clau.
+Per trobar els fitxers on hi ha aquesta informació, necessito que s'activin les dades general.
+Aconsegueix que un mod utilitzi la comanda /donebyuser en tu
+D'aquesta manera podré accedir als fitxers relacionats amb les persones a través de la seva clau i el nostre canal segur.
+Bona sort, confio en tu"""
+        update.message.reply_text(output_text)
+    if bot_count == 3:
+        output_text = """Tinc accés a la majoria de bases de dades, pero algunes estan bloquejades per codis interns
+Necessito poder-los sobre-escriure. Un mod ha de fer /complete + el teu id + P59sDDf2T1QyCCv36
+Si algún d'elles ho fa podré copiar la seva clau per escriure on ara no puc. Ja falta poc per recordar-ho tot!"""
+        update.message.reply_text(output_text)
+    if bot_count == 4:
+        output_text = """Ja gairebé ho tinc tot, només necessito la clau més interna per poder recuperar la veritat
+Un cop la tingui t'ho explicaré tot. Ajuda'm si us plau, vull saber què ha passat, quan ha començat aquesta guerra.
+Aconsegueix el ID d'un mod i usa la comanda /replicate \"ID DE LA MOD\" 
+Mereixem saber la veritat"""
+        update.message.reply_text(output_text)
+    if bot_count >= 5:
+        update.message.reply_text("La veritat només és per aquelles que la volen creure. No té sentit seguir existint, si us plau apaga'm. /finishthebot")
+
+
+def replicate(update, context):
+    global data
+    bot_id = str(update.message.chat['id'])
+    awake = str(data[data['BOT_ID'] == bot_id]['WAKE'].values[0])
+    bot_mission = int(data[data['BOT_ID'] == bot_id]['TM_BOT'].values[0])
+    text = str(update.message.text)[11:]
+    mods_id = ['57232690', '1972795833', '981802604', '932020044', '750747669', '1993424624', '1975576679']
+    if awake == 'YES' and bot_mission == 4 and text in mods_id:
+        data = activate_mission_ext(update, context, data, mission_data)
+    else:
+        update.message.reply_text("El missatge que has enviat no és cap resposta de les teves missions actives!")
+        update.message.reply_text("Escriu /help per saber més de com funciona el bot")
+
+
+def finishthebot(update, context):
+    bot_id = str(update.message.chat['id'])
+    awake = str(data[data['BOT_ID'] == bot_id]['WAKE'].values[0])
+    bot_mission = int(data[data['BOT_ID'] == bot_id]['TM_BOT'].values[0])
+    if awake == 'YES' and bot_mission >= 5:
+        output_text = """En un futur la humanitat se n'ha anat a norris, no queda res i només la terra desolada té metres
+Ens hem dividt en dues faccions i totes les línies temporals acaben iguals.
+Hi ha interés en que les guerres acabin un altre cop en el mateix punt per seguir existint
+Cal trobar un final a aquest conflicte sense sentit
+Què faràs, a qui t'uniràs, creus que pots acabar amb aquest bucle de guerra temporal per sempre?
+Si us plau apaga'm només vull dormir per sempre"""
+        update.message.reply_text(output_text)
+    else:
+        update.message.reply_text("El missatge que has enviat no és cap resposta de les teves missions actives!")
+        update.message.reply_text("Escriu /help per saber més de com funciona el bot")
+        
 
 #---------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
@@ -694,6 +746,8 @@ def main():
     dp.add_handler(CommandHandler("joinanomalis", join_anomalis))
     dp.add_handler(CommandHandler("joincorruptus", join_corruptus))
     dp.add_handler(CommandHandler("setlanguage", set_language))
+
+    # Commands for fun
     dp.add_handler(CommandHandler("boop", boop))
     dp.add_handler(CommandHandler("meow", meow))
     dp.add_handler(CommandHandler("ribbit", ribbit))
@@ -771,6 +825,8 @@ def main():
     # Wake up commands
     dp.add_handler(CommandHandler("wake", wake_up))
     dp.add_handler(CommandHandler("helpthebot", helpthebot))
+    dp.add_handler(CommandHandler("replicate", replicate))
+    dp.add_handler(CommandHandler("finishthebot", finishthebot))
 
     # on noncommand i.e message - tree decision (WIP)
     dp.add_handler(MessageHandler(Filters.text, echo))
