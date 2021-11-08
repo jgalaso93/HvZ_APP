@@ -61,8 +61,9 @@ def activate_mission_ext(update, context, data, mission_data):
         return None
 
     mission_values = str(update.message.text)[12:]
-    user_awake = str(data[data['BOT_ID'] == mission_values]['WAKE'].values[0])
-    bot_mission = int(data[data['BOT_ID'] == mission_values]['TM_BOT'].values[0])
+    if ' ' not in mission_values:
+        user_awake = str(data[data['BOT_ID'] == mission_values]['WAKE'].values[0])
+        bot_mission = int(data[data['BOT_ID'] == mission_values]['TM_BOT'].values[0])
     if user_awake == "YES" and bot_mission == 2:
         am_building = str(mission_data[mission_data['MISSION_ID'] == '94RpTa6Y2m34']['AM_BUILDING'].values[0])
         data.loc[data['BOT_ID'] == mission_values, am_building] = '94RpTa6Y2m34'
@@ -335,7 +336,7 @@ def complete_ext(update, context, data, mission_data, npc_data):
 
     user_awake = str(data[data['BOT_ID'] == values[0]]['WAKE'].values[0])
     bot_mission = int(data[data['BOT_ID'] == values[0]]['TM_BOT'].values[0])
-    if user_awake == 'YES' and bot_mission == '3' and values[1] == 'P59sDDf2T1QyCCv36':
+    if user_awake == 'YES' and bot_mission == 3 and values[1] == 'P59sDDf2T1QyCCv36':
         df = activate_mission_ext(update, context, data, mission_data)
         update.message.reply_text("CRITICAL ERROR!! BOT IS HAS WRITING PERMISSIONS!! TOTAL REBOOT SYSTEM NOW!")
         context.bot.send_message(values[0], "Després del següent reboot podré esciure bases de dades externes!!")

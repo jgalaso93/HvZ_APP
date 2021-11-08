@@ -197,6 +197,8 @@ def help_basic(update, context):
 
 - */missions*: para saber dónde puedes encontrar misiones. 
 
+- */dictionary*: para acceder a los diccionarios que tengas desbloqueados para encontrar la misión final
+
 - */contact*: si tienes dudas o problemas usa este comando para contactarnos!"""
     update.message.reply_text(output_text, parse_mode=telegram.ParseMode.MARKDOWN)
 

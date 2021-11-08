@@ -100,7 +100,13 @@ def mission_accomplished(user_id, mission_id):
     data = mission_accomplished_ext(user_id, mission_id, mission_data, data, NPC_data)
     data.to_csv(player_db_file, index=False, sep=';', encoding='cp1252')
 
-    final_text = str(mission_data[mission_data['MISSION_ID'] == mission_id]['FINAL_TEXT'].values[0])
+    faction = str(data[data['BOT_ID'] == user_id]['FACTION'].values[0])
+    if faction == 'Corruptus':
+        final_text = str(mission_data[mission_data['MISSION_ID'] == mission_id]['FINAL_TEXT_C'].values[0])
+    elif faction == 'Anomalis':
+        final_text = str(mission_data[mission_data['MISSION_ID'] == mission_id]['FINAL_TEXT_A'].values[0])
+    else:
+        final_text = "No t'has unit a cap equip encara, per tant no rebràs cap missatge de finalització de missió!"
     if final_text != 'None':
         return final_text
     else:
@@ -131,7 +137,7 @@ def missions(update, context):
 
 
 def check_pic(user_id, photo_id):
-    # return False
+    return False
 
     df_pics = os.path.join(sys.path[0], 'fotos_database.csv')
     db_pics = pd.read_csv(df_pics, sep=';', header=0)
@@ -690,7 +696,33 @@ Si us plau apaga'm només vull dormir per sempre"""
     else:
         update.message.reply_text("El missatge que has enviat no és cap resposta de les teves missions actives!")
         update.message.reply_text("Escriu /help per saber més de com funciona el bot")
-        
+
+
+def diccionary(update, context):
+    bot_id = str(update.message.chat['id'])
+    adm = all_done_missions(data, bot_id)
+    d1 = False
+    d2 = False
+    d3 = False
+    general_d = False
+    if 'FTI40' in adm:
+        d3 = True
+    if 'BCEN40' in adm:
+        d1 = True
+    if 'ETSE40' in adm:
+        d2 = True
+    if d1 or d2 or d3:
+        general_d = True
+
+   # if not general_d:
+   # output_text = "No has trobat cap diccionari, segueix buscant!!!"
+   # else:
+    output_text = "Has trobat els següents diccionaris:\n"
+    output_text += "Diccionari 1: A=# B=¿ C=C D=\" E=< F=I G=_ H=V I=7 J=5 K=Q L=: M=* N=1 O=¡ P=D Q=J R=? S=M T=W U=X V=H W=T X=P Y=Y Z=0\n"
+
+    output_text += "Diccionari 2: 1=; 2=O 3=E 4=4 5=T 6=> 7=B 8=! 9=Z 0=@\n"
+    output_text += "Diccionari 3: #=F @=9 ?=€ ¿= !=8 ¡=K ;=G :=2 *=U \"=6 _=R €=N <=A >=S"
+    update.message.reply_text(output_text)
 
 #---------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
@@ -791,6 +823,7 @@ def main():
     dp.add_handler(CommandHandler("halal", halal))
     dp.add_handler(CommandHandler("corruptus", corruptus))
     dp.add_handler(CommandHandler("test", test))
+    dp.add_handler(CommandHandler("dictionary", diccionary))
 
     # Util class to check the id of the conversation
     dp.add_handler(CommandHandler("GetMyId", get_my_id))

@@ -1,0 +1,48 @@
+MISSION_ID;AM_BUILDING;MISSION_P1;MISSION_P2;MISSION_P3;RESULT_POOL;HINT;POINTS;NPC;FINAL_TEXT;REQUIREMENTS
+C1;AM_EC;Com es diu el centre de recerca instal·lat en aquesta planta;;;ICTA;Esta a l'entrada;10;;None;None
+C2;AM_EC;De quin color és la dutxa que tens a la dreta?;;;Groc, Groga;Dude.. really? En català;10;;None;None
+C3;AM_EC;Quian funció té l’aparell gris metàl·lic gran d’aquest passadís?;;;Refrigerar, Arrefredar;És una paraula d'un sol verb;10;;None;None
+C4;AM_EC;He guanyat un premi nobel gràcies a la radioactivitat del 84. Qui sóc?;;;Marie Curie;1=H, Mira davant teu ;10;Marie Curie;None;None
+C5;AM_EC;"Una de les meves frases més celebres és: ""Ne pleure pas, Alfred ! J'ai besoin de tout mon courage pour mourir à vingt ans ! (No ploris Alfred! Em cal tot el meu coratge per a morir a vint anys)"". Qui sóc?";;;Evariste Galois;Google it;10;Evariste Galois;None;None
+C6;AM_EC;Acabo de demostrar que tota acció té una reacció. Qui sóc?;;;Sir Isaac Newton, Isaac Newton;The apple is a lie;10;Isaac Newton;None;None
+C7;AM_EC;He escrit l’equació que relaciona l’energia d’un cos amb la seva massa i velocitat. Qui sóc?;;;Albert Einstein;E=mc^2;10;Albert Einstein;None;None
+C8;AM_EC;He estat la primera persona del món en fotografiar informació cel·lular i em recorda subtilment a un helicòpter. Tot i això, encara no he rebut cap reconeixement… Estic decepcionada.. Qui sóc?;;;Rosalind Franklin;Estructura en forma d’hèlix de l’ADN;10;Rosalind Franklin;None;None
+C9;;;;;;;;;None;None
+BNORD1;AM_EB_Nord;Reconeixes aquest fragment d’una obra de teatre? L’he escrit  jo! “Te lo ruego buen Mercucio, vámonos. Hace calor, los Capuletos han salido y, si los encontramos, tendremos pelea, pues este calor inflama la sangre.”. Qui sóc?;;;William Shakespeare;Autor anglès, 23 d’abril;10;William Shakespeare;None;None
+BNORD2;AM_EB_Nord;Em considero molt bona escriptora i n’estic molt ORGULLOSA, sobretot de comèdies, però publico en anònim per por als PREJUDICIS. Qui sóc?;;;Jane Austen;Un llibre sempre comença amb majúscula;10;Jane Austen;None;None
+BNORD3;AM_EB_Nord;Pren nota siusplau. La negació del tot és l'afirmació del no res. Qui sóc?;;;Sòcrates, Socrates;El meu deixeble és bon escriptor;10;Sòcrates;None;None
+BNORD4;;;;;;;;;None;None
+COM1;AM_Comunicacio;He llegit un llibre per la ràdio i sóc tan bo que la gent pensa que de veritat ens estan envaint els alienígenes. Qui sóc?;;;Orson Welles;És el director de ciutadà Kane;10;Orson Welles;None;None
+COM2;AM_Comunicacio;Tot i que el meu nom de pila és Norma Jeane Baker, pràcticament ningú em coneix com a tal. Qui sóc?;;;Marilyn Monroe;Sóc la estrella principal de la pel·lícula Niagara (1953);10;Marilyn Monroe;None;None
+COM3;;;;;;;;;None;None
+VET1;AM_Vet;Enfronto cada dia a caçadors furtius per protegir els goril·les de muntanya de l’extinció. Qui sóc?;;;Dian Fossey;A 1983 publico “Goril·les en la boira”;10;Dian Fossey;None;None
+VET2;AM_Vet;Jugo amb els cocodrils com tu amb el teu gos. Qui sóc?;;;Steve Irwin;El Frank de la jungla australiano;10;Steve Irwin;None;None
+VET3;;;;;;;;;None;None
+VET4;;;;;;;;;None;None
+VET5;;;;;;;;;None;None
+MED1;AM_Med;M’he deixat un cultiu de bacteris tot un finde i quan he tornat me trobat una zona “neta” d’aquests degut a l’acció d’un fong amb el que se’m va embrutar la placa de petri, crec que acabo de descobrir algo molt important. Qui sóc?;;;Sir Alexander Fleming, Alexander Fleming;El fong es diu Penicillium notatum;10;Alexander Fleming;None;None
+MED2;AM_Med;Llegeix el següent text. Jo s´soc creador: Per Apol·lo metge i Asclepi, juro: per Hígia, Panacea i tots els déus i deesses als qui poso per testimonis de l'observança d'aquest vot, que m'obligo a complir el que ofereixo amb totes les meves forces i voluntat. Qui sóc?;;;Hipòcrates;No es un jurament aleatori: fixa't en quina facultat estàs.;10;Hipòcrates;None;None
+MED3;AM_Med;Sóc infermera en les èpoques modernes del segle XX, estic a favor del control de la natalitat i l’eugenèsia. He contribuït a l’estudi de les píldores anticonceptives. Qui sóc?;;;Margaret Sanger;Busca per google;10;Margaret Sanger;None;None
+MED4;;;;;;;;;None;None
+SAF1;AM_SAF;Abans de ser coneguda se’m coneixia sota el cognom de Barbey i l’embarcació que m'ha fet famosa és el Lérina. Qui sóc?;;;Hélène de Pourtalès, Helene de Pourtales;Sóc una dona olímpica, concretament la primera;10;Hélène de Pourtalès;None;None
+SAF2;AM_SAF;Sóc el primer en guanyar una medalla d’or en una marató. Qui sóc?;;;Spiridon Louis;Google it, duh!;10;Spiridon Louis;None;None
+SAF3;;;;;;;;;None;None
+SAF4;;;;;;;;;None;None
+SAF5;;;;;;;;;None;None
+BSUD1;AM_EB_Sud;Sóc una dona que seient he aconseguit més que molta més gent aixecant-se. Qui sóc?;;;Rosa Parks;Drets de les persones afroamericanes;10;Rosa Parks;None;None
+BSUD2;AM_EB_Sud;Sóc l'explorador que més s'ha beneficiat de la ruta de la seda. He escrit un llibre i estic segur que inspirarà a molts viatgers en un futur. Qui sóc?;;;Marco Polo;"El llibre es diu ""Il Milione""";10;Marco Polo;None;None
+BSUD3;;;;;;;;;None;None
+BCEN1;AM_EB_Central;Si tens algun problema familiar, a mi m’has de visitar. Sóc la primera que ajudo als que tenen conflictes familiars. Qui sóc?;;;Virginia Satir;Conjoint Family Therapy (1964), Peoplemaking (1972) i The New Peoplemaking (1988);10;Virginia Satir;None;None
+BCEN2;AM_EB_Central;Sóc un metge alemany. Gran part del meu estudi es basa en analitzar la psique de les persones. Qui sóc?;;;Sigmund Freud;El pare del psicoanàlisi;10;Sigmund Freud;None;None
+BCEN3;;;;;;;;;None;None
+FTI1;AM_FTI;He escrit un gran manual de guerra amb moltes tàctiques militars. Segur que en el futur molta gent l'utilitzarà. Qui sóc?;;;Sun Tsu, Sunzi, Sun Tzu;La guerra és un art;10;Sun Tsu;None;None
+FTI2;AM_FTI;Em considero de les millors novel·listes d'Espanya. He nascut a Corunya i les meves obres posen a les dones com a persones fortes i independents. Qui sóc?;;;Emilia Pedro Bazán, Emilia Pardo Bazán;Un viaje de novios (1881), Los pazos de Ulloa (1886) i La madre naturaleza (1887);10;Emilia Pardo Bazán;None;None
+FTI3;AM_FTI;"Sóc alemany, sóc pedagog, i alguns em diuen ""el pedagog de la innovació"". Qui sóc?";;;Friedrich Fröbel, Freidrich Wilhelm August Fröbel, Friedrich Froebel, Friedrich Wilhelm August Froebel;Kindergarten;10;Friederich Fröbel;None;None
+FTI4;;;;;;;;;None;None
+ETSE1;AM_ETSE;Acabo de fer un quadre que, us prometo, et segueix amb la mirada. Qui sóc?;;;Leonardo da Vinci, da Vinci, Da Vinci;També he creat prototips d’invents de tot tipus.;10;Leonardo da Vinci;None;None
+ETSE2;AM_ETSE;Hi ha un boig que afirma que el CC és millor que el CA, vaig a demostrar-l'hi al món que s'equivoca. Qui sóc?;;;Nikola Tesla, Tesla, Coche espacial;CC=Corrent continu;10;Nikola Tesla;None;None
+ETSE3;AM_ETSE;Sóc la mare a l'algorismia. Qui sóc?;;;Ada Lovelace, Ada lovelace, ada lovelace;També he creat el primer algorítme;10;Ada Lovelace;None;None
+ETSE4;;;;;;;;;None;None
+ETSE5;;;;;;;;;None;None
+FAKE1;AM_ETSE;Quants mods hi ha?;;;8, vuit, Vuit;mira el grup carapan;10;;None;None
+FAKE2;AM_ETSE;On es juga a TimeScape?;;;A la UAB, UAB, Universitat Autònoma de Barcelona;a la uni loco;10;;None;None

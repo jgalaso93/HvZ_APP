@@ -87,10 +87,13 @@ def boop(update, context):
 
 
 def meow(update, context):
-    page = "https://cataas.com/cat"
-    content = requests.get(page)
-    if content.status_code == 200:
-        update.message.reply_photo(content.content)
+    urls = ['https://bit.ly/3jCfF8d', 'https://bit.ly/3nvD4cG', 'https://bit.ly/3nvD6kO', 'https://bit.ly/3mfVUp2', 'https://bit.ly/2ZrpO0E']
+    random_num = randint(0, (len(urls) - 1))
+    pics = scrap_pics(urls[random_num])
+    if pics:
+        image_sender(update, pics)
+    else:
+        slugs(update, context)
 
 
 def ribbit(update, context):

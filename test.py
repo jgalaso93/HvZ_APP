@@ -4,6 +4,7 @@ import sys
 import pandas as pd
 from databases.db_paths import npc_db_file, player_db_file, teams_db_file, \
     conversation_db_file, missions_db_file, npc_conversation_db_file
+from random import randint
 from utils.user_values import all_done_missions
 import requests
 from random import randint
@@ -34,6 +35,45 @@ teams_data = pd.read_csv(teams_db_file, sep=';', header=0, encoding='cp1252', dt
 npc_conversation_data = pd.read_csv(npc_conversation_db_file, sep=';', header=0, encoding='cp1252')
 
 
+bot_id = '981802604'
+a = data[data['BOT_ID'] == bot]['WAKE']
+
+
+#
+# count = 0
+# numbers = dict()
+# for i in range(1001):
+#     numbers[i] = 0
+#
+# print(numbers)
+# while count < 10000000:
+#     n = randint(0, 1000)
+#     numbers[n] += 1
+#     count += 1
+# print(numbers)
+# count = 0
+# for k,v in numbers.items():
+#     if v < 9900:
+#         print(count, k, v)
+#         count += 1
+#     if v > 11000:
+#         print(count, k, v)
+#         count += 1
+# print("\n\n")
+#
+# count = 0
+# for k,v in numbers.items():
+#     if v < 9800:
+#         print(count, k, v)
+#         count += 1
+#     if v > 12000:
+#         print(count, k, v)
+#         count += 1
+
+
+
+
+
 # url = 'https://www.google.com/search?q=babosas&tbm=isch&ved=2ahUKEwiWy8qF_NTzAhUJQhoKHT1ECF0Q2-cCegQIABAA&oq=babosas&gs_lcp=CgNpbWcQAzIFCAAQgAQyBQgAEIAEMgQIABAeMgQIABAeMgQIABAeMgQIABAeMgQIABAeMgQIABAeMgQIABAeMgQIABAeOgcIIxDvAxAnOgYIABAHEB46BAgAEEM6CAgAEIAEELEDOggIABCxAxCDAVCrngFYsacBYKaoAWgAcAB4AIABWIgBkgWSAQE4mAEAoAEBqgELZ3dzLXdpei1pbWfAAQE&sclient=img&ei=0-9tYdaVFYmEab2IoegF&bih=665&biw=1300&rlz=1C1CHBF_esES843ES843'
 # content = requests.get(url)
 #
@@ -61,29 +101,29 @@ npc_conversation_data = pd.read_csv(npc_conversation_db_file, sep=';', header=0,
 # print(only_pics)
 
 
-def scrap_pics(url):
-    content = requests.get(url)
-
-    if content.status_code == 200:
-        soup = BeautifulSoup(content.content, "html.parser")
-
-    content = str(soup).split('<')
-    filtred_content = []
-    for v in content:
-        if 'img' in v and 'https' in v:
-            filtred_content.append(v)
-
-    only_pics = []
-    for fv in filtred_content:
-        s = fv.split("\"")
-        for v in s:
-            if 'https' in v:
-                only_pics.append(v)
-    return only_pics
-
-
-a = scrap_pics('https://bit.ly/3lThJKB')
-print(a)
+# def scrap_pics(url):
+#     content = requests.get(url)
+#
+#     if content.status_code == 200:
+#         soup = BeautifulSoup(content.content, "html.parser")
+#
+#     content = str(soup).split('<')
+#     filtred_content = []
+#     for v in content:
+#         if 'img' in v and 'https' in v:
+#             filtred_content.append(v)
+#
+#     only_pics = []
+#     for fv in filtred_content:
+#         s = fv.split("\"")
+#         for v in s:
+#             if 'https' in v:
+#                 only_pics.append(v)
+#     return only_pics
+#
+#
+# a = scrap_pics('https://bit.ly/3lThJKB')
+# print(a)
 
 # def m_to_pic(done_missions):
 #     ret = dict()
